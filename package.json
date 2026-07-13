@@ -25,7 +25,7 @@
     "tax-table-registry:build": "node scripts/build-tax-table-registry.mjs",
     "tax:longevity-drill": "node scripts/longevity-drill.mjs",
     "tax:import-states": "tsx scripts/import-state-tax-table.mjs",
-    "auth:invite": "tsx scripts/create-registration-invite.ts",
+    "auth:invite": "node --env-file-if-exists=.env.local --import tsx scripts/create-registration-invite.ts",
     "db:migrate": "tsx scripts/migrate.ts",
     "preverify": "pnpm generated-assets:build",
     "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"

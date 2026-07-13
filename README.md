@@ -11,11 +11,11 @@ pnpm install
 export DATABASE_URL='postgresql://...'
 export REGISTRATION_SECRET="$(openssl rand -base64 48)"
 pnpm db:migrate
-pnpm auth:invite -- you@example.com
+pnpm auth:invite
 pnpm dev
 ```
 
-Open `http://localhost:3000` and paste the generated invitation when creating the matching email account. `REGISTRATION_SECRET` is server-only and must contain at least 32 random bytes; keep it stable so the trusted-shell command can mint future email-bound invitations. Migrations must run before the application starts; apply every ordered SQL file in [`migrations/`](migrations/) through `pnpm db:migrate`. Never point automated tests at production: `TEST_DATABASE_URL` defaults to the isolated local `kyle_financial_test` database.
+Open `http://localhost:3000` and paste the generated universal invitation when creating an account. `REGISTRATION_SECRET` is server-only and must contain at least 32 random bytes; keep it stable so the trusted-shell command produces the same invitation. Rotate the secret to invalidate the old invitation and mint a new one. Migrations must run before the application starts; apply every ordered SQL file in [`migrations/`](migrations/) through `pnpm db:migrate`. Never point automated tests at production: `TEST_DATABASE_URL` defaults to the isolated local `kyle_financial_test` database.
 
 ## Verification
 
@@ -55,7 +55,7 @@ pnpm build
 pnpm start
 ```
 
-For Vercel, create or link the project, add `DATABASE_URL` and a random 32+ byte `REGISTRATION_SECRET` as encrypted Production environment variables, and run `pnpm db:migrate` once from a trusted local shell against the production database before deploying. Use that same secret locally with `pnpm auth:invite -- email@example.com` whenever the owner authorizes a new account. Then deploy with `vercel deploy --prod`, exercise invited signup/plan/export/delete on the live URL with disposable data, run the production Lighthouse gate, and perform the iPhone install check. Migrations are ordered and idempotent; never reset the production schema during deployment. Roll back application code by redeploying the prior known-good commit—do not roll back or delete data migrations.
+For Vercel, create or link the project, add `DATABASE_URL` and a random 32+ byte `REGISTRATION_SECRET` as encrypted Production environment variables, and run `pnpm db:migrate` once from a trusted local shell against the production database before deploying. Use that same secret locally with `pnpm auth:invite` to print the universal invitation. Then deploy with `vercel deploy --prod`, exercise invited signup/plan/export/delete on the live URL with disposable data, run the production Lighthouse gate, and perform the iPhone install check. Migrations are ordered and idempotent; never reset the production schema during deployment. Roll back application code by redeploying the prior known-good commit—do not roll back or delete data migrations.
 
 The service worker caches only the public app shell and build assets; `/api/**` and private plan JSON are never stored in Cache Storage. See [architecture](docs/architecture.md), [offline and sync behavior](docs/offline-and-sync.md), and [research sources](docs/research/sources.md).
 

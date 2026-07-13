@@ -87,8 +87,7 @@ export async function registerInvitedUser(
   registrationSecret: string | undefined,
   invitationCode: string,
 ): Promise<void> {
-  if (!isRegistrationInviteValid(registrationSecret, email, invitationCode))
-    return;
+  if (!isRegistrationInviteValid(registrationSecret, invitationCode)) return;
   try {
     await createUser(sql, email, password);
   } catch (error) {

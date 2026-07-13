@@ -5,7 +5,7 @@
 - Domain unit/golden tests assert tax intermediates, explicit zero and threshold boundaries, exact-cent accounting, and display reconciliation.
 - Fast-check properties cover wage/take-home and deduction/take-home monotonicity where mathematically valid, percent/fixed equivalence, sum invariants, and randomized plans.
 - Schema tests prove 50 states plus DC, ordered brackets, valid rates, and citations.
-- DAL integration tests apply migrations to a dedicated local PostgreSQL database, test atomic per-IP/per-identity authentication throttling, concurrent bucket reactivation versus bounded expiry cleanup, email-bound signup invitations, opaque signup and uniform login password verification, auth/session expiry, account isolation, CRUD, unique plan years, deep copy, and export.
+- DAL integration tests apply migrations to a dedicated local PostgreSQL database, test atomic per-IP/per-identity authentication throttling, concurrent bucket reactivation versus bounded expiry cleanup, universal signup invitations, opaque signup and uniform login password verification, auth/session expiry, account isolation, CRUD, unique plan years, deep copy, and export.
 - Offline tests use a fake IndexedDB environment to prove caching, idempotent replay, conflict ordering, and logout deletion.
 - Component tests cover instant recomputation and accessible controls where browser E2E is not the stronger proof.
 - `pnpm verify` runs format check, lint, typecheck, all tests, and production build.

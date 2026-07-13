@@ -65,10 +65,7 @@ describe("account authentication", () => {
       "invitation-existing@example.com",
       "existing account password",
     );
-    const wrongInvitation = createRegistrationInvite(
-      secret,
-      "different@example.com",
-    );
+    const wrongInvitation = "x".repeat(43);
 
     await registerInvitedUser(
       sql,
@@ -98,18 +95,30 @@ describe("account authentication", () => {
       invitedEmail,
       submittedPassword,
       secret,
-      createRegistrationInvite(secret, invitedEmail),
+      createRegistrationInvite(secret),
     );
     await expect(
       authenticateUser(sql, invitedEmail, submittedPassword),
     ).resolves.toMatchObject({ email: invitedEmail });
+
+    const secondInvitedEmail = "second-invitation-authorized@example.com";
+    await registerInvitedUser(
+      sql,
+      secondInvitedEmail,
+      submittedPassword,
+      secret,
+      createRegistrationInvite(secret),
+    );
+    await expect(
+      authenticateUser(sql, secondInvitedEmail, submittedPassword),
+    ).resolves.toMatchObject({ email: secondInvitedEmail });
 
     await registerInvitedUser(
       sql,
       existing.email,
       submittedPassword,
       secret,
-      createRegistrationInvite(secret, existing.email),
+      createRegistrationInvite(secret),
     );
     await expect(
       authenticateUser(sql, existing.email, "existing account password"),

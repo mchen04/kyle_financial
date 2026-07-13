@@ -17,22 +17,17 @@ function requireRegistrationSecret(secret: string | undefined): string {
   return secret;
 }
 
-export function createRegistrationInvite(
-  secret: string | undefined,
-  email: string,
-): string {
+export function createRegistrationInvite(secret: string | undefined): string {
   return createHmac("sha256", requireRegistrationSecret(secret))
     .update(INVITE_CONTEXT)
-    .update(email.trim().toLowerCase())
     .digest("base64url");
 }
 
 export function isRegistrationInviteValid(
   secret: string | undefined,
-  email: string,
   candidate: string,
 ): boolean {
-  const expected = Buffer.from(createRegistrationInvite(secret, email));
+  const expected = Buffer.from(createRegistrationInvite(secret));
   const provided = Buffer.from(candidate.trim());
   return (
     provided.length === expected.length && timingSafeEqual(provided, expected)

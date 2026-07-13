@@ -43,7 +43,7 @@ function signupRequest(): Request {
     body: JSON.stringify({
       email: "New@Example.com",
       password: "correct horse battery staple",
-      invitationCode: "email-bound-invitation-code",
+      invitationCode: "universal-invitation-code",
     }),
   });
 }
@@ -114,7 +114,7 @@ describe("signup throttling", () => {
       "new@example.com",
       "correct horse battery staple",
       undefined,
-      "email-bound-invitation-code",
+      "universal-invitation-code",
     );
     await expect(response.json()).resolves.toEqual({ accepted: true });
     expect(response.headers.get("set-cookie")).toBeNull();
