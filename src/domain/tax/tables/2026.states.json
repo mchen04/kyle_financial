@@ -1,0 +1,3710 @@
+{
+  "year": 2026,
+  "states": {
+    "AK": {
+      "code": "AK",
+      "name": "Alaska",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        }
+      }
+    },
+    "AL": {
+      "code": "AL",
+      "name": "Alabama",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 300000,
+          "personalExemptionCents": 150000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 50000,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 300000,
+              "ratePpm": 50000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 850000,
+          "personalExemptionCents": 300000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 100000,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 600000,
+              "ratePpm": 50000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 300000,
+          "personalExemptionCents": 150000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 50000,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 300000,
+              "ratePpm": 50000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "AR": {
+      "code": "AR",
+      "name": "Arkansas",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 247000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 460000,
+              "ratePpm": 39000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 494000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 460000,
+              "ratePpm": 39000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 247000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 460000,
+              "ratePpm": 39000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "AZ": {
+      "code": "AZ",
+      "name": "Arizona",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 835000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 25000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 1670000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 25000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 835000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 25000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "CA": {
+      "code": "CA",
+      "name": "California",
+      "benefitStateTaxOverrides": { "hsa": false, "employerHsa": false },
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026", "CA_FTB_HSA_2025"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 554000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 10000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1107900,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2626400,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4145200,
+              "ratePpm": 60000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 5754200,
+              "ratePpm": 80000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 7272400,
+              "ratePpm": 93000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 37147900,
+              "ratePpm": 103000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 44577100,
+              "ratePpm": 113000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 74295300,
+              "ratePpm": 123000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 100000000,
+              "ratePpm": 133000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 1108000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 10000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2215800,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 5252800,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 8290400,
+              "ratePpm": 60000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 11508400,
+              "ratePpm": 80000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 14544800,
+              "ratePpm": 93000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 74295800,
+              "ratePpm": 103000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 89154200,
+              "ratePpm": 113000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 100000000,
+              "ratePpm": 123000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 148590600,
+              "ratePpm": 133000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 554000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 10000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1107900,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2626400,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4145200,
+              "ratePpm": 60000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 5754200,
+              "ratePpm": 80000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 7272400,
+              "ratePpm": 93000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 37147900,
+              "ratePpm": 103000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 44577100,
+              "ratePpm": 113000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 74295300,
+              "ratePpm": 123000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 100000000,
+              "ratePpm": 133000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "CO": {
+      "code": "CO",
+      "name": "Colorado",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 1610000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 44000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 3220000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 44000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 1610000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 44000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "CT": {
+      "code": "CT",
+      "name": "Connecticut",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 1500000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1000000,
+              "ratePpm": 45000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 5000000,
+              "ratePpm": 55000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 10000000,
+              "ratePpm": 60000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 20000000,
+              "ratePpm": 65000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 25000000,
+              "ratePpm": 69000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 50000000,
+              "ratePpm": 69900,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 2400000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2000000,
+              "ratePpm": 45000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 10000000,
+              "ratePpm": 55000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 20000000,
+              "ratePpm": 60000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 40000000,
+              "ratePpm": 65000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 50000000,
+              "ratePpm": 69000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 100000000,
+              "ratePpm": 69900,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 1500000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1000000,
+              "ratePpm": 45000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 5000000,
+              "ratePpm": 55000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 10000000,
+              "ratePpm": 60000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 20000000,
+              "ratePpm": 65000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 25000000,
+              "ratePpm": 69000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 50000000,
+              "ratePpm": 69900,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "DC": {
+      "code": "DC",
+      "name": "Washington DC",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 1610000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1000000,
+              "ratePpm": 60000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4000000,
+              "ratePpm": 65000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 6000000,
+              "ratePpm": 85000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 25000000,
+              "ratePpm": 92500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 50000000,
+              "ratePpm": 97500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 100000000,
+              "ratePpm": 107500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 3220000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1000000,
+              "ratePpm": 60000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4000000,
+              "ratePpm": 65000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 6000000,
+              "ratePpm": 85000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 25000000,
+              "ratePpm": 92500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 50000000,
+              "ratePpm": 97500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 100000000,
+              "ratePpm": 107500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 1610000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1000000,
+              "ratePpm": 60000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4000000,
+              "ratePpm": 65000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 6000000,
+              "ratePpm": 85000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 25000000,
+              "ratePpm": 92500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 50000000,
+              "ratePpm": 97500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 100000000,
+              "ratePpm": 107500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "DE": {
+      "code": "DE",
+      "name": "Delaware",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 325000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 200000,
+              "ratePpm": 22000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 500000,
+              "ratePpm": 39000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1000000,
+              "ratePpm": 48000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2000000,
+              "ratePpm": 52000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2500000,
+              "ratePpm": 55500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 6000000,
+              "ratePpm": 66000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 650000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 200000,
+              "ratePpm": 22000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 500000,
+              "ratePpm": 39000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1000000,
+              "ratePpm": 48000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2000000,
+              "ratePpm": 52000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2500000,
+              "ratePpm": 55500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 6000000,
+              "ratePpm": 66000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 325000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 200000,
+              "ratePpm": 22000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 500000,
+              "ratePpm": 39000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1000000,
+              "ratePpm": 48000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2000000,
+              "ratePpm": 52000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2500000,
+              "ratePpm": 55500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 6000000,
+              "ratePpm": 66000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "FL": {
+      "code": "FL",
+      "name": "Florida",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        }
+      }
+    },
+    "GA": {
+      "code": "GA",
+      "name": "Georgia",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 1200000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 51900,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 2400000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 51900,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 1200000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 51900,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "HI": {
+      "code": "HI",
+      "name": "Hawaii",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 440000,
+          "personalExemptionCents": 114400,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 14000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 960000,
+              "ratePpm": 32000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1440000,
+              "ratePpm": 55000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1920000,
+              "ratePpm": 64000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2400000,
+              "ratePpm": 68000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 3600000,
+              "ratePpm": 72000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4800000,
+              "ratePpm": 76000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 12500000,
+              "ratePpm": 79000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 17500000,
+              "ratePpm": 82500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 22500000,
+              "ratePpm": 90000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 27500000,
+              "ratePpm": 100000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 32500000,
+              "ratePpm": 110000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 880000,
+          "personalExemptionCents": 228800,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 14000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1920000,
+              "ratePpm": 32000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2880000,
+              "ratePpm": 55000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 3840000,
+              "ratePpm": 64000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4800000,
+              "ratePpm": 68000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 7200000,
+              "ratePpm": 72000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 9600000,
+              "ratePpm": 76000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 25000000,
+              "ratePpm": 79000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 35000000,
+              "ratePpm": 82500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 45000000,
+              "ratePpm": 90000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 55000000,
+              "ratePpm": 100000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 65000000,
+              "ratePpm": 110000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 440000,
+          "personalExemptionCents": 114400,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 14000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 960000,
+              "ratePpm": 32000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1440000,
+              "ratePpm": 55000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1920000,
+              "ratePpm": 64000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2400000,
+              "ratePpm": 68000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 3600000,
+              "ratePpm": 72000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4800000,
+              "ratePpm": 76000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 12500000,
+              "ratePpm": 79000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 17500000,
+              "ratePpm": 82500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 22500000,
+              "ratePpm": 90000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 27500000,
+              "ratePpm": 100000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 32500000,
+              "ratePpm": 110000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "IA": {
+      "code": "IA",
+      "name": "Iowa",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 1610000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 38000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 3220000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 38000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 1610000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 38000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "ID": {
+      "code": "ID",
+      "name": "Idaho",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 1610000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 481100,
+              "ratePpm": 53000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 3220000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 962200,
+              "ratePpm": 53000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 1610000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 481100,
+              "ratePpm": 53000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "IL": {
+      "code": "IL",
+      "name": "Illinois",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 292500,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 49500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 585000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 49500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 292500,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 49500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "IN": {
+      "code": "IN",
+      "name": "Indiana",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 100000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 29500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 200000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 29500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 100000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 29500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "KS": {
+      "code": "KS",
+      "name": "Kansas",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 360500,
+          "personalExemptionCents": 916000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 52000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2300000,
+              "ratePpm": 55800,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 824000,
+          "personalExemptionCents": 1832000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 52000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4600000,
+              "ratePpm": 55800,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 360500,
+          "personalExemptionCents": 916000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 52000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2300000,
+              "ratePpm": 55800,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "KY": {
+      "code": "KY",
+      "name": "Kentucky",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 336000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 35000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 336000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 35000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 336000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 35000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "LA": {
+      "code": "LA",
+      "name": "Louisiana",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 1287500,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 30000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 2575000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 30000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 1287500,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 30000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "MA": {
+      "code": "MA",
+      "name": "Massachusetts",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 440000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 50000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 108315000,
+              "ratePpm": 90000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 880000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 50000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 108315000,
+              "ratePpm": 90000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 440000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 50000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 108315000,
+              "ratePpm": 90000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "MD": {
+      "code": "MD",
+      "name": "Maryland",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 335000,
+          "personalExemptionCents": 320000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 100000,
+              "ratePpm": 30000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 200000,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 300000,
+              "ratePpm": 47500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 10000000,
+              "ratePpm": 50000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 12500000,
+              "ratePpm": 52500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 15000000,
+              "ratePpm": 55000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 25000000,
+              "ratePpm": 57500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 50000000,
+              "ratePpm": 62500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 100000000,
+              "ratePpm": 65000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 670000,
+          "personalExemptionCents": 640000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 100000,
+              "ratePpm": 30000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 200000,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 300000,
+              "ratePpm": 47500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 15000000,
+              "ratePpm": 50000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 17500000,
+              "ratePpm": 52500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 22500000,
+              "ratePpm": 55000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 30000000,
+              "ratePpm": 57500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 60000000,
+              "ratePpm": 62500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 120000000,
+              "ratePpm": 65000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 335000,
+          "personalExemptionCents": 320000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 100000,
+              "ratePpm": 30000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 200000,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 300000,
+              "ratePpm": 47500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 10000000,
+              "ratePpm": 50000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 12500000,
+              "ratePpm": 52500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 15000000,
+              "ratePpm": 55000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 25000000,
+              "ratePpm": 57500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 50000000,
+              "ratePpm": 62500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 100000000,
+              "ratePpm": 65000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "ME": {
+      "code": "ME",
+      "name": "Maine",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 835000,
+          "personalExemptionCents": 530000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 58000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2739900,
+              "ratePpm": 67500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 6484900,
+              "ratePpm": 71500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 1670000,
+          "personalExemptionCents": 1060000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 58000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 5484900,
+              "ratePpm": 67500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 12974900,
+              "ratePpm": 71500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 835000,
+          "personalExemptionCents": 530000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 58000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2739900,
+              "ratePpm": 67500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 6484900,
+              "ratePpm": 71500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "MI": {
+      "code": "MI",
+      "name": "Michigan",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 590000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 42500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 1180000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 42500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 590000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 42500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "MN": {
+      "code": "MN",
+      "name": "Minnesota",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 1530000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 53500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 3331000,
+              "ratePpm": 68000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 10943000,
+              "ratePpm": 78500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 20315000,
+              "ratePpm": 98500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 3060000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 53500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4870000,
+              "ratePpm": 68000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 19348000,
+              "ratePpm": 78500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 33793000,
+              "ratePpm": 98500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 1530000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 53500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 3331000,
+              "ratePpm": 68000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 10943000,
+              "ratePpm": 78500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 20315000,
+              "ratePpm": 98500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "MO": {
+      "code": "MO",
+      "name": "Missouri",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 1610000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 134800,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 269600,
+              "ratePpm": 25000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 404400,
+              "ratePpm": 30000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 539200,
+              "ratePpm": 35000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 674000,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 808800,
+              "ratePpm": 45000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 943600,
+              "ratePpm": 47000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 3220000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 134800,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 269600,
+              "ratePpm": 25000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 404400,
+              "ratePpm": 30000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 539200,
+              "ratePpm": 35000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 674000,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 808800,
+              "ratePpm": 45000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 943600,
+              "ratePpm": 47000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 1610000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 134800,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 269600,
+              "ratePpm": 25000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 404400,
+              "ratePpm": 30000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 539200,
+              "ratePpm": 35000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 674000,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 808800,
+              "ratePpm": 45000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 943600,
+              "ratePpm": 47000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "MS": {
+      "code": "MS",
+      "name": "Mississippi",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 230000,
+          "personalExemptionCents": 600000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 1000000,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 460000,
+          "personalExemptionCents": 1200000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 1000000,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 230000,
+          "personalExemptionCents": 600000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 1000000,
+              "ratePpm": 40000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "MT": {
+      "code": "MT",
+      "name": "Montana",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 1610000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 47000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4750000,
+              "ratePpm": 56500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 3220000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 47000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 9500000,
+              "ratePpm": 56500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 1610000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 47000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4750000,
+              "ratePpm": 56500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "NC": {
+      "code": "NC",
+      "name": "North Carolina",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 1275000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 39900,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 2550000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 39900,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 1275000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 39900,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "ND": {
+      "code": "ND",
+      "name": "North Dakota",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 1610000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 4847500,
+              "ratePpm": 19500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 24482500,
+              "ratePpm": 25000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 3220000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 8097500,
+              "ratePpm": 19500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 29807500,
+              "ratePpm": 25000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 1610000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 4847500,
+              "ratePpm": 19500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 24482500,
+              "ratePpm": 25000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "NE": {
+      "code": "NE",
+      "name": "Nebraska",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 885000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 24600,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 413000,
+              "ratePpm": 35100,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2476000,
+              "ratePpm": 45500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 1770000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 24600,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 825000,
+              "ratePpm": 35100,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4953000,
+              "ratePpm": 45500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 885000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 24600,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 413000,
+              "ratePpm": 35100,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2476000,
+              "ratePpm": 45500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "NH": {
+      "code": "NH",
+      "name": "New Hampshire",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        }
+      }
+    },
+    "NJ": {
+      "code": "NJ",
+      "name": "New Jersey",
+      "benefitStateTaxOverrides": { "hsa": false, "employerHsa": false },
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026", "NJ_1040_2025"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 100000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 14000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2000000,
+              "ratePpm": 17500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 3500000,
+              "ratePpm": 35000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4000000,
+              "ratePpm": 55300,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 7500000,
+              "ratePpm": 63700,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 50000000,
+              "ratePpm": 89700,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 100000000,
+              "ratePpm": 107500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 200000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 14000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2000000,
+              "ratePpm": 17500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 5000000,
+              "ratePpm": 24500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 7000000,
+              "ratePpm": 35000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 8000000,
+              "ratePpm": 55300,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 15000000,
+              "ratePpm": 63700,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 50000000,
+              "ratePpm": 89700,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 100000000,
+              "ratePpm": 107500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 100000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 14000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2000000,
+              "ratePpm": 17500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 3500000,
+              "ratePpm": 35000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4000000,
+              "ratePpm": 55300,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 7500000,
+              "ratePpm": 63700,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 50000000,
+              "ratePpm": 89700,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 100000000,
+              "ratePpm": 107500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "NM": {
+      "code": "NM",
+      "name": "New Mexico",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 1610000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 15000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 550000,
+              "ratePpm": 32000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1650000,
+              "ratePpm": 43000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 3350000,
+              "ratePpm": 47000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 6650000,
+              "ratePpm": 49000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 21000000,
+              "ratePpm": 59000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 3220000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 15000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 800000,
+              "ratePpm": 32000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2500000,
+              "ratePpm": 43000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 5000000,
+              "ratePpm": 47000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 10000000,
+              "ratePpm": 49000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 31500000,
+              "ratePpm": 59000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 1610000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 15000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 550000,
+              "ratePpm": 32000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1650000,
+              "ratePpm": 43000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 3350000,
+              "ratePpm": 47000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 6650000,
+              "ratePpm": 49000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 21000000,
+              "ratePpm": 59000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "NV": {
+      "code": "NV",
+      "name": "Nevada",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        }
+      }
+    },
+    "NY": {
+      "code": "NY",
+      "name": "New York",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 800000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 39000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 850000,
+              "ratePpm": 44000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1170000,
+              "ratePpm": 51500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1390000,
+              "ratePpm": 54000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 8065000,
+              "ratePpm": 59000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 21540000,
+              "ratePpm": 68500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 107755000,
+              "ratePpm": 96500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 500000000,
+              "ratePpm": 103000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2500000000,
+              "ratePpm": 109000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 1605000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 39000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1715000,
+              "ratePpm": 44000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2360000,
+              "ratePpm": 51500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2790000,
+              "ratePpm": 54000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 16155000,
+              "ratePpm": 59000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 32320000,
+              "ratePpm": 68500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 215535000,
+              "ratePpm": 96500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 500000000,
+              "ratePpm": 103000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2500000000,
+              "ratePpm": 109000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 800000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 39000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 850000,
+              "ratePpm": 44000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1170000,
+              "ratePpm": 51500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1390000,
+              "ratePpm": 54000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 8065000,
+              "ratePpm": 59000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 21540000,
+              "ratePpm": 68500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 107755000,
+              "ratePpm": 96500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 500000000,
+              "ratePpm": 103000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2500000000,
+              "ratePpm": 109000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "OH": {
+      "code": "OH",
+      "name": "Ohio",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 240000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 2605000,
+              "ratePpm": 27500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 480000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 2605000,
+              "ratePpm": 27500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 240000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 2605000,
+              "ratePpm": 27500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "OK": {
+      "code": "OK",
+      "name": "Oklahoma",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 635000,
+          "personalExemptionCents": 100000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 375000,
+              "ratePpm": 25000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 490000,
+              "ratePpm": 35000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 720000,
+              "ratePpm": 45000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 1270000,
+          "personalExemptionCents": 200000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 750000,
+              "ratePpm": 25000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 980000,
+              "ratePpm": 35000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1440000,
+              "ratePpm": 45000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 635000,
+          "personalExemptionCents": 100000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 375000,
+              "ratePpm": 25000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 490000,
+              "ratePpm": 35000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 720000,
+              "ratePpm": 45000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "OR": {
+      "code": "OR",
+      "name": "Oregon",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 291000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 47500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 455000,
+              "ratePpm": 67500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1140000,
+              "ratePpm": 87500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 12500000,
+              "ratePpm": 99000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 582000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 47500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 910000,
+              "ratePpm": 67500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2280000,
+              "ratePpm": 87500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 25000000,
+              "ratePpm": 99000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 291000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 47500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 455000,
+              "ratePpm": 67500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1140000,
+              "ratePpm": 87500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 12500000,
+              "ratePpm": 99000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "PA": {
+      "code": "PA",
+      "name": "Pennsylvania",
+      "benefitStateTaxOverrides": {
+        "traditional401k": false,
+        "dependentCareFsa": false,
+        "commuter": false,
+        "commuterParking": false
+      },
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": [
+        "TF_STATE_2026",
+        "PA_GROSS_COMP_2026",
+        "PA_HSA_DEDUCTIONS_2026",
+        "PA_HSA_RULING_2006"
+      ],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 30700,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 30700,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 30700,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "RI": {
+      "code": "RI",
+      "name": "Rhode Island",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 1120000,
+          "personalExemptionCents": 525000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 37500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 8205000,
+              "ratePpm": 47500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 18645000,
+              "ratePpm": 59900,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 2240000,
+          "personalExemptionCents": 1050000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 37500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 8205000,
+              "ratePpm": 47500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 18645000,
+              "ratePpm": 59900,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 1120000,
+          "personalExemptionCents": 525000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 37500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 8205000,
+              "ratePpm": 47500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 18645000,
+              "ratePpm": 59900,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "SC": {
+      "code": "SC",
+      "name": "South Carolina",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 835000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 0,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 364000,
+              "ratePpm": 30000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1823000,
+              "ratePpm": 60000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 1670000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 0,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 364000,
+              "ratePpm": 30000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1823000,
+              "ratePpm": 60000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 835000,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 0,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 364000,
+              "ratePpm": 30000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1823000,
+              "ratePpm": 60000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "SD": {
+      "code": "SD",
+      "name": "South Dakota",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        }
+      }
+    },
+    "TN": {
+      "code": "TN",
+      "name": "Tennessee",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        }
+      }
+    },
+    "TX": {
+      "code": "TX",
+      "name": "Texas",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        }
+      }
+    },
+    "UT": {
+      "code": "UT",
+      "name": "Utah",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 45000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 45000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 45000,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "VA": {
+      "code": "VA",
+      "name": "Virginia",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 875000,
+          "personalExemptionCents": 93000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 300000,
+              "ratePpm": 30000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 500000,
+              "ratePpm": 50000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1700000,
+              "ratePpm": 57500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 1750000,
+          "personalExemptionCents": 186000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 300000,
+              "ratePpm": 30000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 500000,
+              "ratePpm": 50000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1700000,
+              "ratePpm": 57500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 875000,
+          "personalExemptionCents": 93000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 20000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 300000,
+              "ratePpm": 30000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 500000,
+              "ratePpm": 50000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1700000,
+              "ratePpm": 57500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "VT": {
+      "code": "VT",
+      "name": "Vermont",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 765000,
+          "personalExemptionCents": 530000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 33500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4940000,
+              "ratePpm": 66000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 11970000,
+              "ratePpm": 76000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 24970000,
+              "ratePpm": 87500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 1530000,
+          "personalExemptionCents": 1060000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 33500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 8250000,
+              "ratePpm": 66000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 19945000,
+              "ratePpm": 76000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 30400000,
+              "ratePpm": 87500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 765000,
+          "personalExemptionCents": 530000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 33500,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4940000,
+              "ratePpm": 66000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 11970000,
+              "ratePpm": 76000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 24970000,
+              "ratePpm": 87500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "WA": {
+      "code": "WA",
+      "name": "Washington",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        }
+      }
+    },
+    "WI": {
+      "code": "WI",
+      "name": "Wisconsin",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 1396000,
+          "personalExemptionCents": 70000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 35000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1511000,
+              "ratePpm": 44000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 5195000,
+              "ratePpm": 53000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 33272000,
+              "ratePpm": 76500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 2584000,
+          "personalExemptionCents": 140000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 35000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2015000,
+              "ratePpm": 44000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 6926000,
+              "ratePpm": 53000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 44363000,
+              "ratePpm": 76500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 1396000,
+          "personalExemptionCents": 70000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 35000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1511000,
+              "ratePpm": 44000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 5195000,
+              "ratePpm": 53000,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 33272000,
+              "ratePpm": 76500,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "WV": {
+      "code": "WV",
+      "name": "West Virginia",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 200000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 22200,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1000000,
+              "ratePpm": 29600,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2500000,
+              "ratePpm": 33300,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4000000,
+              "ratePpm": 44400,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 6000000,
+              "ratePpm": 48200,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 400000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 22200,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1000000,
+              "ratePpm": 29600,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2500000,
+              "ratePpm": 33300,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4000000,
+              "ratePpm": 44400,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 6000000,
+              "ratePpm": 48200,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 200000,
+          "citations": ["TF_STATE_2026"],
+          "brackets": [
+            {
+              "thresholdCents": 0,
+              "ratePpm": 22200,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 1000000,
+              "ratePpm": 29600,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 2500000,
+              "ratePpm": 33300,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 4000000,
+              "ratePpm": 44400,
+              "citations": ["TF_STATE_2026"]
+            },
+            {
+              "thresholdCents": 6000000,
+              "ratePpm": 48200,
+              "citations": ["TF_STATE_2026"]
+            }
+          ]
+        }
+      }
+    },
+    "WY": {
+      "code": "WY",
+      "name": "Wyoming",
+      "approximation": "Planning estimate using published brackets, standard deduction, and dollar personal exemption only; credits, recapture, phase-outs, local tax, and special deductions are excluded.",
+      "citations": ["TF_STATE_2026"],
+      "filingStatuses": {
+        "single": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "mfj": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        },
+        "hoh": {
+          "standardDeductionCents": 0,
+          "personalExemptionCents": 0,
+          "citations": ["TF_STATE_2026"],
+          "brackets": []
+        }
+      }
+    }
+  }
+}

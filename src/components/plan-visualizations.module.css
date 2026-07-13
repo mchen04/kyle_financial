@@ -1,0 +1,98 @@
+.flow {
+  min-width: 0;
+  grid-column: 1 / -1;
+}
+.flowLabels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 7px;
+  color: var(--ink-soft);
+  font: 10px/1 var(--data);
+}
+.flowRail {
+  height: 11px;
+  display: flex;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #e8edf2;
+}
+.flowRail > span {
+  min-width: 0;
+  transition: width 0.18s ease;
+}
+.flowLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 8px;
+  color: var(--ink-soft);
+  font-size: 10px;
+}
+.flowLegend span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.flowLegend i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.muted {
+  composes: muted from "./surface-primitives.module.css";
+}
+.eyebrow {
+  composes: eyebrow from "./surface-primitives.module.css";
+}
+.guidance {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+.guidance > p:nth-child(2) {
+  margin: -2px 0 15px;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+.guidance > div {
+  display: grid;
+  gap: 14px;
+}
+.guidance span {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 5px;
+  padding-bottom: 7px;
+  color: var(--ink-soft);
+  font-size: 11px;
+}
+.guidance span::after,
+.guidance span i {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 4px;
+  border-radius: 9px;
+}
+.guidance span::after {
+  width: 100%;
+  background: #e9eef2;
+}
+.guidance span i {
+  z-index: 1;
+  background: var(--blue);
+}
+.guidance strong {
+  color: var(--ink);
+}
+
+@media (max-width: 600px) {
+  .flowLabels span:last-child {
+    display: none;
+  }
+  .flowLegend span:nth-child(n + 3):not(:last-child) {
+    display: none;
+  }
+}

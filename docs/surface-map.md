@@ -24,8 +24,8 @@ The initial idea used a prominent gradient savings card. It was removed during s
 7. Expense ledger: grouped rows, monthly/yearly cadence, add, inline edit, rename, reorder, delete.
 8. Guidance: 50/30/20 comparison, informational language, category-group totals.
 9. Year controls: plan picker, copy next year confirmation, prior-year integrity, year comparison.
-10. Data/account: sync status, JSON export, logout, iOS installation instructions.
-11. Operational states: loading skeleton, no plan, API error with retry, offline cached, offline pending edits, reconnecting, synced, update available.
+10. Data/account: sync status, all-years JSON export with explicit failure recovery, logout, permanent account/data deletion, iOS installation instructions.
+11. Operational states: branded loading, no plan, invalid credentials, export error, offline cached, offline pending edits, sync failure with retry, synced, update available.
 12. Edge states: negative savings, zero income, deductions above income, tax-limit warnings, unavailable tax year fallback.
 
 ## Responsive composition
@@ -42,4 +42,3 @@ Phone                                Desktop
 ```
 
 The 320px layout collapses labels before values, never the values themselves. Landscape uses a two-column answer/ledger split. Tablet and desktop expose assumptions beside the ledger rather than stretching a phone column.
-

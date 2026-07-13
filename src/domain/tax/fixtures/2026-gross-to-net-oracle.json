@@ -1,0 +1,172 @@
+[
+  {
+    "id": "tx-single-100k",
+    "input": {
+      "grossSalaryCents": 10000000,
+      "filingStatus": "single",
+      "stateCode": "TX"
+    },
+    "expected": {
+      "grossIncomeCents": 10000000,
+      "federalTaxableIncomeCents": 8390000,
+      "stateTaxableIncomeCents": 10000000,
+      "ficaTaxableWagesCents": 10000000,
+      "federalBracketTaxes": [
+        [1240000, 124000],
+        [3800000, 456000],
+        [3350000, 737000],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0]
+      ],
+      "federalIncomeTaxCents": 1317000,
+      "socialSecurityTaxCents": 620000,
+      "medicareTaxCents": 145000,
+      "additionalMedicareTaxCents": 0,
+      "ficaTaxCents": 765000,
+      "stateIncomeTaxCents": 0,
+      "totalTaxCents": 2082000,
+      "takeHomeAnnualCents": 7918000,
+      "takeHomeMonthlyCents": 659833,
+      "cashSavingsAnnualCents": 7918000,
+      "savingsMonthlyCents": 659833
+    }
+  },
+  {
+    "id": "il-mfj-180k",
+    "input": {
+      "grossSalaryCents": 18000000,
+      "filingStatus": "mfj",
+      "stateCode": "IL"
+    },
+    "expected": {
+      "grossIncomeCents": 18000000,
+      "federalTaxableIncomeCents": 14780000,
+      "stateTaxableIncomeCents": 17415000,
+      "ficaTaxableWagesCents": 18000000,
+      "federalBracketTaxes": [
+        [2480000, 248000],
+        [7600000, 912000],
+        [4700000, 1034000],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0]
+      ],
+      "federalIncomeTaxCents": 2194000,
+      "socialSecurityTaxCents": 1116000,
+      "medicareTaxCents": 261000,
+      "additionalMedicareTaxCents": 0,
+      "ficaTaxCents": 1377000,
+      "stateIncomeTaxCents": 862043,
+      "totalTaxCents": 4433043,
+      "takeHomeAnnualCents": 13566957,
+      "takeHomeMonthlyCents": 1130580,
+      "cashSavingsAnnualCents": 13566957,
+      "savingsMonthlyCents": 1130580
+    }
+  },
+  {
+    "id": "ca-single-150k",
+    "input": {
+      "grossSalaryCents": 15000000,
+      "filingStatus": "single",
+      "stateCode": "CA"
+    },
+    "expected": {
+      "grossIncomeCents": 15000000,
+      "federalTaxableIncomeCents": 13390000,
+      "stateTaxableIncomeCents": 14446000,
+      "ficaTaxableWagesCents": 15000000,
+      "federalBracketTaxes": [
+        [1240000, 124000],
+        [3800000, 456000],
+        [5530000, 1216600],
+        [2820000, 676800],
+        [0, 0],
+        [0, 0],
+        [0, 0]
+      ],
+      "federalIncomeTaxCents": 2473400,
+      "socialSecurityTaxCents": 930000,
+      "medicareTaxCents": 217500,
+      "additionalMedicareTaxCents": 0,
+      "ficaTaxCents": 1147500,
+      "stateIncomeTaxCents": 987342,
+      "totalTaxCents": 4608242,
+      "takeHomeAnnualCents": 10391758,
+      "takeHomeMonthlyCents": 865980,
+      "cashSavingsAnnualCents": 10391758,
+      "savingsMonthlyCents": 865980
+    }
+  },
+  {
+    "id": "ny-mfj-250k",
+    "input": {
+      "grossSalaryCents": 25000000,
+      "filingStatus": "mfj",
+      "stateCode": "NY"
+    },
+    "expected": {
+      "grossIncomeCents": 25000000,
+      "federalTaxableIncomeCents": 21780000,
+      "stateTaxableIncomeCents": 23395000,
+      "ficaTaxableWagesCents": 25000000,
+      "federalBracketTaxes": [
+        [2480000, 248000],
+        [7600000, 912000],
+        [11060000, 2433200],
+        [640000, 153600],
+        [0, 0],
+        [0, 0],
+        [0, 0]
+      ],
+      "federalIncomeTaxCents": 3746800,
+      "socialSecurityTaxCents": 1143900,
+      "medicareTaxCents": 362500,
+      "additionalMedicareTaxCents": 0,
+      "ficaTaxCents": 1506400,
+      "stateIncomeTaxCents": 1266280,
+      "totalTaxCents": 6519480,
+      "takeHomeAnnualCents": 18480520,
+      "takeHomeMonthlyCents": 1540043,
+      "cashSavingsAnnualCents": 18480520,
+      "savingsMonthlyCents": 1540043
+    }
+  },
+  {
+    "id": "fl-single-300k",
+    "input": {
+      "grossSalaryCents": 30000000,
+      "filingStatus": "single",
+      "stateCode": "FL"
+    },
+    "expected": {
+      "grossIncomeCents": 30000000,
+      "federalTaxableIncomeCents": 28390000,
+      "stateTaxableIncomeCents": 30000000,
+      "ficaTaxableWagesCents": 30000000,
+      "federalBracketTaxes": [
+        [1240000, 124000],
+        [3800000, 456000],
+        [5530000, 1216600],
+        [9607500, 2305800],
+        [5445000, 1742400],
+        [2767500, 968625],
+        [0, 0]
+      ],
+      "federalIncomeTaxCents": 6813425,
+      "socialSecurityTaxCents": 1143900,
+      "medicareTaxCents": 435000,
+      "additionalMedicareTaxCents": 90000,
+      "ficaTaxCents": 1668900,
+      "stateIncomeTaxCents": 0,
+      "totalTaxCents": 8482325,
+      "takeHomeAnnualCents": 21517675,
+      "takeHomeMonthlyCents": 1793140,
+      "cashSavingsAnnualCents": 21517675,
+      "savingsMonthlyCents": 1793140
+    }
+  }
+]

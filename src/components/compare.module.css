@@ -1,0 +1,215 @@
+.eyebrow {
+  composes: eyebrow from "./surface-primitives.module.css";
+}
+
+.muted {
+  composes: muted from "./surface-primitives.module.css";
+}
+
+.wideCard {
+  composes: wideCard from "./surface-primitives.module.css";
+}
+
+.compareTable {
+  margin-top: 30px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-gutter: stable;
+  overscroll-behavior-inline: contain;
+}
+
+.comparisonScrollHint {
+  width: fit-content;
+  margin: 12px 0 -18px;
+  padding: 6px 9px;
+  border-radius: 8px;
+  background: var(--sky);
+  color: var(--blue-dark);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.compareTable > div {
+  width: max-content;
+  min-width: 100%;
+  min-height: 58px;
+  display: grid;
+  align-items: center;
+  gap: 16px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+
+.compareTable > div > span:first-child {
+  position: sticky;
+  z-index: 1;
+  left: 0;
+  background: var(--surface);
+}
+
+.compareHeader > span:first-child {
+  background: var(--paper);
+}
+
+.compareHeader {
+  color: var(--ink-soft);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.positiveText {
+  color: var(--teal);
+}
+
+.negativeText {
+  color: var(--amber);
+}
+
+.compareCards {
+  display: none;
+}
+
+.compareDelta {
+  display: none;
+}
+
+.compareCard {
+  border: 1px solid var(--line);
+  border-radius: 15px 15px 5px 15px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.compareCardHeading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.compareCardHeading h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.compareCardHeading span {
+  color: var(--ink-soft);
+  font-size: 11px;
+}
+
+.compareCard dl {
+  margin: 0;
+}
+
+.compareCard dl > div {
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 15px;
+  border-bottom: 1px solid #e9eef2;
+}
+
+.compareCard dl > div:last-child {
+  border-bottom: 0;
+}
+
+.compareCard dt {
+  min-width: 0;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.compareCard dd {
+  margin: 0;
+  font: 600 13px/1.2 var(--data);
+  text-align: right;
+}
+
+.compareCard .compareCardAnswer {
+  min-height: 58px;
+  background: var(--paper);
+}
+
+.compareCardAnswer dd {
+  font-size: 15px;
+}
+
+@media (max-width: 1500px) {
+  .compareTable,
+  .comparisonScrollHint {
+    display: none;
+  }
+  .compareCards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 12px;
+    margin-top: 22px;
+  }
+}
+
+@media (max-width: 600px) {
+  .wideCard {
+    padding: 16px 13px;
+    border-radius: 17px 17px 6px 17px;
+  }
+  .compareTable {
+    display: none;
+  }
+  .comparisonScrollHint {
+    display: none;
+  }
+  .compareCards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 22px;
+  }
+  .compareDelta {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 14px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 14px 14px 5px 14px;
+    background: var(--paper);
+  }
+  .compareDelta > strong {
+    grid-column: 1 / -1;
+    font-size: 14px;
+  }
+  .compareDelta span {
+    display: grid;
+    gap: 4px;
+    color: var(--ink-soft);
+    font-size: 11px;
+  }
+  .compareDelta b {
+    font: 700 14px/1.2 var(--data);
+  }
+}
+
+@media (min-width: 1600px) {
+  .comparisonScrollHint {
+    display: none;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 900px) {
+  .compareTable {
+    display: none;
+  }
+  .compareCards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin-top: 22px;
+  }
+}

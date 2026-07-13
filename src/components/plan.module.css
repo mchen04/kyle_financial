@@ -1,0 +1,543 @@
+.eyebrow {
+  composes: eyebrow from "./surface-primitives.module.css";
+}
+
+.muted {
+  composes: muted from "./surface-primitives.module.css";
+}
+
+.sectionHeading {
+  composes: sectionHeading from "./surface-primitives.module.css";
+}
+
+.iconButton {
+  composes: iconButton from "./surface-primitives.module.css";
+}
+
+.moneyInput {
+  composes: moneyInput from "./surface-primitives.module.css";
+}
+
+.modelDisclosure {
+  composes: modelDisclosure from "./surface-primitives.module.css";
+}
+
+.benefitSummary {
+  composes: benefitSummary from "./surface-primitives.module.css";
+}
+
+.assumptionFields {
+  display: grid;
+  gap: 17px;
+}
+
+.assumptionFields label {
+  display: grid;
+  gap: 7px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.assumptionFields input,
+.assumptionFields select {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.addButton {
+  min-height: 44px;
+  border: 0;
+  border-radius: 11px;
+  cursor: pointer;
+}
+
+.planGrid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1.65fr) minmax(270px, 0.75fr);
+  grid-template-areas:
+    "answer answer"
+    "ledger assumptions";
+  gap: 18px;
+}
+
+.answerCard {
+  grid-area: answer;
+}
+
+.ledgerCard {
+  grid-area: ledger;
+}
+
+.assumptionsCard {
+  grid-area: assumptions;
+}
+
+.answerCard,
+.ledgerCard,
+.assumptionsCard {
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: 0 8px 26px rgb(18 35 63 / 4%);
+}
+
+.answerCard {
+  min-height: 222px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.75fr;
+  align-items: center;
+  gap: 16px 42px;
+  padding: clamp(20px, 3.5vw, 42px);
+  border-radius: 24px 24px 8px 24px;
+}
+
+.answerNumber {
+  margin: 0;
+  color: var(--teal);
+  font: 650 clamp(46px, 7vw, 82px)/0.9 var(--display);
+  letter-spacing: -0.07em;
+  font-variant-numeric: tabular-nums;
+}
+
+.answerContext {
+  max-width: 560px;
+  margin: 12px 0 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.answerRates {
+  margin: 8px 0 0;
+  color: var(--ink-soft);
+  font: 11px/1.45 var(--data);
+}
+
+.answerNegative {
+  border-color: #e8c4ac;
+  background: linear-gradient(100deg, #fff 50%, var(--amber-soft));
+}
+
+.answerNegative .answerNumber {
+  color: var(--amber);
+  font-size: clamp(38px, 6vw, 68px);
+}
+
+.answerNegative .answerNumber::before {
+  content: "Shortfall";
+  display: block;
+  margin-bottom: 10px;
+  color: #803c0e;
+  font: 700 11px/1 var(--data);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.takeHomeBlock {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+  padding-left: 30px;
+  border-left: 1px solid var(--line);
+}
+
+.takeHomeBlock > span:first-child {
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.takeHomeBlock small {
+  display: block;
+  font-weight: 400;
+}
+
+.takeHomeBlock strong {
+  font: 650 clamp(25px, 3vw, 36px)/1 var(--display);
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.taxLine {
+  color: var(--ink-soft);
+  font: 11px/1.4 var(--data);
+}
+
+.ledgerCard,
+.assumptionsCard {
+  border-radius: 20px 20px 8px 20px;
+  padding: clamp(17px, 2.5vw, 28px);
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ledgerTotal {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0 8px;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.ledgerTotal strong {
+  color: var(--ink);
+  font-family: var(--data);
+}
+
+.expenseList {
+  display: grid;
+}
+
+.unusedExpensesButton {
+  width: 100%;
+  min-height: 44px;
+  margin: 12px 0 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--blue-dark);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.expenseRow {
+  min-height: 66px;
+  display: grid;
+  grid-template-columns: 44px minmax(130px, 1fr) 122px 44px;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #e9eef2;
+}
+
+.reorderButtons {
+  display: grid;
+}
+
+.reorderButtons button {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #8b98a7;
+  cursor: pointer;
+}
+
+.reorderButtons button:disabled {
+  opacity: 0.2;
+}
+
+.expenseIdentity {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.expenseIdentity > input {
+  min-width: 0;
+  width: 100%;
+  padding: 3px 5px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 650;
+  min-height: 44px;
+}
+
+.expenseIdentity > div {
+  display: flex;
+  min-width: 0;
+  gap: 6px;
+}
+
+.expenseIdentity > div input,
+.expenseIdentity select {
+  min-width: 0;
+  width: 110px;
+  padding: 1px 5px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 16px;
+  min-height: 44px;
+}
+
+.expenseIdentity input:hover,
+.expenseIdentity input:focus {
+  border-color: var(--line);
+  background: #fff;
+}
+
+.assumptionsCard {
+  align-self: start;
+  position: sticky;
+  top: 88px;
+  box-shadow: none;
+}
+
+.assumptionsCard details summary {
+  min-height: 44px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  list-style: none;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.assumptionsCard summary span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.assumptionsCard summary > span:last-child {
+  color: var(--blue);
+  font-size: 11px;
+}
+
+.assumptionFields {
+  margin-top: 12px;
+}
+
+.assumptionFields .hsaEligibilityControl {
+  min-height: 44px;
+  grid-template-columns: 22px 1fr;
+  align-items: center;
+  cursor: pointer;
+}
+
+.assumptionFields .hsaEligibilityControl input {
+  width: 18px;
+  min-height: 18px;
+  margin: 0;
+}
+
+.assumptionFields small {
+  color: var(--ink-soft);
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.assumptionsCard .benefitSummary {
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+@media (max-width: 1180px) {
+  .planGrid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "answer"
+      "ledger"
+      "assumptions";
+  }
+  .assumptionsCard {
+    position: static;
+  }
+}
+
+@media (max-width: 900px) {
+  .planGrid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "answer"
+      "ledger"
+      "assumptions";
+    gap: 12px;
+  }
+  .assumptionsCard {
+    position: static;
+  }
+}
+
+@media (max-width: 600px) {
+  .answerCard {
+    min-height: 228px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    padding: 18px;
+    border-radius: 19px 19px 6px 19px;
+  }
+  .answerNumber {
+    overflow-wrap: anywhere;
+    font-size: clamp(38px, 12vw, 56px);
+  }
+  .answerContext {
+    font-size: 13px;
+  }
+  .answerRates {
+    font-size: 12px;
+  }
+  .takeHomeBlock {
+    padding-top: 12px;
+    padding-left: 0;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+  .takeHomeBlock > span:first-child,
+  .taxLine {
+    font-size: 9px;
+  }
+  .takeHomeBlock strong {
+    font-size: 21px;
+  }
+  .ledgerCard,
+  .assumptionsCard {
+    padding: 16px 13px;
+    border-radius: 17px 17px 6px 17px;
+  }
+  .ledgerCard {
+    display: flex;
+    flex-direction: column;
+  }
+  .ledgerCard .sectionHeading {
+    order: 1;
+  }
+  .ledgerCard .expenseList {
+    order: 2;
+  }
+  .ledgerCard .ledgerTotal {
+    order: 3;
+  }
+  .ledgerCard .unusedExpensesButton {
+    order: 4;
+  }
+  .sectionHeading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .sectionHeading > div {
+    min-width: 0;
+    width: 100%;
+  }
+  .sectionHeading h1 {
+    font-size: 23px;
+  }
+  .sectionHeading .addButton {
+    width: 44px;
+    overflow: hidden;
+    color: transparent;
+    gap: 20px;
+  }
+  .sectionHeading .addButton svg {
+    color: var(--blue);
+    flex: 0 0 auto;
+  }
+  .expenseRow {
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    padding: 8px 0;
+  }
+  .reorderButtons {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    display: grid;
+  }
+  .expenseIdentity {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .expenseRow > .moneyInput {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .expenseRow > .iconButton {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+  .expenseIdentity > div {
+    flex-wrap: wrap;
+  }
+  .expenseIdentity > div input,
+  .expenseIdentity select {
+    flex: 1 1 82px;
+  }
+  .expenseIdentity > div input {
+    width: 82px;
+  }
+  .expenseIdentity select {
+    width: 90px;
+  }
+  .moneyInput input {
+    font-size: 16px;
+  }
+  .benefitSummary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 350px) {
+  .answerCard {
+    padding: 15px 12px;
+  }
+  .answerNumber {
+    font-size: 40px;
+  }
+  .takeHomeBlock strong {
+    font-size: 18px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 900px) {
+  .planGrid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "answer"
+      "ledger"
+      "assumptions";
+  }
+  .answerCard {
+    align-self: start;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .takeHomeBlock {
+    padding-top: 12px;
+    padding-left: 0;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+  .ledgerCard {
+    align-self: start;
+  }
+  .expenseIdentity > div {
+    flex-wrap: wrap;
+  }
+  .expenseIdentity > div input,
+  .expenseIdentity select {
+    flex: 1 1 120px;
+    width: auto;
+  }
+}
+
+@media (max-width: 900px), (pointer: coarse) {
+  .assumptionsCard a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
