@@ -1,0 +1,40 @@
+{
+  "artifact": "SmartAsset raw-capture provenance manifest",
+  "captureSession": "wave1-external",
+  "capturedAt": "2026-07-12",
+  "sourceUrl": "https://www.smartasset.com/taxes/income-taxes",
+  "retention": "The displayed DOM values are retained in smartasset-2025-live.json. Raw browser DOM snapshots and screenshots from the original session were not retained.",
+  "replayInstructions": "Re-run each exact scenario from smartasset-2025-live.json in the annual income-tax calculator and attach raw DOM and screenshot paths here. A replay is new corroborating evidence, not the original capture.",
+  "scenarios": [
+    {
+      "id": "tx-single-100000",
+      "rawDomPath": null,
+      "screenshotPath": null,
+      "captureStatus": "recorded-dom-values-only"
+    },
+    {
+      "id": "il-mfj-180000",
+      "rawDomPath": null,
+      "screenshotPath": null,
+      "captureStatus": "recorded-dom-values-only"
+    },
+    {
+      "id": "ca-single-150000",
+      "rawDomPath": null,
+      "screenshotPath": null,
+      "captureStatus": "recorded-dom-values-only"
+    },
+    {
+      "id": "ny-mfj-250000",
+      "rawDomPath": null,
+      "screenshotPath": null,
+      "captureStatus": "recorded-dom-values-only"
+    },
+    {
+      "id": "fl-single-300000",
+      "rawDomPath": null,
+      "screenshotPath": null,
+      "captureStatus": "recorded-dom-values-only"
+    }
+  ]
+}

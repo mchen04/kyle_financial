@@ -1,0 +1,222 @@
+{
+  "artifact": "SmartAsset live annual income-tax calculator capture",
+  "captureMethod": "DOM text captured with agent-browser session wave1-external; no screenshot evidence",
+  "provenanceManifest": "smartasset-2025-live.manifest.json",
+  "capturedAt": "2026-07-12",
+  "calculator": {
+    "name": "Federal Income Tax Calculator - Estimator for 2025-2026 Taxes",
+    "year": 2025,
+    "rawYearLabels": ["Your 2025 Federal Income and FICA Taxes", "2025 Taxes"]
+  },
+  "calculatorContext": {
+    "payFrequency": "not applicable to the annual income-tax calculator",
+    "w4Allowances": "not applicable to the annual income-tax calculator"
+  },
+  "scenarios": [
+    {
+      "id": "tx-single-100000",
+      "sourceUrl": "https://www.smartasset.com/taxes/income-taxes",
+      "capturedAt": "2026-07-12",
+      "calculatorYear": 2025,
+      "inputs": {
+        "householdIncome": "$100,000",
+        "location": "Austin, TX",
+        "filingStatus": "Single",
+        "incomeType": "one household wage job",
+        "dependents": 0,
+        "credits": "$0",
+        "deduction": "Standard Deduction",
+        "401kContribution": "$0",
+        "traditionalIraContribution": "$0",
+        "dependentDeductions": 0,
+        "otherPreTaxDeductions": "$0",
+        "employeeBenefits": "$0",
+        "localCityTaxScenario": false
+      },
+      "rawDisplayed": {
+        "federal": "$13,449",
+        "fica": "$7,650",
+        "state": "$0",
+        "local": "$0",
+        "total": "$21,099",
+        "net": "$78,901"
+      },
+      "independentComparison": {
+        "kyle2026Trace": {
+          "federal": "$13,170.00",
+          "fica": "$7,650.00",
+          "state": "$0.00",
+          "total": "$20,820.00",
+          "net": "$79,180.00"
+        },
+        "formula": "(SmartAsset net - Kyle net) / Kyle net",
+        "deltaDollars": "-$279.00",
+        "deltaPercent": -0.35236171
+      }
+    },
+    {
+      "id": "il-mfj-180000",
+      "sourceUrl": "https://www.smartasset.com/taxes/income-taxes",
+      "capturedAt": "2026-07-12",
+      "calculatorYear": 2025,
+      "inputs": {
+        "householdIncome": "$180,000",
+        "location": "Springfield, IL",
+        "filingStatus": "Married",
+        "incomeType": "one household wage job",
+        "dependents": 0,
+        "credits": "$0",
+        "deduction": "Standard Deduction",
+        "401kContribution": "$0",
+        "traditionalIraContribution": "$0",
+        "dependentDeductions": 0,
+        "otherPreTaxDeductions": "$0",
+        "employeeBenefits": "$0",
+        "localCityTaxScenario": false
+      },
+      "rawDisplayed": {
+        "federal": "$22,498",
+        "fica": "$13,528",
+        "state": "$8,628",
+        "local": "$0",
+        "total": "$44,654",
+        "net": "$135,346"
+      },
+      "independentComparison": {
+        "kyle2026Trace": {
+          "federal": "$21,940.00",
+          "fica": "$13,770.00",
+          "state": "$8,620.43",
+          "total": "$44,330.43",
+          "net": "$135,669.57"
+        },
+        "formula": "(SmartAsset net - Kyle net) / Kyle net",
+        "deltaDollars": "-$323.57",
+        "deltaPercent": -0.23849858
+      }
+    },
+    {
+      "id": "ca-single-150000",
+      "sourceUrl": "https://www.smartasset.com/taxes/income-taxes",
+      "capturedAt": "2026-07-12",
+      "calculatorYear": 2025,
+      "inputs": {
+        "householdIncome": "$150,000",
+        "location": "Sacramento, CA",
+        "filingStatus": "Single",
+        "incomeType": "one household wage job",
+        "dependents": 0,
+        "credits": "$0",
+        "deduction": "Standard Deduction",
+        "401kContribution": "$0",
+        "traditionalIraContribution": "$0",
+        "dependentDeductions": 0,
+        "otherPreTaxDeductions": "$0",
+        "employeeBenefits": "$0",
+        "localCityTaxScenario": false
+      },
+      "rawDisplayed": {
+        "federal": "$25,067",
+        "fica": "$11,475",
+        "state": "$9,844",
+        "local": "$0",
+        "total": "$46,386",
+        "net": "$103,614"
+      },
+      "independentComparison": {
+        "kyle2026Trace": {
+          "federal": "$24,734.00",
+          "fica": "$11,475.00",
+          "state": "$9,873.42",
+          "total": "$46,082.42",
+          "net": "$103,917.58"
+        },
+        "formula": "(SmartAsset net - Kyle net) / Kyle net",
+        "deltaDollars": "-$303.58",
+        "deltaPercent": -0.29213536
+      }
+    },
+    {
+      "id": "ny-mfj-250000",
+      "sourceUrl": "https://www.smartasset.com/taxes/income-taxes",
+      "capturedAt": "2026-07-12",
+      "calculatorYear": 2025,
+      "inputs": {
+        "householdIncome": "$250,000",
+        "location": "Albany, NY",
+        "filingStatus": "Married",
+        "incomeType": "one household wage job",
+        "dependents": 0,
+        "credits": "$0",
+        "deduction": "Standard Deduction",
+        "401kContribution": "$0",
+        "traditionalIraContribution": "$0",
+        "dependentDeductions": 0,
+        "otherPreTaxDeductions": "$0",
+        "employeeBenefits": "$0",
+        "localCityTaxScenario": false
+      },
+      "rawDisplayed": {
+        "federal": "$38,134",
+        "fica": "$14,543",
+        "state": "$12,777",
+        "local": "$0",
+        "total": "$65,454",
+        "net": "$184,546"
+      },
+      "independentComparison": {
+        "kyle2026Trace": {
+          "federal": "$37,468.00",
+          "fica": "$15,064.00",
+          "state": "$12,662.80",
+          "total": "$65,194.80",
+          "net": "$184,805.20"
+        },
+        "formula": "(SmartAsset net - Kyle net) / Kyle net",
+        "deltaDollars": "-$259.20",
+        "deltaPercent": -0.14025579
+      }
+    },
+    {
+      "id": "fl-single-300000",
+      "sourceUrl": "https://www.smartasset.com/taxes/income-taxes",
+      "capturedAt": "2026-07-12",
+      "calculatorYear": 2025,
+      "inputs": {
+        "householdIncome": "$300,000",
+        "location": "Orlando, FL",
+        "filingStatus": "Single",
+        "incomeType": "one household wage job",
+        "dependents": 0,
+        "credits": "$0",
+        "deduction": "Standard Deduction",
+        "401kContribution": "$0",
+        "traditionalIraContribution": "$0",
+        "dependentDeductions": 0,
+        "otherPreTaxDeductions": "$0",
+        "employeeBenefits": "$0",
+        "localCityTaxScenario": false
+      },
+      "rawDisplayed": {
+        "federal": "$69,035",
+        "fica": "$16,168",
+        "state": "$0",
+        "local": "$0",
+        "total": "$85,203",
+        "net": "$214,797"
+      },
+      "independentComparison": {
+        "kyle2026Trace": {
+          "federal": "$68,134.25",
+          "fica": "$16,689.00",
+          "state": "$0.00",
+          "total": "$84,823.25",
+          "net": "$215,176.75"
+        },
+        "formula": "(SmartAsset net - Kyle net) / Kyle net",
+        "deltaDollars": "-$379.75",
+        "deltaPercent": -0.17648282
+      }
+    }
+  ]
+}

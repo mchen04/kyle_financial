@@ -1,0 +1,6 @@
+AGENTS.md
+CLAUDE.md
+.next
+coverage
+node_modules
+public/*.svg

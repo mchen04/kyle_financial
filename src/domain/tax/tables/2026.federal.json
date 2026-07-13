@@ -1,0 +1,235 @@
+{
+  "year": 2026,
+  "sources": {
+    "IRS_RP_2025_32": {
+      "label": "IRS 2026 inflation adjustments",
+      "url": "https://www.irs.gov/irb/2025-45_IRB"
+    },
+    "IRS_PUB_15_2026": {
+      "label": "IRS Publication 15",
+      "url": "https://www.irs.gov/publications/p15"
+    },
+    "SSA_CBB_2026": {
+      "label": "SSA 2026 wage base",
+      "url": "https://www.ssa.gov/oact/cola/cbb.html"
+    },
+    "IRS_MEDICARE_2026": {
+      "label": "IRS Additional Medicare Tax",
+      "url": "https://www.irs.gov/taxtopics/tc560"
+    },
+    "IRS_401K_2026": {
+      "label": "IRS 401(k) limits",
+      "url": "https://www.irs.gov/retirement-plans/plan-participant-employee/retirement-topics-401k-and-profit-sharing-plan-contribution-limits"
+    },
+    "IRS_NOTICE_2025_67": {
+      "label": "IRS 2026 retirement limits",
+      "url": "https://www.irs.gov/irb/2025-49_IRB"
+    },
+    "IRS_HSA_2026": {
+      "label": "IRS 2026 HSA limits",
+      "url": "https://www.irs.gov/irb/2025-21_IRB"
+    },
+    "IRS_PUB_15B_2026": {
+      "label": "IRS Publication 15-B",
+      "url": "https://www.irs.gov/publications/p15b"
+    },
+    "IRS_PUB_969": {
+      "label": "IRS Publication 969",
+      "url": "https://www.irs.gov/publications/p969"
+    },
+    "IRS_ESPP_423": {
+      "label": "IRS Section 423 rules",
+      "url": "https://www.irs.gov/irb/2009-49_IRB"
+    },
+    "TF_STATE_2026": {
+      "label": "Tax Foundation 2026 state tables",
+      "url": "https://taxfoundation.org/data/all/state/state-income-tax-rates-2026/"
+    },
+    "CA_FTB_HSA_2025": {
+      "label": "California FTB HSA instructions",
+      "url": "https://www.ftb.ca.gov/forms/2025/2025-540-ca-instructions.html"
+    },
+    "NJ_1040_2025": {
+      "label": "New Jersey tax instructions",
+      "url": "https://www.nj.gov/treasury/taxation/pdf/current/1040i.pdf"
+    },
+    "PA_GROSS_COMP_2026": {
+      "label": "Pennsylvania compensation guide",
+      "url": "https://www.pa.gov/agencies/revenue/forms-and-publications/pa-personal-income-tax-guide/gross-compensation"
+    },
+    "PA_HSA_DEDUCTIONS_2026": {
+      "label": "Pennsylvania HSA deductions guide",
+      "url": "https://www.pa.gov/agencies/revenue/forms-and-publications/pa-personal-income-tax-guide/deductions-and-credits"
+    },
+    "PA_HSA_RULING_2006": {
+      "label": "Pennsylvania HSA payroll ruling",
+      "url": "https://www.pa.gov/content/dam/copapwp-pagov/en/revenue/documents/taxlawpoliciesbulletinsnotices/letterrulings/pit/documents/pit-06-005.pdf"
+    }
+  },
+  "benefitTreatmentCitations": {
+    "traditional401k": ["IRS_401K_2026", "IRS_PUB_15_2026"],
+    "roth401k": ["IRS_401K_2026", "IRS_PUB_15_2026"],
+    "employer401kMatch": ["IRS_NOTICE_2025_67"],
+    "espp": ["IRS_ESPP_423"],
+    "hsa": ["IRS_HSA_2026", "IRS_PUB_15B_2026", "IRS_PUB_969"],
+    "employerHsa": ["IRS_HSA_2026", "IRS_PUB_15B_2026", "IRS_PUB_969"],
+    "healthFsa": ["IRS_PUB_15B_2026"],
+    "dependentCareFsa": ["IRS_PUB_15B_2026"],
+    "section125Premium": ["IRS_PUB_15B_2026"],
+    "commuter": ["IRS_PUB_15B_2026"],
+    "commuterParking": ["IRS_PUB_15B_2026"],
+    "lifeDisabilityInsurance": ["IRS_PUB_15B_2026"]
+  },
+  "federal": {
+    "single": {
+      "standardDeductionCents": 1610000,
+      "citations": ["IRS_RP_2025_32"],
+      "brackets": [
+        {
+          "thresholdCents": 0,
+          "ratePpm": 100000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 1240000,
+          "ratePpm": 120000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 5040000,
+          "ratePpm": 220000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 10570000,
+          "ratePpm": 240000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 20177500,
+          "ratePpm": 320000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 25622500,
+          "ratePpm": 350000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 64060000,
+          "ratePpm": 370000,
+          "citations": ["IRS_RP_2025_32"]
+        }
+      ]
+    },
+    "mfj": {
+      "standardDeductionCents": 3220000,
+      "citations": ["IRS_RP_2025_32"],
+      "brackets": [
+        {
+          "thresholdCents": 0,
+          "ratePpm": 100000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 2480000,
+          "ratePpm": 120000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 10080000,
+          "ratePpm": 220000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 21140000,
+          "ratePpm": 240000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 40355000,
+          "ratePpm": 320000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 51245000,
+          "ratePpm": 350000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 76870000,
+          "ratePpm": 370000,
+          "citations": ["IRS_RP_2025_32"]
+        }
+      ]
+    },
+    "hoh": {
+      "standardDeductionCents": 2415000,
+      "citations": ["IRS_RP_2025_32"],
+      "brackets": [
+        {
+          "thresholdCents": 0,
+          "ratePpm": 100000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 1770000,
+          "ratePpm": 120000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 6745000,
+          "ratePpm": 220000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 10570000,
+          "ratePpm": 240000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 20175000,
+          "ratePpm": 320000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 25620000,
+          "ratePpm": 350000,
+          "citations": ["IRS_RP_2025_32"]
+        },
+        {
+          "thresholdCents": 64060000,
+          "ratePpm": 370000,
+          "citations": ["IRS_RP_2025_32"]
+        }
+      ]
+    }
+  },
+  "fica": {
+    "socialSecurityRatePpm": 62000,
+    "socialSecurityWageBaseCents": 18450000,
+    "medicareRatePpm": 14500,
+    "additionalMedicareRatePpm": 9000,
+    "additionalMedicareWithholdingThresholdCents": 20000000,
+    "additionalMedicareThresholdCents": {
+      "single": 20000000,
+      "mfj": 25000000,
+      "hoh": 20000000
+    },
+    "citations": ["IRS_PUB_15_2026", "SSA_CBB_2026", "IRS_MEDICARE_2026"]
+  },
+  "limits": {
+    "employee401k": { "cents": 2450000, "citations": ["IRS_401K_2026"] },
+    "definedContributionPlan": {
+      "cents": 7200000,
+      "citations": ["IRS_NOTICE_2025_67"]
+    },
+    "hsaSelf": { "cents": 440000, "citations": ["IRS_HSA_2026"] },
+    "hsaFamily": { "cents": 875000, "citations": ["IRS_HSA_2026"] },
+    "hsaCatchUp": { "cents": 100000, "citations": ["IRS_PUB_969"] },
+    "healthFsa": { "cents": 340000, "citations": ["IRS_RP_2025_32"] },
+    "dependentCareFsa": { "cents": 750000, "citations": ["IRS_PUB_15B_2026"] },
+    "commuterMonthly": { "cents": 34000, "citations": ["IRS_RP_2025_32"] },
+    "esppGrantValue": { "cents": 2500000, "citations": ["IRS_ESPP_423"] }
+  }
+}

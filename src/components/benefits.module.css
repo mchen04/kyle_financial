@@ -1,0 +1,286 @@
+.eyebrow {
+  composes: eyebrow from "./surface-primitives.module.css";
+}
+
+.muted {
+  composes: muted from "./surface-primitives.module.css";
+}
+
+.wideCard {
+  composes: wideCard from "./surface-primitives.module.css";
+}
+
+.sectionHeading {
+  composes: sectionHeading from "./surface-primitives.module.css";
+}
+
+.iconButton {
+  composes: iconButton from "./surface-primitives.module.css";
+}
+
+.moneyInput {
+  composes: moneyInput from "./surface-primitives.module.css";
+}
+
+.modelDisclosure {
+  composes: modelDisclosure from "./surface-primitives.module.css";
+}
+
+.benefitSummary {
+  composes: benefitSummary from "./surface-primitives.module.css";
+}
+
+.compactField {
+  display: grid;
+  gap: 7px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.compactField input {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.addSelect {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.addSelect {
+  border-radius: 11px;
+}
+
+.addSelect select {
+  min-height: 44px;
+  border: 0;
+  background: #fff;
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.benefitList {
+  display: grid;
+}
+
+.benefitName input {
+  min-width: 0;
+  width: 100%;
+  padding: 3px 5px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 650;
+  min-height: 44px;
+}
+
+.benefitName input:hover,
+.benefitName input:focus {
+  border-color: var(--line);
+  background: #fff;
+}
+
+.benefitRow {
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 150px 125px auto 44px;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #e9eef2;
+}
+
+.benefitRowWithDiscount {
+  grid-template-columns:
+    minmax(180px, 1fr) 150px 125px minmax(90px, auto)
+    92px 44px;
+}
+
+.benefitName {
+  min-width: 0;
+}
+
+.benefitName span {
+  display: block;
+  padding-left: 5px;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.benefitName select {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 6px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.benefitRow > select {
+  min-height: 44px;
+  padding: 0 30px 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fff;
+  font-size: 16px;
+}
+
+.benefitRow > .muted {
+  white-space: nowrap;
+}
+
+.compactField {
+  max-width: 100px;
+}
+
+.compactField input {
+  min-height: 44px;
+  font-size: 16px;
+}
+
+.customTreatment {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-size: 11px;
+}
+
+.customTreatment > span {
+  width: 100%;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.customTreatment label {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 0;
+}
+
+.customTreatment input {
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 900px) {
+  .benefitRow {
+    min-height: 98px;
+    grid-template-columns: minmax(190px, 1fr) 160px 125px 44px;
+    padding: 10px 0;
+  }
+  .benefitRowWithDiscount {
+    grid-template-columns: minmax(190px, 1fr) 160px 125px 44px;
+  }
+  .benefitName {
+    grid-row: 1 / span 2;
+  }
+  .benefitRow > select {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .benefitRow > .moneyInput {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .benefitRow > .iconButton {
+    grid-column: 4;
+    grid-row: 1;
+  }
+  .benefitRow > .muted {
+    grid-column: 2 / 4;
+    grid-row: 2;
+  }
+  .benefitRowWithDiscount > .muted {
+    grid-column: 2;
+  }
+  .compactField {
+    grid-column: 3;
+    grid-row: 2;
+  }
+}
+
+@media (max-width: 600px) {
+  .wideCard {
+    padding: 16px 13px;
+    border-radius: 17px 17px 6px 17px;
+  }
+  .sectionHeading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .sectionHeading > div {
+    min-width: 0;
+    width: 100%;
+  }
+  .sectionHeading h1 {
+    font-size: 23px;
+  }
+  .sectionHeading .addSelect {
+    width: 100%;
+    justify-content: center;
+  }
+  .moneyInput input {
+    font-size: 16px;
+  }
+  .benefitSummary {
+    grid-template-columns: 1fr;
+  }
+  .benefitRow {
+    grid-template-columns: minmax(0, 1fr) 105px 44px;
+    padding: 12px 0;
+  }
+  .benefitRowWithDiscount {
+    grid-template-columns: minmax(0, 1fr) 105px 44px;
+  }
+  .benefitRow > select {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .benefitRow > .moneyInput {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .benefitRow > .iconButton {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .benefitRow > .muted {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    padding: 4px 0;
+  }
+  .compactField {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .customTreatment {
+    grid-column: 1 / -1;
+  }
+}

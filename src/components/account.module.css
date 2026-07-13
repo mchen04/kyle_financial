@@ -1,0 +1,168 @@
+.eyebrow {
+  composes: eyebrow from "./surface-primitives.module.css";
+}
+
+.muted {
+  composes: muted from "./surface-primitives.module.css";
+}
+
+.wideCard {
+  composes: wideCard from "./surface-primitives.module.css";
+}
+
+.primaryButton {
+  composes: primaryButton from "./surface-primitives.module.css";
+}
+
+.secondaryButton {
+  composes: secondaryButton from "./surface-primitives.module.css";
+}
+
+.estimateNote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 22px 0 0;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.warning {
+  composes: warning from "./surface-primitives.module.css";
+}
+
+.accountEmail {
+  max-width: 100%;
+  margin: 2px 0 8px;
+  overflow-wrap: anywhere;
+  color: var(--ink-soft);
+  font: 14px/1.4 var(--data);
+}
+
+.accountEmail + .muted {
+  margin-top: 0;
+}
+
+.accountGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.accountGrid .wideCard {
+  min-height: 0;
+}
+
+.accountActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.accountPrivacy {
+  max-width: 720px;
+  margin: 12px 0 20px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.deleteAccountRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.deleteAccountRow div {
+  display: grid;
+  gap: 4px;
+}
+
+.deleteAccountRow span {
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.dangerButton {
+  min-height: 44px;
+  flex: 0 0 auto;
+  padding: 0 14px;
+  border: 1px solid #d9966d;
+  border-radius: 10px;
+  background: #fff;
+  color: #934310;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dangerButton:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.installSteps {
+  display: grid;
+  gap: 15px;
+  padding: 0;
+  list-style: none;
+}
+
+.installSteps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink-soft);
+}
+
+.installSteps span {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sky);
+  color: var(--blue-dark);
+  font: 700 12px/1 var(--data);
+}
+
+@media (max-width: 1180px) {
+  .accountGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .accountGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .deleteAccountRow {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .wideCard {
+    padding: 16px 13px;
+    border-radius: 17px 17px 6px 17px;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .accountGrid > .wideCard:first-child .accountPrivacy {
+    display: none;
+  }
+  .accountGrid > .wideCard:first-child {
+    padding-block: 16px;
+  }
+  .accountGrid > .wideCard:first-child h1 {
+    margin-bottom: 12px;
+  }
+  .accountGrid > .wideCard:first-child .accountEmail + .muted {
+    margin-bottom: 12px;
+  }
+}
