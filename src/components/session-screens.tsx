@@ -149,7 +149,7 @@ export function AuthView({
                 spellCheck={false}
                 required
               />
-              <small>Generated for this email by the app owner.</small>
+              <small>Provided by the app owner.</small>
             </label>
           )}
           {error && (
