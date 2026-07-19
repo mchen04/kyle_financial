@@ -1,8 +1,8 @@
-import { treatmentFor, type BenefitEntry } from "../benefits";
+import { treatmentFor } from "../benefits";
 import type { PlanInput } from "../budget";
 import { divideAnnualForMonthly, sumCents } from "../money";
 import type { BenefitTaxabilityStage } from "./benefit-taxability-stage";
-import type { BenefitResult } from "./plan-result";
+import { sumBenefits, type BenefitResult } from "./plan-result";
 import { calculateExpenseStage, ratioPpm } from "./plan-stages";
 import type { TaxCalculationStage } from "./tax-calculation-stage";
 
@@ -24,17 +24,6 @@ export interface CashflowStage {
   totalSavedAnnualCents: number;
   cashSavingsRateGrossPpm: number;
   cashSavingsRateNetPpm: number;
-}
-
-function sumBenefits(
-  benefits: BenefitResult[],
-  predicate: (entry: BenefitEntry) => boolean,
-): number {
-  return sumCents(
-    benefits
-      .filter(({ entry }) => predicate(entry))
-      .map(({ annualAmountCents }) => annualAmountCents),
-  );
 }
 
 export function calculateCashflowStage(

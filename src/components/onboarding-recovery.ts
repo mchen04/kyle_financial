@@ -1,7 +1,7 @@
 import { isRetryablePlanCreationRecoveryError } from "./plan-types";
 
-export const PLAN_CREATION_RECOVERY_DELAYS_MS = [0, 250, 500, 1_000, 2_000];
-export const PLAN_CREATION_RECOVERY_TIMEOUT_MS = 5_000;
+const PLAN_CREATION_RECOVERY_DELAYS_MS = [0, 250, 500, 1_000, 2_000];
+const PLAN_CREATION_RECOVERY_TIMEOUT_MS = 5_000;
 
 type RecoveryPause = (delayMs: number, signal: AbortSignal) => Promise<void>;
 

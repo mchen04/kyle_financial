@@ -117,7 +117,8 @@
 .answerRates {
   margin: 8px 0 0;
   color: var(--ink-soft);
-  font: 11px/1.45 var(--data);
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .answerNegative {
@@ -155,18 +156,21 @@
 
 .takeHomeBlock small {
   display: block;
+  margin-top: 2px;
   font-weight: 400;
+  opacity: 0.85;
 }
 
 .takeHomeBlock strong {
-  font: 650 clamp(25px, 3vw, 36px)/1 var(--display);
+  font: 600 clamp(19px, 2.1vw, 26px)/1 var(--display);
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
 }
 
 .taxLine {
   color: var(--ink-soft);
-  font: 11px/1.4 var(--data);
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .ledgerCard,
@@ -192,8 +196,9 @@
 .ledgerTotal {
   display: flex;
   justify-content: space-between;
+  gap: 12px;
   margin: 20px 0 8px;
-  padding: 10px 4px;
+  padding: 10px 5px;
   border-bottom: 1px solid var(--line);
   color: var(--ink-soft);
   font-size: 12px;
@@ -206,6 +211,7 @@
 
 .expenseList {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .unusedExpensesButton {
@@ -221,16 +227,157 @@
 }
 
 .expenseRow {
-  min-height: 66px;
-  display: grid;
-  grid-template-columns: 44px minmax(130px, 1fr) 122px 44px;
-  align-items: center;
-  gap: 8px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 0;
   border-bottom: 1px solid #e9eef2;
 }
 
-.reorderButtons {
+.expensePrimary {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.expenseName {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 6px 9px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 650;
+  min-height: 44px;
+}
+
+.expenseName:hover,
+.expenseName:focus {
+  border-color: var(--line);
+  background: #fff;
+  outline: 0;
+}
+
+.expensePrimary .moneyInput {
+  flex: 0 0 132px;
+  width: 132px;
+  height: 48px;
+  border-color: var(--blue-soft, #cfe0ee);
+}
+
+.expensePrimary .moneyInput input {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.detailsToggle {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
   display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--paper);
+  color: #5f6d7d;
+  cursor: pointer;
+}
+
+.detailsToggle svg {
+  transition: transform 0.15s ease;
+}
+
+.detailsToggle:hover {
+  color: var(--blue);
+}
+
+.detailsToggle[data-active="true"] {
+  border-color: var(--blue);
+  background: #fff;
+  color: var(--blue);
+}
+
+.detailsToggle[data-active="true"] svg {
+  transform: rotate(180deg);
+}
+
+.expenseSecondary {
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 2px;
+  padding: 8px 2px 2px;
+}
+
+.detailField {
+  flex: 1 1 100px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.detailField > span {
+  font: 700 10px/1 var(--data);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.detailField:has(.reorderButtons),
+.detailField:has(.iconButton) {
+  flex: 0 0 auto;
+}
+
+.expenseGroup {
+  width: 100%;
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 16px;
+  min-height: 44px;
+}
+
+.expenseGroup:focus {
+  border-color: var(--blue);
+  outline: 0;
+}
+
+.expenseSecondary select {
+  width: 100%;
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 15px;
+  min-height: 44px;
+}
+
+.ledgerHint {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 8px 0 2px;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.reorderButtons {
+  display: flex;
+  gap: 6px;
 }
 
 .reorderButtons button {
@@ -239,58 +386,15 @@
   display: grid;
   place-items: center;
   padding: 0;
-  border: 0;
+  border: 1px solid var(--line);
   border-radius: 7px;
-  background: transparent;
-  color: #8b98a7;
+  background: #fff;
+  color: #5f6d7d;
   cursor: pointer;
 }
 
 .reorderButtons button:disabled {
-  opacity: 0.2;
-}
-
-.expenseIdentity {
-  min-width: 0;
-  display: grid;
-  gap: 4px;
-}
-
-.expenseIdentity > input {
-  min-width: 0;
-  width: 100%;
-  padding: 3px 5px;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--ink);
-  font-size: 16px;
-  font-weight: 650;
-  min-height: 44px;
-}
-
-.expenseIdentity > div {
-  display: flex;
-  min-width: 0;
-  gap: 6px;
-}
-
-.expenseIdentity > div input,
-.expenseIdentity select {
-  min-width: 0;
-  width: 110px;
-  padding: 1px 5px;
-  border: 0;
-  background: transparent;
-  color: var(--ink-soft);
-  font-size: 16px;
-  min-height: 44px;
-}
-
-.expenseIdentity input:hover,
-.expenseIdentity input:focus {
-  border-color: var(--line);
-  background: #fff;
+  opacity: 0.35;
 }
 
 .assumptionsCard {
@@ -402,10 +506,12 @@
   }
   .takeHomeBlock > span:first-child,
   .taxLine {
-    font-size: 9px;
+    font-size: 11px;
   }
   .takeHomeBlock strong {
-    font-size: 21px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ink-soft);
   }
   .ledgerCard,
   .assumptionsCard {
@@ -419,14 +525,17 @@
   .ledgerCard .sectionHeading {
     order: 1;
   }
-  .ledgerCard .expenseList {
+  .ledgerCard .ledgerTotal {
     order: 2;
   }
-  .ledgerCard .ledgerTotal {
+  .ledgerCard .ledgerHint {
     order: 3;
   }
-  .ledgerCard .unusedExpensesButton {
+  .ledgerCard .expenseList {
     order: 4;
+  }
+  .ledgerCard .unusedExpensesButton {
+    order: 5;
   }
   .sectionHeading {
     align-items: flex-start;
@@ -448,43 +557,6 @@
   .sectionHeading .addButton svg {
     color: var(--blue);
     flex: 0 0 auto;
-  }
-  .expenseRow {
-    grid-template-columns: 44px minmax(0, 1fr) 44px;
-    padding: 8px 0;
-  }
-  .reorderButtons {
-    grid-column: 1;
-    grid-row: 1 / span 2;
-    display: grid;
-  }
-  .expenseIdentity {
-    grid-column: 2;
-    grid-row: 1;
-  }
-  .expenseRow > .moneyInput {
-    grid-column: 2;
-    grid-row: 2;
-  }
-  .expenseRow > .iconButton {
-    grid-column: 3;
-    grid-row: 1 / span 2;
-  }
-  .expenseIdentity > div {
-    flex-wrap: wrap;
-  }
-  .expenseIdentity > div input,
-  .expenseIdentity select {
-    flex: 1 1 82px;
-  }
-  .expenseIdentity > div input {
-    width: 82px;
-  }
-  .expenseIdentity select {
-    width: 90px;
-  }
-  .moneyInput input {
-    font-size: 16px;
   }
   .benefitSummary {
     grid-template-columns: 1fr;
@@ -523,14 +595,6 @@
   }
   .ledgerCard {
     align-self: start;
-  }
-  .expenseIdentity > div {
-    flex-wrap: wrap;
-  }
-  .expenseIdentity > div input,
-  .expenseIdentity select {
-    flex: 1 1 120px;
-    width: auto;
   }
 }
 

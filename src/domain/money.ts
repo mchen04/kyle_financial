@@ -1,4 +1,4 @@
-export const RATE_SCALE = 1_000_000;
+const RATE_SCALE = 1_000_000;
 
 export function assertCents(value: number, label = "money"): number {
   if (!Number.isSafeInteger(value)) {

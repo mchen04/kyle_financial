@@ -76,8 +76,7 @@ export function PlanAnswer({
         </span>
         <strong>{money(result.takeHomeMonthlyCents, 2)}</strong>
         <span className={styles.taxLine}>
-          {money(result.totalTaxCents, 2)} estimated yearly tax ·{" "}
-          {rate(taxRate)} effective
+          {rate(taxRate)} effective tax rate
         </span>
       </div>
       <MoneyFlow result={result} expenses={draft.expenses} />

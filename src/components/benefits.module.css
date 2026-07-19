@@ -253,32 +253,46 @@
     grid-template-columns: 1fr;
   }
   .benefitRow {
-    grid-template-columns: minmax(0, 1fr) 105px 44px;
-    padding: 12px 0;
+    grid-template-columns: minmax(0, 1fr) 118px 44px;
+    grid-template-areas:
+      "name name name"
+      "type amount remove"
+      "result result result";
+    row-gap: 8px;
+    padding: 14px 0;
   }
   .benefitRowWithDiscount {
-    grid-template-columns: minmax(0, 1fr) 105px 44px;
+    grid-template-columns: minmax(0, 1fr) 118px 44px;
+    grid-template-areas:
+      "name name name"
+      "type amount remove"
+      "discount result result";
+  }
+  .benefitName {
+    grid-area: name;
+    grid-row: auto;
   }
   .benefitRow > select {
-    grid-column: 1;
-    grid-row: 2;
+    grid-area: type;
+    grid-row: auto;
   }
   .benefitRow > .moneyInput {
-    grid-column: 2;
-    grid-row: 1;
+    grid-area: amount;
+    grid-row: auto;
   }
   .benefitRow > .iconButton {
-    grid-column: 3;
-    grid-row: 1;
+    grid-area: remove;
+    grid-row: auto;
   }
   .benefitRow > .muted {
-    grid-column: 1 / -1;
+    grid-area: result;
     grid-row: auto;
-    padding: 4px 0;
+    align-self: center;
+    padding: 0;
   }
   .compactField {
-    grid-column: 2;
-    grid-row: 2;
+    grid-area: discount;
+    max-width: none;
   }
   .customTreatment {
     grid-column: 1 / -1;

@@ -1,6 +1,6 @@
 import { treatmentFor } from "@/domain/benefits";
 import { annualExpenseAmount, type ExpenseEntry } from "@/domain/budget";
-import { calculatePlan } from "@/domain/tax/engine";
+import type { PlanResult } from "@/domain/tax/engine";
 import { expenseTotalsByGroup } from "./expense-totals";
 import { money } from "./plan-types";
 import styles from "./plan-visualizations.module.css";
@@ -35,7 +35,7 @@ export function MoneyFlow({
   result,
   expenses,
 }: {
-  result: ReturnType<typeof calculatePlan>;
+  result: PlanResult;
   expenses: ExpenseEntry[];
 }) {
   const base = Math.max(1, result.grossIncomeCents);
@@ -134,11 +134,7 @@ export function MoneyFlow({
   );
 }
 
-export function Guidance({
-  result,
-}: {
-  result: ReturnType<typeof calculatePlan>;
-}) {
+export function Guidance({ result }: { result: PlanResult }) {
   const planResources = Math.max(
     1,
     result.takeHomeAnnualCents + result.payrollSavingsAnnualCents,

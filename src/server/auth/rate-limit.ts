@@ -30,7 +30,7 @@ const AUTHENTICATION_POLICIES: Record<
 };
 
 export const AUTH_RATE_LIMIT_CLEANUP_BATCH_SIZE = 100;
-export const AUTH_RATE_LIMIT_RETENTION_SECONDS = 65 * 60;
+const AUTH_RATE_LIMIT_RETENTION_SECONDS = 65 * 60;
 
 interface ConsumedBucket {
   allowed: boolean;

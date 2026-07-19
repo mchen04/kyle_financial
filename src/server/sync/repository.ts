@@ -554,10 +554,12 @@ export async function applySyncMutations(
     );
     acknowledgements.push(...result.acknowledgements);
   }
-  await sql`
-    DELETE FROM applied_mutations
-    WHERE user_id = ${userId} AND applied_at < now() - interval '90 days'
-  `;
+  if (byYear.size > 0) {
+    await sql`
+      DELETE FROM applied_mutations
+      WHERE user_id = ${userId} AND applied_at < now() - interval '90 days'
+    `;
+  }
 
   return { acknowledgements, plans: await listPlans(sql, userId) };
 }

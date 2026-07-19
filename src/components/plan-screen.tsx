@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
-import { calculatePlan } from "@/domain/tax/engine";
+import type { PlanResult } from "@/domain/tax/engine";
 import { ExpenseLedger } from "./expense-ledger";
 import type { HsaFamilyAllocation } from "./hsa-controls";
 import { PlanAnswer } from "./plan-answer";
@@ -11,17 +10,17 @@ import styles from "./plan.module.css";
 
 export function PlanScreen({
   draft,
+  result,
   onDraft,
   preferredHsaAllocation,
   onHsaAllocationIntent,
 }: {
   draft: StoredPlan;
+  result: PlanResult;
   onDraft: (plan: StoredPlan) => void;
   preferredHsaAllocation?: HsaFamilyAllocation;
   onHsaAllocationIntent: (allocation: HsaFamilyAllocation) => void;
 }) {
-  const result = useMemo(() => calculatePlan(draft), [draft]);
-
   return (
     <div className={styles.planGrid}>
       <PlanAnswer draft={draft} result={result} />

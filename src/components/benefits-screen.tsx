@@ -6,7 +6,7 @@ import {
   type BenefitType,
   type TaxTreatment,
 } from "@/domain/benefits";
-import { calculatePlan } from "@/domain/tax/engine";
+import type { PlanResult } from "@/domain/tax/engine";
 import { BufferedTextInput } from "./buffered-text-input";
 import {
   benefitAmountFromInput,
@@ -44,12 +44,13 @@ const postTaxTreatment: TaxTreatment = {
 
 export function BenefitsScreen({
   draft,
+  result,
   onDraft,
 }: {
   draft: StoredPlan;
+  result: PlanResult;
   onDraft: (plan: StoredPlan) => void;
 }) {
-  const result = calculatePlan(draft);
   const esppDiscountValueCents = result.benefits.reduce(
     (total, benefit) => total + benefit.impliedEsppDiscountGainCents,
     0,

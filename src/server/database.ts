@@ -11,7 +11,3 @@ export function database(): Sql {
   client = postgres(databaseUrl, { max: 5, idle_timeout: 20 });
   return client;
 }
-
-export function createDatabaseClient(databaseUrl: string): Sql {
-  return postgres(databaseUrl, { max: 2, idle_timeout: 5 });
-}

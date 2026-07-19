@@ -27,7 +27,7 @@ import { STATE_CODES } from "./tax/jurisdictions";
 export const maximumMonthlyCents = Math.floor(Number.MAX_SAFE_INTEGER / 12);
 export const maximumRatePpm = 1_000_000;
 export const maximumEsppDiscountPpm = 150_000;
-export const maximumExpenseSortOrder = 10_000;
+const maximumExpenseSortOrder = 10_000;
 
 export const planYearSchema = z.int().min(2000).max(2200);
 export { fieldVersionSchema } from "./field-version";

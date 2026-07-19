@@ -72,7 +72,7 @@ export type DecodedSyncMutation =
   | ExpenseMutation<"sortOrder", number>
   | ExpenseMutation<"guidanceBucket", ExpenseEntry["guidanceBucket"]>;
 
-export function canonicalSyncIntent(mutation: SyncMutation): SyncMutation {
+function canonicalSyncIntent(mutation: SyncMutation): SyncMutation {
   const canonical = encodeSyncMutation(decodeSyncMutation(mutation));
   const intent = {
     ...canonical,

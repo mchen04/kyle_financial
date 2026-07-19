@@ -6,7 +6,7 @@ import {
 import type { PlanInput } from "../budget";
 import { sumCents } from "../money";
 import { eligibleBenefitAmounts } from "./benefit-limits";
-import type { BenefitResult } from "./plan-result";
+import { sumBenefits, type BenefitResult } from "./plan-result";
 import type { StateTaxEntry, TaxTable } from "./types";
 
 export interface BenefitTaxabilityStage {
@@ -23,17 +23,6 @@ export interface BenefitTaxabilityStage {
   primaryPaycheckDeductionsCents: number;
   spousePaycheckDeductionsCents: number;
   paycheckDeductionsCents: number;
-}
-
-function sumBenefits(
-  benefits: BenefitResult[],
-  predicate: (entry: BenefitEntry) => boolean,
-): number {
-  return sumCents(
-    benefits
-      .filter(({ entry }) => predicate(entry))
-      .map(({ annualAmountCents }) => annualAmountCents),
-  );
 }
 
 export function calculateBenefitTaxability(

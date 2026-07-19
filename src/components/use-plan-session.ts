@@ -31,7 +31,6 @@ type SessionAction =
   | { type: "screen"; value: Screen }
   | { type: "save"; value: SaveState }
   | { type: "retry"; value: SetStateAction<number> }
-  | { type: "notice"; value: string }
   | { type: "account-transition" }
   | { type: "signed-out"; notice: string };
 
@@ -102,8 +101,6 @@ function sessionReducer(
             ? action.value(state.localSaveRetry)
             : action.value,
       };
-    case "notice":
-      return { ...state, authNotice: action.value };
     case "account-transition":
       return {
         ...state,
@@ -250,10 +247,6 @@ export function usePlanSession() {
     (value: SetStateAction<number>) => dispatch({ type: "retry", value }),
     [],
   );
-  const setAuthNotice = useCallback(
-    (value: string) => dispatch({ type: "notice", value }),
-    [],
-  );
   const beginPlanIntent = useCallback(
     () => ++runtimeRef.current.intentRevision,
     [],
@@ -302,7 +295,6 @@ export function usePlanSession() {
     setScreen,
     setSaveState,
     setLocalSaveRetry,
-    setAuthNotice,
     beginPlanIntent,
     getOwnerSignal,
     beginAccount,

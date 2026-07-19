@@ -18,9 +18,9 @@ import {
 import { isRegistrationInviteValid } from "./registration-invite";
 
 export const SESSION_COOKIE = "kyle_session";
-export const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
+const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
 
-export interface CreatedSession {
+interface CreatedSession {
   id: string;
   token: string;
   expiresAt: Date;

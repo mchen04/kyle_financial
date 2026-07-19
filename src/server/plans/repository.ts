@@ -310,7 +310,7 @@ export async function getPlanByYear(
   );
 }
 
-export async function listPlansInTransaction(
+async function listPlansInTransaction(
   sql: TransactionSql,
   userId: string,
 ): Promise<StoredPlan[]> {

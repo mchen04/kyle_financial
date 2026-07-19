@@ -185,13 +185,18 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
           {screen === "plan" && (
             <PlanScreen
               draft={draft}
+              result={currentResult}
               onDraft={acceptDraft}
               preferredHsaAllocation={preferredHsaAllocation}
               onHsaAllocationIntent={rememberHsaAllocation}
             />
           )}
           {screen === "benefits" && (
-            <BenefitsScreen draft={draft} onDraft={acceptDraft} />
+            <BenefitsScreen
+              draft={draft}
+              result={currentResult}
+              onDraft={acceptDraft}
+            />
           )}
           {screen === "compare" && <CompareScreen plans={props.plans} />}
           {screen === "account" && <AccountScreen {...props} />}

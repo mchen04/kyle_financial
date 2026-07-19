@@ -1,10 +1,22 @@
 import type { BenefitEntry } from "../benefits";
+import { sumCents } from "../money";
 import type { BracketTax } from "./calculate-progressive-tax";
 
 export interface BenefitResult {
   entry: BenefitEntry;
   annualAmountCents: number;
   impliedEsppDiscountGainCents: number;
+}
+
+export function sumBenefits(
+  benefits: BenefitResult[],
+  predicate: (entry: BenefitEntry) => boolean,
+): number {
+  return sumCents(
+    benefits
+      .filter(({ entry }) => predicate(entry))
+      .map(({ annualAmountCents }) => annualAmountCents),
+  );
 }
 
 export interface LimitWarning {
