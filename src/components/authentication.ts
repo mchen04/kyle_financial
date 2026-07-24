@@ -10,7 +10,6 @@ export async function authenticateWithOwner(
   credentials: {
     email: FormDataEntryValue | null;
     password: FormDataEntryValue | null;
-    invitationCode?: FormDataEntryValue | null;
   },
   ownerSignal: AbortSignal,
 ): Promise<User> {

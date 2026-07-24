@@ -23,7 +23,6 @@ describe("authentication request ownership", () => {
         {
           email: "new@example.test",
           password: "password-a",
-          invitationCode: "invitation-a",
         },
         owner.signal,
       ),
@@ -35,7 +34,6 @@ describe("authentication request ownership", () => {
     expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body))).toEqual({
       email: "new@example.test",
       password: "password-a",
-      invitationCode: "invitation-a",
     });
     expect(JSON.parse(String(fetchMock.mock.calls[1][1]?.body))).toEqual({
       email: "new@example.test",
@@ -59,7 +57,6 @@ describe("authentication request ownership", () => {
         {
           email: "new@example.test",
           password: "password-a",
-          invitationCode: "invitation-a",
         },
         owner.signal,
       ),

@@ -15,7 +15,6 @@ import {
   hashSessionToken,
   verifyAuthenticationPassword,
 } from "./crypto";
-import { isRegistrationInviteValid } from "./registration-invite";
 
 export const SESSION_COOKIE = "kyle_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
@@ -80,14 +79,11 @@ export async function createUser(
   return insertUser(sql, normalized, passwordHash);
 }
 
-export async function registerInvitedUser(
+export async function registerPublicUser(
   sql: Sql,
   email: string,
   password: string,
-  registrationSecret: string | undefined,
-  invitationCode: string,
 ): Promise<void> {
-  if (!isRegistrationInviteValid(registrationSecret, invitationCode)) return;
   try {
     await createUser(sql, email, password);
   } catch (error) {
