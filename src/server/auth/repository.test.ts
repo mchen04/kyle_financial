@@ -8,10 +8,9 @@ import {
   deleteUser,
   EmailAlreadyRegisteredError,
   findSessionUser,
-  registerInvitedUser,
+  registerPublicUser,
   revokeSession,
 } from "./repository";
-import { createRegistrationInvite } from "./registration-invite";
 
 const sql = testSql();
 
@@ -57,72 +56,27 @@ describe("account authentication", () => {
     ).rejects.toBeInstanceOf(EmailAlreadyRegisteredError);
   });
 
-  it("makes uninvited new and existing identities indistinguishable to signup then login", async () => {
-    const secret = "test-registration-secret-with-at-least-32-bytes";
+  it("registers a public identity without replacing an existing password", async () => {
     const submittedPassword = "attacker selected password";
     const existing = await createUser(
       sql,
-      "invitation-existing@example.com",
+      "public-existing@example.com",
       "existing account password",
     );
-    const wrongInvitation = "x".repeat(43);
 
-    await registerInvitedUser(
-      sql,
-      "invitation-new@example.com",
-      submittedPassword,
-      secret,
-      wrongInvitation,
-    );
-    await registerInvitedUser(
-      sql,
-      existing.email,
-      submittedPassword,
-      secret,
-      wrongInvitation,
-    );
-
+    const publicEmail = "public-new@example.com";
+    await registerPublicUser(sql, publicEmail, submittedPassword);
     await expect(
-      authenticateUser(sql, "invitation-new@example.com", submittedPassword),
-    ).resolves.toBeNull();
-    await expect(
-      authenticateUser(sql, existing.email, submittedPassword),
-    ).resolves.toBeNull();
+      authenticateUser(sql, publicEmail, submittedPassword),
+    ).resolves.toMatchObject({ email: publicEmail });
 
-    const invitedEmail = "invitation-authorized@example.com";
-    await registerInvitedUser(
-      sql,
-      invitedEmail,
-      submittedPassword,
-      secret,
-      createRegistrationInvite(secret),
-    );
-    await expect(
-      authenticateUser(sql, invitedEmail, submittedPassword),
-    ).resolves.toMatchObject({ email: invitedEmail });
-
-    const secondInvitedEmail = "second-invitation-authorized@example.com";
-    await registerInvitedUser(
-      sql,
-      secondInvitedEmail,
-      submittedPassword,
-      secret,
-      createRegistrationInvite(secret),
-    );
-    await expect(
-      authenticateUser(sql, secondInvitedEmail, submittedPassword),
-    ).resolves.toMatchObject({ email: secondInvitedEmail });
-
-    await registerInvitedUser(
-      sql,
-      existing.email,
-      submittedPassword,
-      secret,
-      createRegistrationInvite(secret),
-    );
+    await registerPublicUser(sql, existing.email, submittedPassword);
     await expect(
       authenticateUser(sql, existing.email, "existing account password"),
     ).resolves.toEqual(existing);
+    await expect(
+      authenticateUser(sql, existing.email, submittedPassword),
+    ).resolves.toBeNull();
   });
 
   it("creates, expires, and revokes opaque sessions", async () => {

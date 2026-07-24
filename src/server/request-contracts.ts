@@ -10,9 +10,7 @@ export const credentialsSchema = z.object({
   password: z.string().min(10).max(200),
 });
 
-export const signupCredentialsSchema = credentialsSchema.extend({
-  invitationCode: z.string().trim().min(20).max(200),
-});
+export const signupCredentialsSchema = credentialsSchema;
 
 export const copyPlanSchema = z.object({
   sourceYear: planYearSchema,

@@ -63,7 +63,6 @@ export function AuthView({
         {
           email: form.get("email"),
           password: form.get("password"),
-          invitationCode: form.get("invitationCode"),
         },
         ownerSignal,
       );
@@ -140,19 +139,6 @@ export function AuthView({
             />
             {mode === "signup" && <small>Use at least 10 characters.</small>}
           </label>
-          {mode === "signup" && (
-            <label>
-              Invitation code
-              <input
-                name="invitationCode"
-                type="text"
-                autoComplete="off"
-                spellCheck={false}
-                required
-              />
-              <small>Provided by the app owner.</small>
-            </label>
-          )}
           {error && (
             <p className={styles.formError} role="alert">
               {error}

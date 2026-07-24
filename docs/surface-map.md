@@ -28,7 +28,7 @@ preserving quoted content and valid binary `calc()` arithmetic.
 
 ## Surfaces and hierarchy
 
-1. **Public/Auth:** daily-plus-annual product promise, private invited account,
+1. **Public/Auth:** daily-plus-annual product promise, public account creation,
    sign-in, validation, and honest online-first bootstrap.
 2. **Onboarding:** year, rough wage income, state, and filing status; the copy
    explains that the annual plan becomes the daily budget.

@@ -1,5 +1,5 @@
 import { signupAcceptedResponseSchema } from "@/domain/api-contracts";
-import { registerInvitedUser } from "@/server/auth/repository";
+import { registerPublicUser } from "@/server/auth/repository";
 import {
   authenticationRateLimitResponse,
   consumeAuthenticationIdentityAttempt,
@@ -35,12 +35,10 @@ export async function POST(request: Request): Promise<Response> {
     );
     if (!identityRateLimit.allowed)
       return authenticationRateLimitResponse(identityRateLimit);
-    await registerInvitedUser(
+    await registerPublicUser(
       database(),
       parsed.data.email,
       parsed.data.password,
-      process.env.REGISTRATION_SECRET,
-      parsed.data.invitationCode,
     );
   } catch {
     return errorResponse(500, "The account could not be created.");

@@ -4,7 +4,7 @@ const {
   authenticationRateLimitResponse,
   consumeAuthenticationIdentityAttempt,
   consumeAuthenticationIpAttempt,
-  registerInvitedUser,
+  registerPublicUser,
 } = vi.hoisted(() => ({
   authenticationRateLimitResponse: vi.fn(
     ({ retryAfterSeconds }: { retryAfterSeconds: number }) =>
@@ -18,11 +18,11 @@ const {
   ),
   consumeAuthenticationIdentityAttempt: vi.fn(),
   consumeAuthenticationIpAttempt: vi.fn(),
-  registerInvitedUser: vi.fn(),
+  registerPublicUser: vi.fn(),
 }));
 
 vi.mock("@/server/auth/repository", () => ({
-  registerInvitedUser,
+  registerPublicUser,
 }));
 vi.mock("@/server/auth/rate-limit", () => ({
   authenticationRateLimitResponse,
@@ -43,7 +43,6 @@ function signupRequest(): Request {
     body: JSON.stringify({
       email: "New@Example.com",
       password: "correct horse battery staple",
-      invitationCode: "universal-invitation-code",
     }),
   });
 }
@@ -77,7 +76,7 @@ describe("signup throttling", () => {
       "signup",
     );
     expect(consumeAuthenticationIdentityAttempt).not.toHaveBeenCalled();
-    expect(registerInvitedUser).not.toHaveBeenCalled();
+    expect(registerPublicUser).not.toHaveBeenCalled();
   });
 
   it("counts schema-invalid bodies against the IP bucket before validation", async () => {
@@ -97,7 +96,7 @@ describe("signup throttling", () => {
     expect(limited.headers.get("Retry-After")).toBe("51");
     expect(consumeAuthenticationIpAttempt).toHaveBeenCalledTimes(2);
     expect(consumeAuthenticationIdentityAttempt).not.toHaveBeenCalled();
-    expect(registerInvitedUser).not.toHaveBeenCalled();
+    expect(registerPublicUser).not.toHaveBeenCalled();
   });
 
   it("returns a generic accepted result after allowed account creation", async () => {
@@ -109,19 +108,17 @@ describe("signup throttling", () => {
       "signup",
       "new@example.com",
     );
-    expect(registerInvitedUser).toHaveBeenCalledWith(
+    expect(registerPublicUser).toHaveBeenCalledWith(
       {},
       "new@example.com",
       "correct horse battery staple",
-      undefined,
-      "universal-invitation-code",
     );
     await expect(response.json()).resolves.toEqual({ accepted: true });
     expect(response.headers.get("set-cookie")).toBeNull();
   });
 
   it("returns the same generic result when registration declines the identity", async () => {
-    registerInvitedUser.mockResolvedValue(undefined);
+    registerPublicUser.mockResolvedValue(undefined);
 
     const response = await POST(signupRequest());
 
@@ -131,20 +128,7 @@ describe("signup throttling", () => {
   });
 
   it("does not hide an unexpected persistence failure", async () => {
-    registerInvitedUser.mockRejectedValue(new Error("database unavailable"));
-
-    const response = await POST(signupRequest());
-
-    expect(response.status).toBe(500);
-    await expect(response.json()).resolves.toEqual({
-      error: "The account could not be created.",
-    });
-  });
-
-  it("fails closed when registration invitation verification is unavailable", async () => {
-    registerInvitedUser.mockRejectedValue(
-      new Error("REGISTRATION_SECRET is not configured"),
-    );
+    registerPublicUser.mockRejectedValue(new Error("database unavailable"));
 
     const response = await POST(signupRequest());
 
