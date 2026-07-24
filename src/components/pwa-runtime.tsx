@@ -56,16 +56,27 @@ export function PwaRuntime() {
       );
   }, []);
 
+  useEffect(() => {
+    if (waiting) document.documentElement.dataset.updateReady = "true";
+    else delete document.documentElement.dataset.updateReady;
+    return () => {
+      delete document.documentElement.dataset.updateReady;
+    };
+  }, [waiting]);
+
   if (!waiting) return null;
   return (
     <button
       className={styles.updateToast}
+      aria-label="Update ready; reload"
       onClick={() => {
         reloadForUpdate.current = true;
         waiting.postMessage({ type: "SKIP_WAITING" });
       }}
     >
-      <RefreshCw size={16} /> Update ready · reload
+      <RefreshCw size={16} />
+      <span className={styles.updateFull}>Update ready · reload</span>
+      <span className={styles.updateShort}>Update</span>
     </button>
   );
 }

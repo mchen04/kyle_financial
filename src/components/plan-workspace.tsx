@@ -1,52 +1,52 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import {
+  Activity,
   Check,
   ChevronRight,
   CircleHelp,
   CloudOff,
-  ReceiptText,
+  House,
+  Landmark,
+  Plus,
   RefreshCw,
-  Settings2,
-  TrendingUp,
+  UserRound,
   WalletCards,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { User } from "@/domain/api-contracts";
+import { PRODUCT_MARK, PRODUCT_NAME } from "@/domain/brand";
+import { planYearHasStarted } from "@/domain/fast-log";
 import { calculatePlan } from "@/domain/tax/engine";
+import {
+  advanceFollowedPeriod,
+  FastLogSheet,
+  initialPeriod,
+  periodForYear,
+} from "./daily-cockpit";
+import { PlanWorkspaceContent } from "./plan-workspace-content";
 import {
   acceptCalculablePlanDraft,
   retryActionForSaveState,
   type SaveState,
   type Screen,
   type StoredPlan,
+  type WorkspaceLocation,
+  type WorkspaceRoute,
 } from "./plan-types";
-import {
-  currentHsaFamilyAllocation,
-  type HsaFamilyAllocation,
-} from "./hsa-controls";
-import { PlanScreen } from "./plan-screen";
+import type { PlanDraftChange } from "./sync-state";
+import { useFastLogController } from "./use-fast-log-controller";
 import styles from "./financial-app.module.css";
 
-const AccountScreen = dynamic(() =>
-  import("./account-screen").then(({ AccountScreen }) => AccountScreen),
-);
-const BenefitsScreen = dynamic(() =>
-  import("./benefits-screen").then(({ BenefitsScreen }) => BenefitsScreen),
-);
-const CompareScreen = dynamic(() =>
-  import("./compare-screen").then(({ CompareScreen }) => CompareScreen),
-);
-
 export interface PlanWorkspaceProps {
+  today: string;
   user: User;
   plans: StoredPlan[];
   draft: StoredPlan;
-  screen: Screen;
+  location: WorkspaceLocation;
   saveState: SaveState;
-  onScreen: (screen: Screen) => void;
-  onDraft: (plan: StoredPlan) => void;
+  onLocation: (location: WorkspaceLocation) => void;
+  onDraft: (change: PlanDraftChange) => void;
   onYear: (year: number) => void;
   onCopyForward: (sourcePlan: StoredPlan, targetYear: number) => Promise<void>;
   onRetryLocalSave: () => void;
@@ -55,23 +55,44 @@ export interface PlanWorkspaceProps {
   onDeleteAccount: () => Promise<void>;
 }
 
+const planScreens = new Set<Screen>([
+  "plan",
+  "plan-details",
+  "benefits",
+  "compare",
+]);
+const budgetScreens = new Set<Screen>([
+  "budget",
+  "category",
+  "edit-budget",
+  "manage-categories",
+  "wrap",
+]);
+
 export function PlanWorkspace(props: PlanWorkspaceProps) {
-  const { draft, screen, onScreen } = props;
+  const { draft, location, onLocation, today } = props;
+  const { route } = location;
+  const { screen } = route;
+  const contentRef = useRef<HTMLElement>(null);
   const [calculationError, setCalculationError] = useState("");
-  const [hsaFamilyAllocationIntents, setHsaFamilyAllocationIntents] = useState(
-    () => new Map<string, HsaFamilyAllocation>(),
-  );
+  const [periodSelection, setPeriodSelection] = useState(() => ({
+    period: initialPeriod(draft.year, today),
+    selectedOn: today,
+  }));
   const currentResult = useMemo(() => calculatePlan(draft), [draft]);
-  const currentHsaAllocation = currentHsaFamilyAllocation(draft);
-  const preferredHsaAllocation =
-    currentHsaAllocation ?? hsaFamilyAllocationIntents.get(draft.id);
-  const rememberHsaAllocation = (allocation: HsaFamilyAllocation) => {
-    setHsaFamilyAllocationIntents((current) => {
-      const next = new Map(current);
-      next.set(draft.id, allocation);
-      return next;
-    });
-  };
+
+  const activePeriod = advanceFollowedPeriod(
+    periodForYear(periodSelection.period, draft.year, today),
+    periodSelection.selectedOn,
+    today,
+    draft.year,
+  );
+  const selectPeriod = (nextPeriod: typeof activePeriod) =>
+    setPeriodSelection({ period: nextPeriod, selectedOn: today });
+  useLayoutEffect(() => {
+    contentRef.current?.scrollTo({ top: 0 });
+  }, [screen]);
+
   const acceptDraft = (nextDraft: StoredPlan) => {
     const error = acceptCalculablePlanDraft(nextDraft, props.onDraft);
     if (error) {
@@ -84,45 +105,31 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
     setCalculationError("");
     props.onYear(year);
   };
+  const navigate = (nextRoute: WorkspaceRoute) => {
+    onLocation({ route: nextRoute });
+  };
+  const fastLog = useFastLogController({
+    location,
+    onLocation,
+    onDraft: props.onDraft,
+    onValidationError: setCalculationError,
+  });
+  const showFastLog =
+    screen === "home" || screen === "budget" || screen === "activity";
+  const canCreateExpense = planYearHasStarted(draft.year, today);
+
   return (
     <div className={styles.appFrame}>
       <aside className={styles.sidebar}>
         <div className={styles.wordmark}>
-          <span className={styles.brandMark}>KF</span>
-          <span>
-            Kyle
-            <br />
-            Financial
-          </span>
+          <span className={styles.brandMark}>{PRODUCT_MARK}</span>
+          <span>{PRODUCT_NAME}</span>
         </div>
         <nav aria-label="Main navigation">
-          <NavButton
-            active={screen === "plan"}
-            icon={<ReceiptText />}
-            label="Plan"
-            onClick={() => onScreen("plan")}
-          />
-          <NavButton
-            active={screen === "benefits"}
-            icon={<WalletCards />}
-            label="Benefits"
-            onClick={() => onScreen("benefits")}
-          />
-          <NavButton
-            active={screen === "compare"}
-            icon={<TrendingUp />}
-            label="Compare"
-            onClick={() => onScreen("compare")}
-          />
-          <NavButton
-            active={screen === "account"}
-            icon={<Settings2 />}
-            label="Account"
-            onClick={() => onScreen("account")}
-          />
+          <PrimaryNav screen={screen} onRoute={navigate} />
         </nav>
         <p className={styles.sidebarFoot}>
-          Planning estimate
+          Daily decisions · annual plan
           <br />
           Tax data {currentResult.appliedTaxYear}
         </p>
@@ -131,39 +138,14 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
         <a className={styles.skipToMobileNav} href="#mobile-primary-navigation">
           Skip to primary navigation
         </a>
-        <TopBar {...props} onYear={changeYear} />
-        <nav
-          id="mobile-primary-navigation"
-          className={styles.bottomNav}
-          aria-label="Main navigation"
-          tabIndex={-1}
-        >
-          <NavButton
-            active={screen === "plan"}
-            icon={<ReceiptText />}
-            label="Plan"
-            onClick={() => onScreen("plan")}
-          />
-          <NavButton
-            active={screen === "benefits"}
-            icon={<WalletCards />}
-            label="Benefits"
-            onClick={() => onScreen("benefits")}
-          />
-          <NavButton
-            active={screen === "compare"}
-            icon={<TrendingUp />}
-            label="Compare"
-            onClick={() => onScreen("compare")}
-          />
-          <NavButton
-            active={screen === "account"}
-            icon={<Settings2 />}
-            label="Account"
-            onClick={() => onScreen("account")}
-          />
-        </nav>
-        <main className={styles.content}>
+        <TopBar
+          {...props}
+          onYear={changeYear}
+          onFastLog={
+            showFastLog && canCreateExpense ? () => fastLog.open() : undefined
+          }
+        />
+        <main ref={contentRef} className={styles.content}>
           {calculationError && (
             <p className={styles.syncNotice} role="alert">
               <CircleHelp size={16} /> {calculationError}
@@ -182,27 +164,106 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
               </span>
             </p>
           )}
-          {screen === "plan" && (
-            <PlanScreen
-              draft={draft}
-              result={currentResult}
-              onDraft={acceptDraft}
-              preferredHsaAllocation={preferredHsaAllocation}
-              onHsaAllocationIntent={rememberHsaAllocation}
-            />
-          )}
-          {screen === "benefits" && (
-            <BenefitsScreen
-              draft={draft}
-              result={currentResult}
-              onDraft={acceptDraft}
-            />
-          )}
-          {screen === "compare" && <CompareScreen plans={props.plans} />}
-          {screen === "account" && <AccountScreen {...props} />}
+          <PlanWorkspaceContent
+            today={today}
+            user={props.user}
+            plans={props.plans}
+            draft={draft}
+            route={route}
+            saveState={props.saveState}
+            result={currentResult}
+            period={activePeriod}
+            onPeriod={selectPeriod}
+            onDraft={acceptDraft}
+            onNavigate={navigate}
+            onOpenTransaction={fastLog.open}
+            canCreateExpense={canCreateExpense}
+            onLogout={props.onLogout}
+            onDeleteAccount={props.onDeleteAccount}
+          />
         </main>
+        {showFastLog && canCreateExpense && (
+          <button
+            className={`${styles.fastLogButton} ${
+              screen === "home" ? styles.fastLogLabeled : ""
+            }`}
+            aria-label="Fast Log expense"
+            onClick={() => fastLog.open()}
+          >
+            <Plus />
+            {screen === "home" && <span>Fast Log</span>}
+          </button>
+        )}
+        <nav
+          id="mobile-primary-navigation"
+          className={styles.bottomNav}
+          aria-label="Main navigation"
+          tabIndex={-1}
+        >
+          <PrimaryNav screen={screen} onRoute={navigate} />
+        </nav>
       </div>
+      {location.overlay?.kind === "fast-log" && (
+        <FastLogSheet
+          key={location.overlay.transactionId ?? "new"}
+          today={today}
+          plan={draft}
+          state={location.overlay}
+          onClose={fastLog.close}
+          onDraft={fastLog.acceptTransition}
+          onSaved={fastLog.saved}
+          onDeleted={fastLog.deleted}
+        />
+      )}
+      {fastLog.toast && (
+        <div className={styles.expenseToast} role="status">
+          <span>
+            <Check /> {fastLog.toast.message}
+          </span>
+          {fastLog.toast.allowEdit && (
+            <button onClick={fastLog.editToast}>Edit</button>
+          )}
+          <button onClick={fastLog.undoToast}>Undo</button>
+        </div>
+      )}
     </div>
+  );
+}
+
+function PrimaryNav({
+  screen,
+  onRoute,
+}: {
+  screen: Screen;
+  onRoute: (route: WorkspaceRoute) => void;
+}) {
+  return (
+    <>
+      <NavButton
+        active={screen === "home"}
+        icon={<House />}
+        label="Home"
+        onClick={() => onRoute({ screen: "home" })}
+      />
+      <NavButton
+        active={budgetScreens.has(screen)}
+        icon={<WalletCards />}
+        label="Budget"
+        onClick={() => onRoute({ screen: "budget" })}
+      />
+      <NavButton
+        active={screen === "activity"}
+        icon={<Activity />}
+        label="Activity"
+        onClick={() => onRoute({ screen: "activity" })}
+      />
+      <NavButton
+        active={planScreens.has(screen)}
+        icon={<Landmark />}
+        label="Plan"
+        onClick={() => onRoute({ screen: "plan" })}
+      />
+    </>
   );
 }
 
@@ -232,12 +293,16 @@ function NavButton({
 function TopBar({
   plans,
   draft,
+  location,
   saveState,
+  onLocation,
   onYear,
   onCopyForward,
   onRetryLocalSave,
   onRetrySync,
-}: PlanWorkspaceProps) {
+  onFastLog,
+}: PlanWorkspaceProps & { onFastLog?: () => void }) {
+  const { screen } = location.route;
   const [copyError, setCopyError] = useState("");
   const [copying, setCopying] = useState(false);
   const retryAction = retryActionForSaveState(saveState);
@@ -301,7 +366,7 @@ function TopBar({
     <>
       <header className={styles.topBar}>
         <div className={styles.mobileMark}>
-          <span className={styles.brandMark}>KF</span>
+          <span className={styles.brandMark}>{PRODUCT_MARK}</span>
         </div>
         <label className={styles.yearPicker}>
           <span>Plan year</span>
@@ -316,24 +381,42 @@ function TopBar({
           </select>
         </label>
         <span
-          className={`${styles.syncStatus} ${saveState.endsWith("error") || saveState === "rejected" ? styles.syncError : ""}`}
+          className={`${styles.syncStatus} ${
+            saveState.endsWith("error") || saveState === "rejected"
+              ? styles.syncError
+              : ""
+          }`}
           role="status"
         >
           {status}
         </span>
+        {planScreens.has(screen) && (
+          <button
+            className={styles.secondaryButton}
+            onClick={() => void copyNextYear()}
+            disabled={copying}
+          >
+            {copying ? "Starting…" : `Start ${draft.year + 1}`}
+            {!copying && <ChevronRight />}
+          </button>
+        )}
+        {onFastLog && (
+          <button
+            className={styles.desktopFastLog}
+            aria-label="Fast Log expense"
+            onClick={onFastLog}
+          >
+            <Plus />
+            {screen === "home" && <span>Fast Log</span>}
+          </button>
+        )}
         <button
-          className={styles.secondaryButton}
-          onClick={() => void copyNextYear()}
-          disabled={copying}
+          className={styles.profileButton}
+          aria-label="Open account"
+          aria-current={screen === "account" ? "page" : undefined}
+          onClick={() => onLocation({ route: { screen: "account" } })}
         >
-          {copying ? "Starting…" : "Start"}{" "}
-          {!copying && (
-            <>
-              {draft.year + 1}
-              <span className={styles.nextYearSuffix}> plan</span>
-              <ChevronRight size={16} />
-            </>
-          )}
+          <UserRound />
         </button>
       </header>
       {(saveState === "local-error" ||
@@ -370,8 +453,8 @@ function TopBar({
       {saveState === "offline" && (
         <div className={styles.offlineNotice} role="status">
           <span>
-            Edits made offline stay queued on this device and sync when the
-            connection returns.
+            Showing the latest copy saved on this device. Offline edits stay
+            queued here and sync when the connection returns.
           </span>
           <button className={styles.secondaryButton} onClick={onRetrySync}>
             Retry sync

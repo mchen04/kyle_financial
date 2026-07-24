@@ -4,6 +4,21 @@ import type { StateCode } from "./tax/jurisdictions";
 
 export type ExpenseCadence = "monthly" | "yearly";
 export type GuidanceBucket = "needs" | "wants" | "saving";
+export const CATEGORY_COLOR_TOKENS = [
+  "blue",
+  "teal",
+  "violet",
+  "amber",
+  "rose",
+  "cyan",
+  "green",
+  "orange",
+  "indigo",
+  "pink",
+  "lime",
+  "slate",
+] as const;
+export type CategoryColorToken = (typeof CATEGORY_COLOR_TOKENS)[number];
 
 export interface ExpenseEntry {
   id: string;
@@ -13,6 +28,87 @@ export interface ExpenseEntry {
   amountCents: number;
   sortOrder: number;
   guidanceBucket?: GuidanceBucket;
+  colorToken?: CategoryColorToken;
+  archived?: boolean;
+}
+
+export interface BudgetCategory extends Omit<
+  ExpenseEntry,
+  "guidanceBucket" | "colorToken" | "archived"
+> {
+  guidanceBucket: GuidanceBucket;
+  colorToken: CategoryColorToken;
+  archived: boolean;
+}
+
+export function createBudgetCategory(
+  id: string,
+  sortOrder: number,
+): BudgetCategory {
+  return {
+    id,
+    name: "New category",
+    group: "Wants",
+    cadence: "monthly",
+    amountCents: 0,
+    sortOrder,
+    guidanceBucket: "wants",
+    colorToken: CATEGORY_COLOR_TOKENS[sortOrder % CATEGORY_COLOR_TOKENS.length],
+    archived: false,
+  };
+}
+
+export function addBudgetCategory(
+  categories: readonly BudgetCategory[],
+  id: string,
+): BudgetCategory[] {
+  return [...categories, createBudgetCategory(id, categories.length)];
+}
+
+export function patchBudgetCategory(
+  categories: readonly BudgetCategory[],
+  categoryId: string,
+  change: Partial<BudgetCategory>,
+): BudgetCategory[] {
+  return categories.map((category) =>
+    category.id === categoryId ? { ...category, ...change } : category,
+  );
+}
+
+export interface TransactionEntry {
+  id: string;
+  categoryId: string;
+  amountCents: number;
+  title: string;
+  note?: string;
+  date: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export function moveActiveBudgetCategory(
+  categories: readonly BudgetCategory[],
+  categoryId: string,
+  direction: -1 | 1,
+): BudgetCategory[] {
+  const activeIndexes = categories.flatMap((category, index) =>
+    category.archived ? [] : [index],
+  );
+  const activeIndex = activeIndexes.findIndex(
+    (index) => categories[index]?.id === categoryId,
+  );
+  const sourceIndex = activeIndexes[activeIndex];
+  const targetIndex = activeIndexes[activeIndex + direction];
+  if (sourceIndex === undefined || targetIndex === undefined) {
+    return [...categories];
+  }
+
+  const reordered = [...categories];
+  [reordered[sourceIndex], reordered[targetIndex]] = [
+    reordered[targetIndex],
+    reordered[sourceIndex],
+  ];
+  return reordered.map((category, sortOrder) => ({ ...category, sortOrder }));
 }
 
 export interface PlanInput {
@@ -32,6 +128,8 @@ export interface PlanInput {
   spouseHsaFamilyAllocationPpm: number;
   benefits: BenefitEntry[];
   expenses: ExpenseEntry[];
+  transactions?: TransactionEntry[];
+  startingSavingsCents?: number;
 }
 
 export interface HsaPlanSettings {
@@ -127,6 +225,7 @@ export function normalizedHsaPlanSettings(
 }
 
 export function annualExpenseAmount(expense: ExpenseEntry): number {
+  if (expense.archived) return 0;
   return expense.cadence === "monthly"
     ? expense.amountCents * 12
     : expense.amountCents;
@@ -179,4 +278,20 @@ export function guidanceBucket(
   )
     return "needs";
   return "wants";
+}
+
+export function canonicalBudgetCategory(
+  expense: ExpenseEntry,
+  fallbackIndex = expense.sortOrder,
+): BudgetCategory {
+  return {
+    ...expense,
+    guidanceBucket: guidanceBucket(expense),
+    colorToken:
+      expense.colorToken ??
+      CATEGORY_COLOR_TOKENS[
+        Math.abs(fallbackIndex) % CATEGORY_COLOR_TOKENS.length
+      ],
+    archived: expense.archived ?? false,
+  };
 }

@@ -1,6 +1,6 @@
-# Kyle Financial
+# House by 30
 
-Plan-based budgeting PWA that turns yearly income, estimated taxes, payroll benefits, and planned expenses into an honest monthly remainder. Plans are private per account, persist in PostgreSQL, and remain editable offline through an account-scoped IndexedDB outbox.
+Offline-first daily money cockpit backed by an annual plan. House by 30 turns yearly income, estimated taxes, payroll benefits, and category allocations into a selected-period safe-to-spend answer; dated transactions update Home, Budget, Activity, Monthly Wrap, and projected savings immediately. Plans are private per account, persist in PostgreSQL, and remain editable offline through an account-scoped IndexedDB outbox.
 
 ## Local setup
 
@@ -23,7 +23,7 @@ Open `http://localhost:3000` and paste the generated universal invitation when c
 pnpm verify
 ```
 
-The gate runs formatting, lint, TypeScript, deterministic unit/property/integration tests, and a production Next.js build. PostgreSQL tests create an isolated local test database and apply every migration from empty.
+The gate runs formatting, token-authority checks, lint, TypeScript, deterministic unit/property/integration tests, and a production Next.js build. PostgreSQL tests create an isolated local test database and apply every migration from empty.
 
 ## Yearly tax-table update
 
@@ -42,7 +42,7 @@ Users can permanently delete themselves from Account. The app first makes local 
 
 ## Install on iPhone
 
-Open the deployed HTTPS URL in Safari, tap Share, choose **Add to Home Screen**, and open Kyle Financial from the new icon. Safari has no install prompt, so the Account screen repeats these steps. Complete one online sync before testing an offline launch.
+Open the deployed HTTPS URL in Safari, tap Share, choose **Add to Home Screen**, and open House by 30 from the new icon. Safari has no install prompt, so the Account screen repeats these steps. Complete one online sign-in and sync before testing an offline launch; afterward the cached Home, Fast Log, Activity, Budget, Wrap, and Plan flows work without a network connection.
 
 ## Production and Vercel runbook
 
@@ -59,4 +59,4 @@ For Vercel, create or link the project, add `DATABASE_URL` and a random 32+ byte
 
 The service worker caches only the public app shell and build assets; `/api/**` and private plan JSON are never stored in Cache Storage. See [architecture](docs/architecture.md), [offline and sync behavior](docs/offline-and-sync.md), and [research sources](docs/research/sources.md).
 
-Signed-in users can export every plan year as one JSON file from Account. Ordinary logout revokes the session and clears the local private cache without deleting server plans.
+Signed-in users can export every plan year, category, and transaction as one server-backed JSON file from Account. A second account-scoped device export remains available offline for the data currently cached on that device. Ordinary logout revokes the session and clears the local private cache without deleting server plans.

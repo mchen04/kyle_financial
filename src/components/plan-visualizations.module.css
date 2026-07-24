@@ -5,16 +5,16 @@
 .flowLabels {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 7px;
+  margin-bottom: var(--space-2);
   color: var(--ink-soft);
-  font: 10px/1 var(--data);
+  font: var(--text-xs)/1 var(--data);
 }
 .flowRail {
-  height: 11px;
+  height: var(--space-3);
   display: flex;
   overflow: hidden;
-  border-radius: 99px;
-  background: #e8edf2;
+  border-radius: var(--radius-pill);
+  background: var(--color-line-200);
 }
 .flowRail > span {
   min-width: 0;
@@ -23,19 +23,19 @@
 .flowLegend {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 16px;
-  margin-top: 8px;
+  gap: var(--space-2) var(--space-4);
+  margin-top: var(--space-2);
   color: var(--ink-soft);
-  font-size: 10px;
+  font-size: var(--text-xs);
 }
 .flowLegend span {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--space-1);
 }
 .flowLegend i {
-  width: 7px;
-  height: 7px;
+  width: var(--space-2);
+  height: var(--space-2);
   border-radius: 50%;
 }
 .muted {
@@ -45,27 +45,27 @@
   composes: eyebrow from "./surface-primitives.module.css";
 }
 .guidance {
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid var(--line);
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: var(--border-hairline) solid var(--line);
 }
 .guidance > p:nth-child(2) {
-  margin: -2px 0 15px;
+  margin: calc(-1 * var(--micro-2)) 0 var(--space-4);
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 .guidance > div {
   display: grid;
-  gap: 14px;
+  gap: var(--space-3);
 }
 .guidance span {
   position: relative;
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 5px;
-  padding-bottom: 7px;
+  gap: var(--space-1);
+  padding-bottom: var(--space-2);
   color: var(--ink-soft);
-  font-size: 11px;
+  font-size: var(--text-xs);
 }
 .guidance span::after,
 .guidance span i {
@@ -73,12 +73,12 @@
   position: absolute;
   left: 0;
   bottom: 0;
-  height: 4px;
-  border-radius: 9px;
+  height: var(--space-1);
+  border-radius: var(--radius-sm);
 }
 .guidance span::after {
   width: 100%;
-  background: #e9eef2;
+  background: var(--border-subtle);
 }
 .guidance span i {
   z-index: 1;
@@ -88,7 +88,7 @@
   color: var(--ink);
 }
 
-@media (max-width: 600px) {
+@media (--viewport-phone) {
   .flowLabels span:last-child {
     display: none;
   }

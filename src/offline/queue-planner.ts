@@ -144,12 +144,72 @@ function invariantAwareBatch(
   return mutations.filter(({ mutationId }) => selected.has(mutationId));
 }
 
+function foldTransactionCorrections(
+  mutations: readonly SequencedSyncMutation[],
+  mutationId: () => string,
+): SequencedSyncMutation[] {
+  const pending = new Map<
+    string,
+    {
+      whole: SequencedSyncMutation;
+      properties: SequencedSyncMutation[];
+    }
+  >();
+  for (const mutation of mutations) {
+    const target = parseSyncTarget(mutation.field);
+    if (target?.kind !== "transaction") continue;
+    const key = `${mutation.planYear}:${target.id}`;
+    if (!target.property) {
+      pending.set(key, { whole: mutation, properties: [] });
+      continue;
+    }
+    pending.get(key)?.properties.push(mutation);
+  }
+
+  const removed = new Set<string>();
+  const replacements = new Map<string, SequencedSyncMutation>();
+  for (const { whole, properties } of pending.values()) {
+    if (
+      whole.value === null ||
+      typeof whole.value !== "object" ||
+      properties.length === 0
+    )
+      continue;
+    const value = { ...(whole.value as Record<string, unknown>) };
+    for (const propertyMutation of properties) {
+      const target = parseSyncTarget(propertyMutation.field);
+      if (target?.kind !== "transaction" || !target.property) continue;
+      if (propertyMutation.value === null) delete value[target.property];
+      else value[target.property] = propertyMutation.value;
+    }
+    const carrier = properties.at(-1)!;
+    const replacement: SequencedSyncMutation = {
+      ...carrier,
+      mutationId: mutationId(),
+      field: whole.field,
+      value,
+      baseVersion: whole.baseVersion,
+      deliveryOrderAssigned: false,
+    };
+    delete replacement.deliveryAfterMutationId;
+    replacements.set(carrier.mutationId, replacement);
+    removed.add(whole.mutationId);
+    for (const property of properties.slice(0, -1))
+      removed.add(property.mutationId);
+  }
+  return mutations
+    .filter(({ mutationId }) => !removed.has(mutationId))
+    .map((mutation) => replacements.get(mutation.mutationId) ?? mutation);
+}
+
 export function planMutationBatch(
   queuedMutations: readonly SequencedSyncMutation[],
+  mutationId: () => string = () => crypto.randomUUID(),
 ): MutationBatchPlan {
   const queued = queuedMutations.map((mutation) => ({ ...mutation }));
-  const ordered = queued.toSorted(
-    (left, right) => left.localSequence - right.localSequence,
+  const ordered = foldTransactionCorrections(
+    queued.toSorted((left, right) => left.localSequence - right.localSequence),
+    mutationId,
   );
   const latestByField = new Map<string, SequencedSyncMutation>();
   for (const mutation of ordered) {
@@ -208,10 +268,10 @@ export function planMutationBatch(
   const validMutations = retainedMutations.filter(({ field, value }) => {
     const target = parseSyncTarget(field);
     const requiresNonemptyText =
-      target?.kind === "benefit"
-        ? target.property === "label"
-        : target?.kind === "expense" &&
-          (target.property === "name" || target.property === "group");
+      (target?.kind === "benefit" && target.property === "label") ||
+      (target?.kind === "expense" &&
+        (target.property === "name" || target.property === "group")) ||
+      (target?.kind === "transaction" && target.property === "title");
     return (
       !requiresNonemptyText ||
       (typeof value === "string" && value.trim().length > 0)

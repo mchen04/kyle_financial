@@ -67,16 +67,14 @@ export function CompareScreen({ plans }: { plans: StoredPlan[] }) {
           ? "Start next year's plan to compare them side by side."
           : "Each year remains a separate, editable plan."}
       </p>
-      {!singleYear && (
-        <p id="comparison-scroll-hint" className={styles.comparisonScrollHint}>
-          Scroll horizontally to see every category →
-        </p>
-      )}
+      <p id="comparison-scroll-hint" className={styles.comparisonScrollHint}>
+        Scroll horizontally to see every category →
+      </p>
       <div
         className={styles.compareTable}
         role="table"
         aria-label="Year-over-year plan comparison"
-        aria-describedby={singleYear ? undefined : "comparison-scroll-hint"}
+        aria-describedby="comparison-scroll-hint"
         tabIndex={0}
       >
         <div

@@ -6,6 +6,7 @@ import {
   fullPlanSchema,
   normalizedFullPlanSchema,
   planYearSchema,
+  storedPlanSchema,
   updatePlanBasicsSchema,
 } from "@/domain/plan-schema";
 
@@ -63,6 +64,41 @@ describe("whole-plan invariants", () => {
     hsaCoverage: "self" as const,
   };
 
+  it("keeps plans with legacy future actuals available for repair", () => {
+    const categoryId = "00000000-0000-4000-8000-000000000098";
+    expect(
+      storedPlanSchema.parse({
+        ...basics,
+        id: "00000000-0000-4000-8000-000000000097",
+        year: 2200,
+        benefits: [],
+        expenses: [
+          {
+            id: categoryId,
+            name: "History",
+            group: "Needs",
+            cadence: "monthly",
+            amountCents: 100,
+            sortOrder: 0,
+          },
+        ],
+        transactions: [
+          {
+            id: "00000000-0000-4000-8000-000000000099",
+            categoryId,
+            amountCents: 100,
+            title: "Legacy future actual",
+            date: "2200-01-01",
+            createdAt: "2026-07-24T12:00:00.000Z",
+            updatedAt: "2026-07-24T12:00:00.000Z",
+          },
+        ],
+        updatedAt: "2026-07-24T12:00:00.000Z",
+        fieldVersions: {},
+      }).transactions,
+    ).toHaveLength(1);
+  });
+
   it("rejects aggregate amounts that exceed safe calculation range", () => {
     expect(() =>
       fullPlanSchema.parse({
@@ -110,6 +146,56 @@ describe("whole-plan invariants", () => {
           },
         ],
         expenses: [],
+      }),
+    ).toThrow("Combined plan amounts are too large");
+  });
+
+  it("does not let an archived zero-allocation category consume the aggregate limit", () => {
+    expect(
+      fullPlanSchema.safeParse({
+        ...basics,
+        benefits: [],
+        expenses: [
+          {
+            id: "00000000-0000-4000-8000-000000000005",
+            name: "Archived history",
+            group: "Needs",
+            cadence: "yearly",
+            amountCents: Number.MAX_SAFE_INTEGER,
+            sortOrder: 0,
+            archived: true,
+          },
+        ],
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejects transaction totals that would overflow every rollup", () => {
+    const categoryId = "00000000-0000-4000-8000-000000000006";
+    expect(() =>
+      fullPlanSchema.parse({
+        ...basics,
+        grossSalaryCents: 0,
+        benefits: [],
+        expenses: [
+          {
+            id: categoryId,
+            name: "History",
+            group: "Needs",
+            cadence: "monthly",
+            amountCents: 0,
+            sortOrder: 0,
+          },
+        ],
+        transactions: ["1", "2"].map((suffix) => ({
+          id: `00000000-0000-4000-8000-00000000001${suffix}`,
+          categoryId,
+          amountCents: Number.MAX_SAFE_INTEGER,
+          title: "Overflow",
+          date: "2026-07-23",
+          createdAt: "2026-07-23T12:00:00.000Z",
+          updatedAt: "2026-07-23T12:00:00.000Z",
+        })),
       }),
     ).toThrow("Combined plan amounts are too large");
   });

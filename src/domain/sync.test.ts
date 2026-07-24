@@ -5,6 +5,7 @@ import {
   fullPlanSchema,
   persistedFieldVersionsSchema,
 } from "./plan-schema";
+import { normalizeStoredPlan } from "./stored-plan";
 import {
   diffPlanMutations,
   isSyncField,
@@ -201,7 +202,7 @@ describe("sync field boundary", () => {
   });
 
   it("drops unrepresentable persisted base versions when diffing", () => {
-    const previous = {
+    const previous = normalizeStoredPlan({
       id: "00000000-0000-4000-8000-000000000001",
       ...planInput(),
       updatedAt: "2026-07-12T00:00:00.000Z",
@@ -211,7 +212,7 @@ describe("sync field boundary", () => {
           mutationId: "legacy-non-uuid-version",
         },
       }),
-    };
+    });
 
     expect(
       diffPlanMutations(
@@ -240,15 +241,18 @@ describe("sync field boundary", () => {
         ],
       }),
     );
-    const previous = {
+    const previous = normalizeStoredPlan({
       id: "00000000-0000-4000-8000-000000000001",
       ...parsed,
       year: 2026,
       expenses: [],
       updatedAt: "2026-07-12T00:00:00.000Z",
       fieldVersions: {},
-    };
-    const current = { ...previous, expenses: parsed.expenses };
+    });
+    const current = normalizeStoredPlan({
+      ...previous,
+      expenses: parsed.expenses,
+    });
 
     expect(
       diffPlanMutations(
@@ -258,6 +262,72 @@ describe("sync field boundary", () => {
         () => "00000000-0000-4000-8000-000000000002",
       ).map(({ field }) => field),
     ).toEqual([`expense:${id}`]);
+  });
+
+  it("diffs category metadata and transaction CRUD independently", () => {
+    const categoryId = "00000000-0000-4000-8000-000000000101";
+    const transactionId = "00000000-0000-4000-8000-000000000102";
+    const parsed = fullPlanSchema.parse(
+      planInput({
+        expenses: [
+          {
+            id: categoryId,
+            name: "Groceries",
+            group: "Everyday",
+            cadence: "monthly",
+            amountCents: 50_000,
+            sortOrder: 0,
+            guidanceBucket: "needs",
+            colorToken: "blue",
+            archived: false,
+          },
+        ],
+      }),
+    );
+    const previous = normalizeStoredPlan({
+      id: "00000000-0000-4000-8000-000000000100",
+      ...parsed,
+      year: 2026,
+      updatedAt: "2026-07-12T00:00:00.000Z",
+      fieldVersions: {},
+    });
+    const transaction = {
+      id: transactionId,
+      categoryId,
+      amountCents: 1_234,
+      title: "Market",
+      date: "2026-07-23",
+      createdAt: "2026-07-23T12:00:00.000Z",
+      updatedAt: "2026-07-23T12:00:00.000Z",
+    };
+    const mutations = diffPlanMutations(
+      previous,
+      {
+        ...previous,
+        expenses: previous.expenses.map((category) => ({
+          ...category,
+          colorToken: "teal" as const,
+          archived: true,
+        })),
+        transactions: [transaction],
+      },
+      "2026-07-23T12:00:00.000Z",
+      (() => {
+        let index = 200;
+        return () =>
+          `00000000-0000-4000-8000-${String(index++).padStart(12, "0")}`;
+      })(),
+    );
+
+    expect(mutations.map(({ field }) => field)).toEqual([
+      `expense:${categoryId}:colorToken`,
+      `expense:${categoryId}:archived`,
+      `transaction:${transactionId}`,
+    ]);
+    expect(syncMutationSchema.parse(mutations[2])).toMatchObject({
+      field: `transaction:${transactionId}`,
+      value: transaction,
+    });
   });
 
   it("does not admit arbitrary collection suffixes at compile time", () => {

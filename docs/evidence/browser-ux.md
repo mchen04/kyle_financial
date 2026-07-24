@@ -103,3 +103,24 @@ Target: production `next start`, Neon PostgreSQL
 - At 390x844 the Savings/month answer, take-home summary, Monthly expense ledger heading, and first expense row are all in the initial viewport; the first expense starts at y=787.
 - Accessibility snapshots contained the labeled plan navigation, year selector, answer and ledger regions, every editable expense field, and expanded state. A 12-step keyboard pass followed skip link → year → next year → four navigation actions → disclosures → Add expense → unused categories → row actions, with a visible solid outline and no trap.
 - Both sessions had zero uncaught page errors. The full Cycle 14/15 visual matrices cover offline, sync failure, invalid auth, loading, warning, export failure, negative-plan, and responsive states; scores are in `docs/evidence/ui-quality.md`.
+
+## Daily cockpit final objective production gate
+
+Date: 2026-07-24
+
+Code candidate: `46c78ef`
+Target: local PostgreSQL plus production `next start`
+
+- The authenticated default rendered House by 30 Home with July 2026, “Left to spend,” exact budgeted/spent/remaining/savings-impact figures, recent activity, Monthly Wrap, and one-activation Fast Log.
+- Fast Log kept the amount focused, wrapped Tab/Shift+Tab, closed on Escape, restored its trigger, transferred focus through dynamic category controls, and kept repeated “Save & add another” confirmation inside the modal. An older actionable toast was cleared before any Fast Log opened.
+- A normal online create/edit/delete flow passed and was cleaned. A compound offline category plus transaction survived a cold reload, remained usable across Home/Budget/Activity/Plan/Wrap, drained to outbox zero on reconnect, and appeared exactly once on the server before cleanup.
+- The hard viewport matrix covered 320×568, 360×740, 375×667, 390×844, 414×896, 667×375, 844×390, 896×414, 768×1024, 1024×768, 1024×700, 1280×800, 1440×900, 1728×1117, 1920×1080, 2560×1440, 3440×1440, and 720×450 as a 200%-zoom equivalent. Every pass reported zero horizontal overflow, minimum visible input font 16px, no visible mobile/coarse button below 44px, contextual Quick Log, and the expected heading.
+- Desktop Plan rendered its allocation chart and labeled legend without Quick Log. Benefits, Compare, Budget category detail, Edit Budget, and Manage Categories remained reachable and overflow-free.
+- Monthly Wrap visibly reconciled total budget against combined spending/funding and signed remaining before the per-category and savings-impact sections. The final production proof rendered `$100` budget, `$10` spent/funded, and `+$90` remaining with zero overflow at 390×844.
+- A mounted integration pass used real account-scoped IndexedDB rather than a database mock: an offline inline category plus Fast Log transaction survived a cold root remount, then reconnect produced one unique sync request, an empty outbox, and the saved server state.
+- The final candidate recheck covered Home, Budget, Activity, and Plan at 320×568, 390×844, 844×390, 768×1024, and 1440×900. Every route had the expected heading, zero horizontal overflow, 16px-or-larger visible form text, no undersized mobile/coarse action, and no console or page error.
+- The update-ready action reloaded the service worker without losing authentication. A disposable account completed signup, onboarding, export, online/offline device checks, logout/login, and permanent deletion; the private account database was removed.
+- Manifest metadata reports House by 30, standalone display, and any/maskable icons. Installed icon files decode at 180, 192, 512, and 1024 pixels; the service worker is non-cacheable and excludes API traffic.
+- Production root and unauthenticated API responses include `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, a strict-origin referrer policy, and denied camera/microphone/geolocation/payment/USB permissions; `X-Powered-By` is absent.
+- Final screenshots live at `/Users/michaelchen/.cache/agent-loops/kyle_financial/main/final-46c78ef/`.
+- Real Safari automation is blocked until Safari Settings → Developer → Allow remote automation is enabled. The exact driver response was: `Could not create a session: You must enable 'Allow remote automation' in the Developer section of Safari Settings to control Safari via WebDriver.` Installed-iPhone Safari is still an external owner-device gate.

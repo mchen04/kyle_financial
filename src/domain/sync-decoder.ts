@@ -1,47 +1,23 @@
 import { z } from "zod";
-import type { BenefitEntry, ConfiguredAmount, TaxTreatment } from "./benefits";
-import type { ExpenseEntry } from "./budget";
 import {
-  benefitSchema,
-  benefitOwnerSchema,
-  configuredAmountSchema,
-  entryLabelSchema,
-  esppDiscountRateSchema,
-  expenseCadenceSchema,
-  expenseGuidanceBucketSchema,
-  expenseSchema,
-  expenseSortOrderSchema,
   filingStatusSchema,
   hsaAllocationSchema,
   hsaCoverageSchema,
   safeNonnegativeCentsSchema,
   stateCodeSchema,
-  taxTreatmentSchema,
 } from "./plan-schema";
 import type { StoredPlan } from "./stored-plan";
 import { canonicalJson, parseSyncTarget, type SyncMutation } from "./sync";
-
-type MutationMetadata = Omit<SyncMutation, "field" | "value">;
+import {
+  applyDecodedEntityMutation,
+  decodeEntitySyncMutation,
+  type DecodedEntityMutation,
+  type MutationMetadata,
+} from "./sync-entity-decoder";
 
 type ScalarMutation<K extends string, V> = MutationMetadata & {
   kind: "scalar";
   field: K;
-  value: V;
-};
-
-type BenefitMutation<P extends string | null, V> = MutationMetadata & {
-  kind: "benefit";
-  field: SyncMutation["field"];
-  entityId: string;
-  property: P;
-  value: V;
-};
-
-type ExpenseMutation<P extends string | null, V> = MutationMetadata & {
-  kind: "expense";
-  field: SyncMutation["field"];
-  entityId: string;
-  property: P;
   value: V;
 };
 
@@ -59,18 +35,8 @@ export type DecodedSyncMutation =
   | ScalarMutation<"spouseHsaCatchUpEligible", boolean>
   | ScalarMutation<"primaryHsaFamilyAllocationPpm", number>
   | ScalarMutation<"spouseHsaFamilyAllocationPpm", number>
-  | BenefitMutation<null, BenefitEntry | null>
-  | BenefitMutation<"owner", BenefitEntry["owner"]>
-  | BenefitMutation<"label", string>
-  | BenefitMutation<"amount", ConfiguredAmount>
-  | BenefitMutation<"discountRatePpm", number | null>
-  | BenefitMutation<"customTaxTreatment", TaxTreatment | null>
-  | ExpenseMutation<null, ExpenseEntry | null>
-  | ExpenseMutation<"name" | "group", string>
-  | ExpenseMutation<"cadence", ExpenseEntry["cadence"]>
-  | ExpenseMutation<"amountCents", number>
-  | ExpenseMutation<"sortOrder", number>
-  | ExpenseMutation<"guidanceBucket", ExpenseEntry["guidanceBucket"]>;
+  | ScalarMutation<"startingSavingsCents", number | undefined>
+  | DecodedEntityMutation;
 
 function canonicalSyncIntent(mutation: SyncMutation): SyncMutation {
   const canonical = encodeSyncMutation(decodeSyncMutation(mutation));
@@ -151,6 +117,16 @@ export function decodeSyncMutation(
           field: target.field,
           value: hsaAllocationSchema.parse(mutation.value),
         };
+      case "startingSavingsCents":
+        return {
+          ...base,
+          kind: "scalar",
+          field: target.field,
+          value:
+            mutation.value === null
+              ? undefined
+              : safeNonnegativeCentsSchema.parse(mutation.value),
+        };
       default:
         return {
           ...base,
@@ -160,111 +136,7 @@ export function decodeSyncMutation(
         };
     }
   }
-  if (target.kind === "benefit") {
-    const common = {
-      ...base,
-      kind: "benefit" as const,
-      field: mutation.field,
-      entityId: target.id,
-    };
-    if (!target.property) {
-      const value =
-        mutation.value === null ? null : benefitSchema.parse(mutation.value);
-      if (value && value.id !== target.id)
-        throw new Error("Benefit mutation ID mismatch");
-      return { ...common, property: null, value };
-    }
-    switch (target.property) {
-      case "owner":
-        return {
-          ...common,
-          property: target.property,
-          value:
-            mutation.value === null
-              ? undefined
-              : benefitOwnerSchema.parse(mutation.value),
-        };
-      case "label":
-        return {
-          ...common,
-          property: target.property,
-          value: entryLabelSchema.parse(mutation.value),
-        };
-      case "amount":
-        return {
-          ...common,
-          property: target.property,
-          value: configuredAmountSchema.parse(mutation.value),
-        };
-      case "discountRatePpm":
-        return {
-          ...common,
-          property: target.property,
-          value:
-            mutation.value === null
-              ? null
-              : esppDiscountRateSchema.parse(mutation.value),
-        };
-      case "customTaxTreatment":
-        return {
-          ...common,
-          property: target.property,
-          value:
-            mutation.value === null
-              ? null
-              : taxTreatmentSchema.parse(mutation.value),
-        };
-    }
-  }
-  const common = {
-    ...base,
-    kind: "expense" as const,
-    field: mutation.field,
-    entityId: target.id,
-  };
-  if (!target.property) {
-    const value =
-      mutation.value === null ? null : expenseSchema.parse(mutation.value);
-    if (value && value.id !== target.id)
-      throw new Error("Expense mutation ID mismatch");
-    return { ...common, property: null, value };
-  }
-  switch (target.property) {
-    case "name":
-    case "group":
-      return {
-        ...common,
-        property: target.property,
-        value: entryLabelSchema.parse(mutation.value),
-      };
-    case "cadence":
-      return {
-        ...common,
-        property: target.property,
-        value: expenseCadenceSchema.parse(mutation.value),
-      };
-    case "amountCents":
-      return {
-        ...common,
-        property: target.property,
-        value: safeNonnegativeCentsSchema.parse(mutation.value),
-      };
-    case "sortOrder":
-      return {
-        ...common,
-        property: target.property,
-        value: expenseSortOrderSchema.parse(mutation.value),
-      };
-    case "guidanceBucket":
-      return {
-        ...common,
-        property: target.property,
-        value:
-          mutation.value === null
-            ? undefined
-            : expenseGuidanceBucketSchema.parse(mutation.value),
-      };
-  }
+  return decodeEntitySyncMutation(mutation, target, base);
 }
 
 export function encodeSyncMutation(
@@ -323,72 +195,11 @@ export function applyDecodedSyncMutation(
       case "spouseHsaFamilyAllocationPpm":
         next.spouseHsaFamilyAllocationPpm = mutation.value;
         break;
-    }
-    return next;
-  }
-  if (mutation.kind === "benefit") {
-    const index = next.benefits.findIndex(
-      (entry) => entry.id === mutation.entityId,
-    );
-    if (mutation.property === null) {
-      if (mutation.value === null) {
-        if (index >= 0) next.benefits.splice(index, 1);
-      } else if (index >= 0) next.benefits[index] = mutation.value;
-      else next.benefits.push(mutation.value);
-      return next;
-    }
-    if (index < 0) return next;
-    const entry = next.benefits[index];
-    switch (mutation.property) {
-      case "owner":
-        entry.owner = mutation.value;
-        break;
-      case "label":
-        entry.label = mutation.value;
-        break;
-      case "amount":
-        entry.amount = mutation.value;
-        break;
-      case "discountRatePpm":
-        entry.discountRatePpm = mutation.value ?? undefined;
-        break;
-      case "customTaxTreatment":
-        entry.customTaxTreatment = mutation.value ?? undefined;
+      case "startingSavingsCents":
+        next.startingSavingsCents = mutation.value;
         break;
     }
     return next;
   }
-  const index = next.expenses.findIndex(
-    (entry) => entry.id === mutation.entityId,
-  );
-  if (mutation.property === null) {
-    if (mutation.value === null) {
-      if (index >= 0) next.expenses.splice(index, 1);
-    } else if (index >= 0) next.expenses[index] = mutation.value;
-    else next.expenses.push(mutation.value);
-    return next;
-  }
-  if (index < 0) return next;
-  const entry = next.expenses[index];
-  switch (mutation.property) {
-    case "name":
-      entry.name = mutation.value;
-      break;
-    case "group":
-      entry.group = mutation.value;
-      break;
-    case "cadence":
-      entry.cadence = mutation.value;
-      break;
-    case "amountCents":
-      entry.amountCents = mutation.value;
-      break;
-    case "sortOrder":
-      entry.sortOrder = mutation.value;
-      break;
-    case "guidanceBucket":
-      entry.guidanceBucket = mutation.value;
-      break;
-  }
-  return next;
+  return applyDecodedEntityMutation(plan, mutation);
 }

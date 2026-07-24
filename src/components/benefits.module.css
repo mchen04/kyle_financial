@@ -32,45 +32,45 @@
 
 .compactField {
   display: grid;
-  gap: 7px;
+  gap: var(--space-2);
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 600;
   text-align: left;
 }
 
 .compactField input {
   width: 100%;
-  min-height: 48px;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fff;
+  min-height: var(--control-md);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-hairline) solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-panel);
   color: var(--ink);
 }
 
 .addSelect {
   display: flex;
   align-items: center;
-  gap: 6px;
-  min-height: 44px;
-  padding: 0 12px;
-  border: 1px solid var(--line);
-  background: #fff;
+  gap: var(--space-2);
+  min-height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: var(--border-hairline) solid var(--line);
+  background: var(--surface-panel);
   color: var(--blue);
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   white-space: nowrap;
 }
 
 .addSelect {
-  border-radius: 11px;
+  border-radius: var(--radius-md);
 }
 
 .addSelect select {
-  min-height: 44px;
+  min-height: var(--control-sm);
   border: 0;
-  background: #fff;
+  background: var(--surface-panel);
   color: var(--blue);
   font-weight: 700;
 }
@@ -82,35 +82,38 @@
 .benefitName input {
   min-width: 0;
   width: 100%;
-  padding: 3px 5px;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  background: transparent;
+  padding: var(--micro-3) var(--space-1);
+  border: var(--border-hairline) solid var(--color-transparent);
+  border-radius: var(--radius-sm);
+  background: var(--color-transparent);
   color: var(--ink);
-  font-size: 16px;
+  font-size: var(--text-md);
   font-weight: 650;
-  min-height: 44px;
+  min-height: var(--control-sm);
 }
 
 .benefitName input:hover,
 .benefitName input:focus {
   border-color: var(--line);
-  background: #fff;
+  background: var(--surface-panel);
 }
 
 .benefitRow {
-  min-height: 76px;
+  min-height: var(--space-20);
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) 150px 125px auto 44px;
+  grid-template-columns:
+    minmax(var(--layout-copy-min), 1fr) var(--layout-sm)
+    var(--layout-xs) auto var(--control-sm);
   align-items: center;
-  gap: 10px;
-  border-bottom: 1px solid #e9eef2;
+  gap: var(--space-2);
+  border-bottom: var(--border-hairline) solid var(--border-subtle);
 }
 
 .benefitRowWithDiscount {
   grid-template-columns:
-    minmax(180px, 1fr) 150px 125px minmax(90px, auto)
-    92px 44px;
+    minmax(var(--layout-copy-min), 1fr) var(--layout-sm) var(--layout-xs)
+    minmax(var(--space-20), auto)
+    var(--layout-2xs) var(--control-sm);
 }
 
 .benefitName {
@@ -119,30 +122,30 @@
 
 .benefitName span {
   display: block;
-  padding-left: 5px;
+  padding-left: var(--space-1);
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 
 .benefitName select {
   width: 100%;
-  min-height: 44px;
-  margin-top: 6px;
-  padding: 0 8px;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: #fff;
+  min-height: var(--control-sm);
+  margin-top: var(--space-2);
+  padding: 0 var(--space-2);
+  border: var(--border-hairline) solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-panel);
   color: var(--ink);
-  font-size: 16px;
+  font-size: var(--text-md);
 }
 
 .benefitRow > select {
-  min-height: 44px;
-  padding: 0 30px 0 8px;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: #fff;
-  font-size: 16px;
+  min-height: var(--control-sm);
+  padding: 0 var(--space-7) 0 var(--space-2);
+  border: var(--border-hairline) solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-panel);
+  font-size: var(--text-md);
 }
 
 .benefitRow > .muted {
@@ -150,24 +153,24 @@
 }
 
 .compactField {
-  max-width: 100px;
+  max-width: var(--layout-2xs);
 }
 
 .compactField input {
-  min-height: 44px;
-  font-size: 16px;
+  min-height: var(--control-sm);
+  font-size: var(--text-md);
 }
 
 .customTreatment {
   grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 18px;
-  padding: 10px;
-  border-radius: 8px;
+  gap: var(--space-2) var(--space-4);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
   background: var(--paper);
   color: var(--ink-soft);
-  font-size: 11px;
+  font-size: var(--text-xs);
 }
 
 .customTreatment > span {
@@ -177,26 +180,30 @@
 }
 
 .customTreatment label {
-  min-height: 44px;
+  min-height: var(--control-sm);
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 0;
+  gap: var(--space-1);
+  padding: var(--space-1) 0;
 }
 
 .customTreatment input {
-  width: 20px;
-  height: 20px;
+  width: var(--space-5);
+  height: var(--space-5);
 }
 
-@media (max-width: 900px) {
+@media (--viewport-shell) {
   .benefitRow {
-    min-height: 98px;
-    grid-template-columns: minmax(190px, 1fr) 160px 125px 44px;
-    padding: 10px 0;
+    min-height: var(--layout-2xs);
+    grid-template-columns:
+      minmax(var(--layout-copy-min), 1fr) var(--layout-sm)
+      var(--layout-xs) var(--control-sm);
+    padding: var(--space-2) 0;
   }
   .benefitRowWithDiscount {
-    grid-template-columns: minmax(190px, 1fr) 160px 125px 44px;
+    grid-template-columns:
+      minmax(var(--layout-copy-min), 1fr) var(--layout-sm)
+      var(--layout-xs) var(--control-sm);
   }
   .benefitName {
     grid-row: 1 / span 2;
@@ -226,10 +233,11 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (--viewport-phone) {
   .wideCard {
-    padding: 16px 13px;
-    border-radius: 17px 17px 6px 17px;
+    padding: var(--space-4) var(--space-3);
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-sm)
+      var(--radius-lg);
   }
   .sectionHeading {
     align-items: flex-start;
@@ -240,29 +248,29 @@
     width: 100%;
   }
   .sectionHeading h1 {
-    font-size: 23px;
+    font-size: var(--text-xl);
   }
   .sectionHeading .addSelect {
     width: 100%;
     justify-content: center;
   }
   .moneyInput input {
-    font-size: 16px;
+    font-size: var(--text-md);
   }
   .benefitSummary {
     grid-template-columns: 1fr;
   }
   .benefitRow {
-    grid-template-columns: minmax(0, 1fr) 118px 44px;
+    grid-template-columns: minmax(0, 1fr) var(--layout-xs) var(--control-sm);
     grid-template-areas:
       "name name name"
       "type amount remove"
       "result result result";
-    row-gap: 8px;
-    padding: 14px 0;
+    row-gap: var(--space-2);
+    padding: var(--space-3) 0;
   }
   .benefitRowWithDiscount {
-    grid-template-columns: minmax(0, 1fr) 118px 44px;
+    grid-template-columns: minmax(0, 1fr) var(--layout-xs) var(--control-sm);
     grid-template-areas:
       "name name name"
       "type amount remove"
@@ -296,5 +304,38 @@
   }
   .customTreatment {
     grid-column: 1 / -1;
+  }
+}
+
+@media (--viewport-narrow) {
+  .benefitRow,
+  .benefitRowWithDiscount {
+    grid-template-columns: minmax(0, 1fr) var(--control-sm);
+    grid-template-areas:
+      "name name"
+      "type type"
+      "amount remove"
+      "discount discount"
+      "result result";
+  }
+
+  .benefitRow > select {
+    width: 100%;
+  }
+}
+
+@media (--landscape-short-shell) {
+  .sectionHeading {
+    display: grid;
+    grid-template-columns: minmax(var(--layout-copy-min), 0.8fr) minmax(
+        var(--layout-panel-sm),
+        1.2fr
+      );
+  }
+
+  .sectionHeading .addSelect,
+  .sectionHeading .addSelect select {
+    min-width: 0;
+    width: 100%;
   }
 }

@@ -28,14 +28,14 @@
 
 .assumptionFields {
   display: grid;
-  gap: 17px;
+  gap: var(--space-4);
 }
 
 .assumptionFields label {
   display: grid;
-  gap: 7px;
+  gap: var(--space-2);
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 600;
   text-align: left;
 }
@@ -43,29 +43,29 @@
 .assumptionFields input,
 .assumptionFields select {
   width: 100%;
-  min-height: 48px;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fff;
+  min-height: var(--control-md);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-hairline) solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-panel);
   color: var(--ink);
 }
 
 .addButton {
-  min-height: 44px;
+  min-height: var(--control-sm);
   border: 0;
-  border-radius: 11px;
+  border-radius: var(--radius-md);
   cursor: pointer;
 }
 
 .planGrid {
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(0, 1.65fr) minmax(270px, 0.75fr);
+  grid-template-columns: minmax(0, 1.65fr) minmax(var(--layout-lg), 0.75fr);
   grid-template-areas:
     "answer answer"
     "ledger assumptions";
-  gap: 18px;
+  gap: var(--space-4);
 }
 
 .answerCard {
@@ -80,115 +80,129 @@
   grid-area: assumptions;
 }
 
+.assumptionsCard a {
+  min-height: var(--control-sm);
+  display: inline-flex;
+  align-items: center;
+}
+
 .answerCard,
 .ledgerCard,
 .assumptionsCard {
   min-width: 0;
-  border: 1px solid var(--line);
+  border: var(--border-hairline) solid var(--line);
   background: var(--surface);
-  box-shadow: 0 8px 26px rgb(18 35 63 / 4%);
+  box-shadow: var(--shadow-card);
 }
 
 .answerCard {
-  min-height: 222px;
+  min-height: var(--layout-md);
   display: grid;
   grid-template-columns: 1.1fr 0.75fr;
   align-items: center;
-  gap: 16px 42px;
-  padding: clamp(20px, 3.5vw, 42px);
-  border-radius: 24px 24px 8px 24px;
+  gap: var(--space-4) var(--space-10);
+  padding: clamp(var(--space-5), var(--fluid-3-5), var(--space-10));
+  border-radius: var(--radius-xl) var(--radius-xl) var(--radius-sm)
+    var(--radius-xl);
 }
 
 .answerNumber {
   margin: 0;
   color: var(--teal);
-  font: 650 clamp(46px, 7vw, 82px)/0.9 var(--display);
-  letter-spacing: -0.07em;
+  font: 650 clamp(var(--text-4xl), var(--fluid-7), var(--text-6xl))/0.9
+    var(--display);
+  letter-spacing: var(--tracking-tighter);
   font-variant-numeric: tabular-nums;
 }
 
 .answerContext {
-  max-width: 560px;
-  margin: 12px 0 0;
+  max-width: var(--layout-4xl);
+  margin: var(--space-3) 0 0;
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 
 .answerRates {
-  margin: 8px 0 0;
+  margin: var(--space-2) 0 0;
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: var(--text-sm);
   line-height: 1.45;
 }
 
 .answerNegative {
-  border-color: #e8c4ac;
-  background: linear-gradient(100deg, #fff 50%, var(--amber-soft));
+  border-color: var(--border-warning);
+  background: linear-gradient(
+    100deg,
+    var(--surface-panel) 50%,
+    var(--surface-warning)
+  );
 }
 
 .answerNegative .answerNumber {
   color: var(--amber);
-  font-size: clamp(38px, 6vw, 68px);
+  font-size: clamp(var(--text-3xl), var(--fluid-6), var(--text-5xl));
 }
 
 .answerNegative .answerNumber::before {
   content: "Shortfall";
   display: block;
-  margin-bottom: 10px;
-  color: #803c0e;
-  font: 700 11px/1 var(--data);
-  letter-spacing: 0.08em;
+  margin-bottom: var(--space-2);
+  color: var(--status-warning-text);
+  font: 700 var(--text-xs)/1 var(--data);
+  letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
 }
 
 .takeHomeBlock {
   min-width: 0;
   display: grid;
-  gap: 6px;
-  padding-left: 30px;
-  border-left: 1px solid var(--line);
+  gap: var(--space-2);
+  padding-left: var(--space-7);
+  border-left: var(--border-hairline) solid var(--line);
 }
 
 .takeHomeBlock > span:first-child {
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 
 .takeHomeBlock small {
   display: block;
-  margin-top: 2px;
+  margin-top: var(--micro-2);
   font-weight: 400;
   opacity: 0.85;
 }
 
 .takeHomeBlock strong {
-  font: 600 clamp(19px, 2.1vw, 26px)/1 var(--display);
-  letter-spacing: -0.04em;
+  font: 600 clamp(var(--text-lg), var(--fluid-2-1), var(--text-xl))/1
+    var(--display);
+  letter-spacing: var(--tracking-tight);
   font-variant-numeric: tabular-nums;
 }
 
 .taxLine {
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: var(--text-sm);
   line-height: 1.4;
 }
 
 .ledgerCard,
 .assumptionsCard {
-  border-radius: 20px 20px 8px 20px;
-  padding: clamp(17px, 2.5vw, 28px);
+  border-radius: var(--radius-lg) var(--radius-lg) var(--radius-sm)
+    var(--radius-lg);
+  padding: clamp(var(--space-4), var(--fluid-2-5), var(--space-7));
 }
 
 .addButton {
   display: flex;
   align-items: center;
-  gap: 6px;
-  min-height: 44px;
-  padding: 0 12px;
-  border: 1px solid var(--line);
-  background: #fff;
+  gap: var(--space-2);
+  min-height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: var(--border-hairline) solid var(--line);
+  background: var(--surface-panel);
   color: var(--blue);
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -196,12 +210,12 @@
 .ledgerTotal {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
-  margin: 20px 0 8px;
-  padding: 10px 5px;
-  border-bottom: 1px solid var(--line);
+  gap: var(--space-3);
+  margin: var(--space-5) 0 var(--space-2);
+  padding: var(--space-2) var(--space-1);
+  border-bottom: var(--border-hairline) solid var(--line);
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 
 .ledgerTotal strong {
@@ -216,10 +230,10 @@
 
 .unusedExpensesButton {
   width: 100%;
-  min-height: 44px;
-  margin: 12px 0 4px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
+  min-height: var(--control-sm);
+  margin: var(--space-3) 0 var(--space-1);
+  border: var(--border-hairline) solid var(--line);
+  border-radius: var(--radius-sm);
   background: var(--paper);
   color: var(--blue-dark);
   font-weight: 700;
@@ -230,61 +244,61 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 12px 0;
-  border-bottom: 1px solid #e9eef2;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  border-bottom: var(--border-hairline) solid var(--border-subtle);
 }
 
 .expensePrimary {
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-2);
 }
 
 .expenseName {
   flex: 1 1 auto;
   min-width: 0;
-  padding: 6px 9px;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  background: transparent;
+  padding: var(--space-2) var(--space-2);
+  border: var(--border-hairline) solid var(--color-transparent);
+  border-radius: var(--radius-sm);
+  background: var(--color-transparent);
   color: var(--ink);
-  font-size: 16px;
+  font-size: var(--text-md);
   font-weight: 650;
-  min-height: 44px;
+  min-height: var(--control-sm);
 }
 
 .expenseName:hover,
 .expenseName:focus {
   border-color: var(--line);
-  background: #fff;
+  background: var(--surface-panel);
   outline: 0;
 }
 
 .expensePrimary .moneyInput {
-  flex: 0 0 132px;
-  width: 132px;
-  height: 48px;
-  border-color: var(--blue-soft, #cfe0ee);
+  flex: 0 0 var(--layout-xs);
+  width: var(--layout-xs);
+  height: var(--control-md);
+  border-color: var(--blue-soft);
 }
 
 .expensePrimary .moneyInput input {
-  font-size: 18px;
+  font-size: var(--text-lg);
   font-weight: 600;
 }
 
 .detailsToggle {
   flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
+  width: var(--control-sm);
+  height: var(--control-sm);
   display: grid;
   place-items: center;
   padding: 0;
-  border: 1px solid var(--line);
-  border-radius: 9px;
+  border: var(--border-hairline) solid var(--line);
+  border-radius: var(--radius-sm);
   background: var(--paper);
-  color: #5f6d7d;
+  color: var(--color-navy-600);
   cursor: pointer;
 }
 
@@ -298,7 +312,7 @@
 
 .detailsToggle[data-active="true"] {
   border-color: var(--blue);
-  background: #fff;
+  background: var(--surface-panel);
   color: var(--blue);
 }
 
@@ -311,22 +325,22 @@
   display: flex;
   align-items: flex-end;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 2px;
-  padding: 8px 2px 2px;
+  gap: var(--space-2);
+  margin-top: var(--micro-2);
+  padding: var(--space-2) var(--micro-2) var(--micro-2);
 }
 
 .detailField {
-  flex: 1 1 100px;
+  flex: 1 1 var(--layout-2xs);
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: var(--micro-3);
 }
 
 .detailField > span {
-  font: 700 10px/1 var(--data);
-  letter-spacing: 0.06em;
+  font: 700 var(--text-xs)/1 var(--data);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   color: var(--ink-soft);
 }
@@ -339,13 +353,13 @@
 .expenseGroup {
   width: 100%;
   min-width: 0;
-  padding: 4px 8px;
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  background: #fff;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-hairline) solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-panel);
   color: var(--ink);
-  font-size: 16px;
-  min-height: 44px;
+  font-size: var(--text-md);
+  min-height: var(--control-sm);
 }
 
 .expenseGroup:focus {
@@ -356,40 +370,40 @@
 .expenseSecondary select {
   width: 100%;
   min-width: 0;
-  padding: 4px 8px;
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  background: #fff;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-hairline) solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-panel);
   color: var(--ink);
-  font-size: 15px;
-  min-height: 44px;
+  font-size: var(--text-md);
+  min-height: var(--control-sm);
 }
 
 .ledgerHint {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 4px;
-  margin: 8px 0 2px;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 var(--micro-2);
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 
 .reorderButtons {
   display: flex;
-  gap: 6px;
+  gap: var(--space-2);
 }
 
 .reorderButtons button {
-  width: 44px;
-  height: 44px;
+  width: var(--control-sm);
+  height: var(--control-sm);
   display: grid;
   place-items: center;
   padding: 0;
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  background: #fff;
-  color: #5f6d7d;
+  border: var(--border-hairline) solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-panel);
+  color: var(--color-navy-600);
   cursor: pointer;
 }
 
@@ -400,46 +414,46 @@
 .assumptionsCard {
   align-self: start;
   position: sticky;
-  top: 88px;
+  top: var(--space-20);
   box-shadow: none;
 }
 
 .assumptionsCard details summary {
-  min-height: 44px;
+  min-height: var(--control-sm);
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
   list-style: none;
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 700;
 }
 
 .assumptionsCard summary span {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: var(--space-2);
 }
 
 .assumptionsCard summary > span:last-child {
   color: var(--blue);
-  font-size: 11px;
+  font-size: var(--text-xs);
 }
 
 .assumptionFields {
-  margin-top: 12px;
+  margin-top: var(--space-3);
 }
 
 .assumptionFields .hsaEligibilityControl {
-  min-height: 44px;
-  grid-template-columns: 22px 1fr;
+  min-height: var(--control-sm);
+  grid-template-columns: var(--space-5) 1fr;
   align-items: center;
   cursor: pointer;
 }
 
 .assumptionFields .hsaEligibilityControl input {
-  width: 18px;
-  min-height: 18px;
+  width: var(--space-4);
+  min-height: var(--space-4);
   margin: 0;
 }
 
@@ -450,10 +464,10 @@
 }
 
 .assumptionsCard .benefitSummary {
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(var(--layout-xs), 1fr));
 }
 
-@media (max-width: 1180px) {
+@media (--viewport-desktop-compact) {
   .planGrid {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
@@ -466,57 +480,59 @@
   }
 }
 
-@media (max-width: 900px) {
+@media (--viewport-shell) {
   .planGrid {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
       "answer"
       "ledger"
       "assumptions";
-    gap: 12px;
+    gap: var(--space-3);
   }
   .assumptionsCard {
     position: static;
   }
 }
 
-@media (max-width: 600px) {
+@media (--viewport-phone) {
   .answerCard {
-    min-height: 228px;
+    min-height: var(--layout-md);
     grid-template-columns: minmax(0, 1fr);
-    gap: 14px;
-    padding: 18px;
-    border-radius: 19px 19px 6px 19px;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-sm)
+      var(--radius-lg);
   }
   .answerNumber {
     overflow-wrap: anywhere;
-    font-size: clamp(38px, 12vw, 56px);
+    font-size: clamp(var(--text-3xl), var(--fluid-12), var(--text-4xl));
   }
   .answerContext {
-    font-size: 13px;
+    font-size: var(--text-sm);
   }
   .answerRates {
-    font-size: 12px;
+    font-size: var(--text-sm);
   }
   .takeHomeBlock {
-    padding-top: 12px;
+    padding-top: var(--space-3);
     padding-left: 0;
-    border-top: 1px solid var(--line);
+    border-top: var(--border-hairline) solid var(--line);
     border-left: 0;
   }
   .takeHomeBlock > span:first-child,
   .taxLine {
-    font-size: 11px;
+    font-size: var(--text-xs);
   }
   .takeHomeBlock strong {
-    font-size: 18px;
+    font-size: var(--text-lg);
     font-weight: 600;
     color: var(--ink-soft);
   }
   .ledgerCard,
   .assumptionsCard {
-    padding: 16px 13px;
-    border-radius: 17px 17px 6px 17px;
+    padding: var(--space-4) var(--space-3);
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-sm)
+      var(--radius-lg);
   }
   .ledgerCard {
     display: flex;
@@ -546,13 +562,13 @@
     width: 100%;
   }
   .sectionHeading h1 {
-    font-size: 23px;
+    font-size: var(--text-xl);
   }
   .sectionHeading .addButton {
-    width: 44px;
+    width: var(--control-sm);
     overflow: hidden;
-    color: transparent;
-    gap: 20px;
+    color: var(--color-transparent);
+    gap: var(--space-5);
   }
   .sectionHeading .addButton svg {
     color: var(--blue);
@@ -563,19 +579,19 @@
   }
 }
 
-@media (max-width: 350px) {
+@media (--viewport-xs) {
   .answerCard {
-    padding: 15px 12px;
+    padding: var(--space-4) var(--space-3);
   }
   .answerNumber {
-    font-size: 40px;
+    font-size: var(--text-3xl);
   }
   .takeHomeBlock strong {
-    font-size: 18px;
+    font-size: var(--text-lg);
   }
 }
 
-@media (orientation: landscape) and (max-height: 500px) and (max-width: 900px) {
+@media (--landscape-short-shell) {
   .planGrid {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
@@ -588,20 +604,12 @@
     grid-template-columns: minmax(0, 1fr);
   }
   .takeHomeBlock {
-    padding-top: 12px;
+    padding-top: var(--space-3);
     padding-left: 0;
-    border-top: 1px solid var(--line);
+    border-top: var(--border-hairline) solid var(--line);
     border-left: 0;
   }
   .ledgerCard {
     align-self: start;
-  }
-}
-
-@media (max-width: 900px), (pointer: coarse) {
-  .assumptionsCard a {
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
   }
 }

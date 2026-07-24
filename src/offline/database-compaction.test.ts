@@ -70,6 +70,43 @@ describe("offline mutation compaction", () => {
     expect(await queuedMutations("user-a")).toEqual([corrected]);
   });
 
+  it("supersedes a rejected category deletion with the user's correction", async () => {
+    const categoryId = "f09af018-f6c2-4eb1-9380-123173bd9802";
+    const deletion: SyncMutation = {
+      mutationId: "00000000-0000-4000-8000-000000000042",
+      planYear: 2026,
+      field: syncFieldForTarget({ kind: "expense", id: categoryId }),
+      value: null,
+      updatedAt: "2026-07-12T01:00:00.000Z",
+    };
+    await enqueueMutations("user-a", [deletion]);
+    expect(await compactedMutationBatch("user-a")).toEqual([deletion]);
+
+    const correction: SyncMutation = {
+      ...deletion,
+      mutationId: "00000000-0000-4000-8000-000000000043",
+      value: {
+        id: categoryId,
+        name: "Groceries",
+        group: "Needs",
+        cadence: "monthly",
+        amountCents: 75_000,
+        sortOrder: 0,
+        guidanceBucket: "needs",
+        colorToken: "teal",
+        archived: false,
+      },
+      updatedAt: "2026-07-12T01:01:00.000Z",
+    };
+    await enqueueMutations("user-a", [correction]);
+
+    expect(await compactedMutationBatch("user-a")).toEqual([correction]);
+    expect(await queuedMutations("user-a")).toEqual([correction]);
+    expect(
+      (await startupPlanState("user-a", [plan()])).pendingMutations,
+    ).toEqual([correction]);
+  });
+
   it("drains a full valid batch even when a later mutation is invalid", async () => {
     const mutations = Array.from({ length: 501 }, (_, index) => ({
       mutationId: `00000000-0000-4000-8000-${String(index + 100).padStart(12, "0")}`,

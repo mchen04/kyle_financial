@@ -5,6 +5,7 @@ import {
   planAggregateError,
 } from "./plan-admissibility";
 import {
+  CATEGORY_COLOR_TOKENS,
   normalizedHsaPlanSettings,
   type HsaPlanSettings,
   type PlanInput,
@@ -15,6 +16,10 @@ import {
   persistedFieldVersionSchema,
   type FieldVersion,
 } from "./field-version";
+import {
+  isLocalCalendarDate,
+  localDateBelongsToYear,
+} from "./local-calendar-date";
 import { normalizeStoredPlan } from "./stored-plan";
 import {
   entityIdSchema,
@@ -92,6 +97,7 @@ export const esppDiscountRateSchema = z
   .max(maximumEsppDiscountPpm);
 export const expenseCadenceSchema = z.enum(["monthly", "yearly"]);
 export const expenseGuidanceBucketSchema = z.enum(["needs", "wants", "saving"]);
+export const categoryColorTokenSchema = z.enum(CATEGORY_COLOR_TOKENS);
 export const expenseSortOrderSchema = z
   .number()
   .int()
@@ -244,6 +250,8 @@ export const expenseSchema = z
     amountCents: safeNonnegativeCentsSchema,
     sortOrder: expenseSortOrderSchema,
     guidanceBucket: expenseGuidanceBucketSchema.optional(),
+    colorToken: categoryColorTokenSchema.default("blue"),
+    archived: z.boolean().default(false),
   })
   .superRefine((expense, context) => {
     if (
@@ -261,10 +269,27 @@ export const expenseSchema = z
     }
   });
 
+export const localCalendarDateSchema = z
+  .string()
+  .refine(isLocalCalendarDate, "Date must be a valid local calendar date");
+
+export const transactionSchema = z.object({
+  id: entityIdSchema,
+  categoryId: entityIdSchema,
+  amountCents: safeNonnegativeCentsSchema.positive(),
+  title: entryLabelSchema,
+  note: z.string().max(500).optional(),
+  date: localCalendarDateSchema,
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+});
+
 const fullPlanBaseSchema = updatePlanBasicsBaseSchema
   .extend({
     benefits: z.array(benefitSchema).max(100),
     expenses: z.array(expenseSchema).max(500),
+    transactions: z.array(transactionSchema).max(100_000).default([]),
+    startingSavingsCents: safeNonnegativeCentsSchema.optional(),
   })
   .superRefine((plan, context) => {
     validateSpouseConsistency(plan, context);
@@ -279,6 +304,25 @@ const fullPlanBaseSchema = updatePlanBasicsBaseSchema
           });
         }
         seen.add(entry.id);
+      }
+    }
+    const categoryIds = new Set(plan.expenses.map(({ id }) => id));
+    const transactionIds = new Set<string>();
+    for (const [index, transaction] of plan.transactions.entries()) {
+      if (transactionIds.has(transaction.id)) {
+        context.addIssue({
+          code: "custom",
+          message: "Transaction IDs must be unique.",
+          path: ["transactions", index, "id"],
+        });
+      }
+      transactionIds.add(transaction.id);
+      if (!categoryIds.has(transaction.categoryId)) {
+        context.addIssue({
+          code: "custom",
+          message: "Transactions must reference a category in the same plan.",
+          path: ["transactions", index, "categoryId"],
+        });
       }
     }
     if (
@@ -330,4 +374,15 @@ export const storedPlanSchema = z
       fieldVersions: persistedFieldVersionsSchema.default({}),
     }),
   )
+  .superRefine((plan, context) => {
+    for (const [index, transaction] of plan.transactions.entries()) {
+      if (!localDateBelongsToYear(transaction.date, plan.year)) {
+        context.addIssue({
+          code: "custom",
+          message: "Transaction date must be inside the plan year.",
+          path: ["transactions", index, "date"],
+        });
+      }
+    }
+  })
   .transform(normalizeStoredPlan);

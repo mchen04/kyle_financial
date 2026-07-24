@@ -1,5 +1,9 @@
 import type { BenefitEntry } from "./benefits";
-import type { ExpenseEntry } from "./budget";
+import {
+  CATEGORY_COLOR_TOKENS,
+  guidanceBucket,
+  type ExpenseEntry,
+} from "./budget";
 
 export const DEFAULT_BENEFITS: Omit<BenefitEntry, "id">[] = [
   {
@@ -75,5 +79,8 @@ export const DEFAULT_EXPENSES: Omit<ExpenseEntry, "id">[] = expenseDefaults.map(
     cadence,
     amountCents: 0,
     sortOrder,
+    guidanceBucket: guidanceBucket({ group }),
+    colorToken: CATEGORY_COLOR_TOKENS[sortOrder % CATEGORY_COLOR_TOKENS.length],
+    archived: false,
   }),
 );

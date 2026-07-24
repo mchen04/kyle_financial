@@ -1,8 +1,11 @@
 import "server-only";
 
-import type { Sql, TransactionSql } from "postgres";
+import type { Sql } from "postgres";
 import { z } from "zod";
-import { guidanceBucket } from "@/domain/budget";
+import {
+  actualDateIsAdmissible,
+  localDateBelongsToYear,
+} from "@/domain/local-calendar-date";
 import { normalizedFullPlanSchema } from "@/domain/plan-schema";
 import {
   applyDecodedSyncMutation,
@@ -31,9 +34,25 @@ import {
   listPlans,
 } from "@/server/plans/repository";
 import { parseFieldVersions } from "@/server/field-versions";
+import { isForeignKeyConstraintViolation } from "@/server/postgres-errors";
+import { persistDecodedEntityMutation } from "@/server/sync/entity-repository";
 
 class InvalidFinalPlanError extends Error {}
 export class SyncPlanNotFoundError extends Error {}
+
+function mutationUsesFutureActualDate(
+  mutation: DecodedSyncMutation,
+  receivedAt: Date,
+): boolean {
+  if (mutation.kind !== "transaction") return false;
+  if (mutation.property === "date")
+    return !actualDateIsAdmissible(mutation.value, receivedAt);
+  return (
+    mutation.property === null &&
+    mutation.value !== null &&
+    !actualDateIsAdmissible(mutation.value.date, receivedAt)
+  );
+}
 
 interface CommittedSyncAcknowledgement {
   mutationId: string;
@@ -103,165 +122,6 @@ function versionsJson(
         : [],
     ),
   );
-}
-
-type BenefitMutation = Extract<DecodedSyncMutation, { kind: "benefit" }>;
-type ExpenseMutation = Extract<DecodedSyncMutation, { kind: "expense" }>;
-type WholeBenefitMutation = Extract<BenefitMutation, { property: null }>;
-type WholeExpenseMutation = Extract<ExpenseMutation, { property: null }>;
-type BenefitPropertyMutation = Exclude<BenefitMutation, WholeBenefitMutation>;
-type ExpensePropertyMutation = Exclude<ExpenseMutation, WholeExpenseMutation>;
-
-async function replaceBenefit(
-  transaction: TransactionSql,
-  planId: string,
-  mutation: WholeBenefitMutation,
-): Promise<void> {
-  const entryId = mutation.entityId;
-  const existing = await transaction<{ sort_order: number }[]>`
-    SELECT sort_order FROM benefits WHERE plan_id = ${planId} AND id = ${entryId}
-  `;
-  const nextOrder =
-    existing[0]?.sort_order ??
-    (
-      await transaction<{ next_order: number }[]>`
-      SELECT coalesce(max(sort_order), -1) + 1 AS next_order
-      FROM benefits WHERE plan_id = ${planId}
-    `
-    )[0].next_order;
-  await transaction`
-    DELETE FROM benefits WHERE plan_id = ${planId} AND id = ${entryId}
-  `;
-  if (mutation.value === null) return;
-  const entry = mutation.value;
-  const amountValue =
-    entry.amount.kind === "percent" ? entry.amount.ratePpm : entry.amount.cents;
-  const customTreatment = entry.customTaxTreatment
-    ? JSON.stringify(entry.customTaxTreatment)
-    : null;
-  await transaction`
-    INSERT INTO benefits (
-      id, plan_id, owner, type, label, amount_kind, amount_value,
-      discount_rate_ppm, custom_tax_treatment, sort_order
-    ) VALUES (
-      ${entry.id}, ${planId}, ${entry.owner ?? "primary"}, ${entry.type}, ${entry.label}, ${entry.amount.kind},
-      ${amountValue}, ${entry.discountRatePpm ?? null}, ${customTreatment}::jsonb,
-      ${nextOrder}
-    )
-  `;
-}
-
-async function updateBenefitProperty(
-  transaction: TransactionSql,
-  planId: string,
-  mutation: BenefitPropertyMutation,
-): Promise<boolean> {
-  const entryId = mutation.entityId;
-  switch (mutation.property) {
-    case "label":
-      return (
-        (
-          await transaction`UPDATE benefits SET label = ${mutation.value} WHERE plan_id = ${planId} AND id = ${entryId} RETURNING id`
-        ).length > 0
-      );
-    case "owner":
-      return (
-        (
-          await transaction`UPDATE benefits SET owner = ${mutation.value ?? "primary"} WHERE plan_id = ${planId} AND id = ${entryId} RETURNING id`
-        ).length > 0
-      );
-    case "amount": {
-      const amount = mutation.value;
-      const amountValue =
-        amount.kind === "percent" ? amount.ratePpm : amount.cents;
-      return (
-        (
-          await transaction`UPDATE benefits SET amount_kind = ${amount.kind}, amount_value = ${amountValue} WHERE plan_id = ${planId} AND id = ${entryId} RETURNING id`
-        ).length > 0
-      );
-    }
-    case "discountRatePpm":
-      return (
-        (
-          await transaction`UPDATE benefits SET discount_rate_ppm = ${mutation.value} WHERE plan_id = ${planId} AND id = ${entryId} RETURNING id`
-        ).length > 0
-      );
-    case "customTaxTreatment": {
-      return (
-        (
-          await transaction`UPDATE benefits SET custom_tax_treatment = ${mutation.value === null ? null : transaction.json({ ...mutation.value })} WHERE plan_id = ${planId} AND id = ${entryId} RETURNING id`
-        ).length > 0
-      );
-    }
-  }
-}
-
-async function replaceExpense(
-  transaction: TransactionSql,
-  planId: string,
-  mutation: WholeExpenseMutation,
-): Promise<void> {
-  const entryId = mutation.entityId;
-  await transaction`
-    DELETE FROM expenses WHERE plan_id = ${planId} AND id = ${entryId}
-  `;
-  if (mutation.value === null) return;
-  const entry = mutation.value;
-  await transaction`
-    INSERT INTO expenses (
-      id, plan_id, name, category_group, cadence, amount_cents, sort_order,
-      guidance_bucket
-    ) VALUES (
-      ${entry.id}, ${planId}, ${entry.name}, ${entry.group}, ${entry.cadence},
-      ${entry.amountCents}, ${entry.sortOrder}, ${guidanceBucket(entry)}
-    )
-  `;
-}
-
-async function updateExpenseProperty(
-  transaction: TransactionSql,
-  planId: string,
-  mutation: ExpensePropertyMutation,
-): Promise<boolean> {
-  const entryId = mutation.entityId;
-  switch (mutation.property) {
-    case "name":
-      return (
-        (
-          await transaction`UPDATE expenses SET name = ${mutation.value} WHERE plan_id = ${planId} AND id = ${entryId} RETURNING id`
-        ).length > 0
-      );
-    case "group":
-      return (
-        (
-          await transaction`UPDATE expenses SET category_group = ${mutation.value} WHERE plan_id = ${planId} AND id = ${entryId} RETURNING id`
-        ).length > 0
-      );
-    case "cadence":
-      return (
-        (
-          await transaction`UPDATE expenses SET cadence = ${mutation.value} WHERE plan_id = ${planId} AND id = ${entryId} RETURNING id`
-        ).length > 0
-      );
-    case "amountCents":
-      return (
-        (
-          await transaction`UPDATE expenses SET amount_cents = ${mutation.value} WHERE plan_id = ${planId} AND id = ${entryId} RETURNING id`
-        ).length > 0
-      );
-    case "sortOrder":
-      return (
-        (
-          await transaction`UPDATE expenses SET sort_order = ${mutation.value} WHERE plan_id = ${planId} AND id = ${entryId} RETURNING id`
-        ).length > 0
-      );
-    case "guidanceBucket":
-      return (
-        (
-          await transaction`UPDATE expenses SET guidance_bucket = ${mutation.value ?? null} WHERE plan_id = ${planId} AND id = ${entryId} RETURNING id`
-        ).length > 0
-      );
-  }
 }
 
 async function reconcilePlanYear(
@@ -358,13 +218,21 @@ async function reconcilePlanYear(
                     ? {}
                     : { property: mutation.property }),
                 }
-              : {
-                  kind: "expense",
-                  id: mutation.entityId,
-                  ...(mutation.property === null
-                    ? {}
-                    : { property: mutation.property }),
-                },
+              : mutation.kind === "expense"
+                ? {
+                    kind: "expense",
+                    id: mutation.entityId,
+                    ...(mutation.property === null
+                      ? {}
+                      : { property: mutation.property }),
+                  }
+                : {
+                    kind: "transaction",
+                    id: mutation.entityId,
+                    ...(mutation.property === null
+                      ? {}
+                      : { property: mutation.property }),
+                  },
         );
         const newestVersion = latestVersionForField(mutation.field, versions);
         const baseMatches =
@@ -389,26 +257,12 @@ async function reconcilePlanYear(
           baseMatches || isIncomingVersionNewer(incoming, newestVersion);
 
         if (applied) {
-          if (mutation.kind === "benefit") {
-            if (mutation.property !== null) {
-              applied = await updateBenefitProperty(
-                transaction,
-                plan.id,
-                mutation,
-              );
-            } else {
-              await replaceBenefit(transaction, plan.id, mutation);
-            }
-          } else if (mutation.kind === "expense") {
-            if (mutation.property !== null) {
-              applied = await updateExpenseProperty(
-                transaction,
-                plan.id,
-                mutation,
-              );
-            } else {
-              await replaceExpense(transaction, plan.id, mutation);
-            }
+          if (mutation.kind !== "scalar") {
+            applied = await persistDecodedEntityMutation(
+              transaction,
+              plan.id,
+              mutation,
+            );
           }
           if (applied) {
             projectedPlan = applyDecodedSyncMutation(projectedPlan, mutation);
@@ -445,6 +299,7 @@ async function reconcilePlanYear(
               spouse_hsa_catch_up_eligible = ${projectedPlan.spouseHsaCatchUpEligible},
               primary_hsa_family_allocation_ppm = ${projectedPlan.primaryHsaFamilyAllocationPpm},
               spouse_hsa_family_allocation_ppm = ${projectedPlan.spouseHsaFamilyAllocationPpm},
+              starting_savings_cents = ${projectedPlan.startingSavingsCents ?? null},
               field_versions = ${transaction.json(versionsJson(versions))},
               updated_at = now()
           WHERE id = ${plan.id}
@@ -457,13 +312,23 @@ async function reconcilePlanYear(
           ) AS receipt(mutation_id text, result jsonb)
         `;
       }
-      if (!normalizedFullPlanSchema.safeParse(projectedPlan).success)
+      const transactionOutsidePlanYear = projectedPlan.transactions.some(
+        ({ date }) => !localDateBelongsToYear(date, projectedPlan.year),
+      );
+      if (
+        transactionOutsidePlanYear ||
+        !normalizedFullPlanSchema.safeParse(projectedPlan).success
+      )
         throw new InvalidFinalPlanError();
       return result;
     });
     return { kind: "committed", acknowledgements };
   } catch (error) {
-    if (!(error instanceof InvalidFinalPlanError)) throw error;
+    if (
+      !(error instanceof InvalidFinalPlanError) &&
+      !isForeignKeyConstraintViolation(error)
+    )
+      throw error;
     return {
       kind: "rejected",
       acknowledgements: yearMutations.map(({ mutationId }) => ({
@@ -480,6 +345,7 @@ export async function applySyncMutations(
   userId: string,
   rawMutations: unknown[],
 ) {
+  const receivedAt = new Date();
   const acknowledgements: SyncAcknowledgement[] = [];
   const envelopesById = new Map<string, SyncMutation[]>();
   const invalidCanonicalIds = new Set<string>();
@@ -518,7 +384,10 @@ export async function applySyncMutations(
     if (
       invalidCanonicalIds.has(mutationId) ||
       decoded.length !== envelopes.length ||
-      fingerprints.size > 1
+      fingerprints.size > 1 ||
+      decoded.some((mutation) =>
+        mutationUsesFutureActualDate(mutation, receivedAt),
+      )
     ) {
       acknowledgements.push(
         ...envelopes.map(() => ({
@@ -536,7 +405,6 @@ export async function applySyncMutations(
       Date.parse(left.updatedAt) - Date.parse(right.updatedAt) ||
       left.mutationId.localeCompare(right.mutationId),
   );
-  const receivedAt = new Date();
   const byYear = new Map<number, DecodedSyncMutation[]>();
   for (const mutation of parsedMutations) {
     const group = byYear.get(mutation.planYear) ?? [];
@@ -554,12 +422,5 @@ export async function applySyncMutations(
     );
     acknowledgements.push(...result.acknowledgements);
   }
-  if (byYear.size > 0) {
-    await sql`
-      DELETE FROM applied_mutations
-      WHERE user_id = ${userId} AND applied_at < now() - interval '90 days'
-    `;
-  }
-
   return { acknowledgements, plans: await listPlans(sql, userId) };
 }

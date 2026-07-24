@@ -16,7 +16,34 @@ import { calculatePlan } from "@/domain/tax/engine";
 
 export type { StoredPlan } from "@/domain/stored-plan";
 
-export type Screen = "plan" | "benefits" | "compare" | "account";
+export type WorkspaceRoute =
+  | {
+      screen:
+        | "home"
+        | "budget"
+        | "activity"
+        | "plan"
+        | "manage-categories"
+        | "wrap"
+        | "plan-details"
+        | "benefits"
+        | "compare"
+        | "account";
+    }
+  | { screen: "category"; categoryId: string }
+  | { screen: "edit-budget"; returnTo: "budget" | "plan" };
+
+export type Screen = WorkspaceRoute["screen"];
+
+export interface FastLogOverlay {
+  kind: "fast-log";
+  transactionId?: string;
+}
+
+export interface WorkspaceLocation {
+  route: WorkspaceRoute;
+  overlay?: FastLogOverlay;
+}
 export type SaveState =
   "saved" | "saving" | "offline" | "local-error" | "rejected" | "sync-error";
 

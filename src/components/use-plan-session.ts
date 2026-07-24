@@ -7,17 +7,18 @@ import {
 } from "react";
 import type { User } from "@/domain/api-contracts";
 import type { AccountPersistenceRetry } from "./sync-state";
-import type { SaveState, Screen, StoredPlan } from "./plan-types";
+import type { SaveState, StoredPlan, WorkspaceLocation } from "./plan-types";
 
 export type PlanSessionPhase =
   "loading" | "signed-out" | "onboarding" | "ready";
 
 interface SessionState {
   user: User | null;
+  accountGeneration: number;
   plans: StoredPlan[];
   draft: StoredPlan | null;
   loading: boolean;
-  screen: Screen;
+  location: WorkspaceLocation;
   saveState: SaveState;
   localSaveRetry: number;
   authNotice: string;
@@ -28,11 +29,15 @@ type SessionAction =
   | { type: "plans"; value: StoredPlan[] }
   | { type: "draft"; value: SetStateAction<StoredPlan | null> }
   | { type: "loading"; value: boolean }
-  | { type: "screen"; value: Screen }
+  | { type: "location"; value: WorkspaceLocation }
   | { type: "save"; value: SaveState }
   | { type: "retry"; value: SetStateAction<number> }
-  | { type: "account-transition" }
-  | { type: "signed-out"; notice: string };
+  | { type: "account-transition"; accountGeneration: number }
+  | {
+      type: "signed-out";
+      notice: string;
+      accountGeneration: number;
+    };
 
 export interface PlanSessionRuntime {
   savedSnapshots: Map<number, string>;
@@ -61,10 +66,11 @@ export interface PlanSessionRuntime {
 
 const initialState: SessionState = {
   user: null,
+  accountGeneration: 0,
   plans: [],
   draft: null,
   loading: true,
-  screen: "plan",
+  location: { route: { screen: "home" } },
   saveState: "saved",
   localSaveRetry: 0,
   authNotice: "",
@@ -89,8 +95,8 @@ function sessionReducer(
       };
     case "loading":
       return { ...state, loading: action.value };
-    case "screen":
-      return { ...state, screen: action.value };
+    case "location":
+      return { ...state, location: action.value };
     case "save":
       return { ...state, saveState: action.value };
     case "retry":
@@ -105,9 +111,10 @@ function sessionReducer(
       return {
         ...state,
         user: null,
+        accountGeneration: action.accountGeneration,
         plans: [],
         draft: null,
-        screen: "plan",
+        location: { route: { screen: "home" } },
         saveState: "saved",
         localSaveRetry: 0,
         authNotice: "",
@@ -116,10 +123,11 @@ function sessionReducer(
       return {
         ...state,
         user: null,
+        accountGeneration: action.accountGeneration,
         plans: [],
         draft: null,
         loading: false,
-        screen: "plan",
+        location: { route: { screen: "home" } },
         saveState: "saved",
         localSaveRetry: 0,
         authNotice: action.notice,
@@ -235,8 +243,8 @@ export function usePlanSession() {
     (value: boolean) => dispatch({ type: "loading", value }),
     [],
   );
-  const setScreen = useCallback(
-    (value: Screen) => dispatch({ type: "screen", value }),
+  const setLocation = useCallback(
+    (value: WorkspaceLocation) => dispatch({ type: "location", value }),
     [],
   );
   const setSaveState = useCallback(
@@ -266,14 +274,17 @@ export function usePlanSession() {
         ownerSignal,
       );
       if (generation === null) return null;
-      dispatch({ type: "account-transition" });
+      dispatch({ type: "account-transition", accountGeneration: generation });
       return generation;
     },
     [],
   );
   const invalidateSession = useCallback((notice: string) => {
-    transitionPlanSessionRuntime(runtimeRef.current, null);
-    dispatch({ type: "signed-out", notice });
+    const accountGeneration = transitionPlanSessionRuntime(
+      runtimeRef.current,
+      null,
+    );
+    dispatch({ type: "signed-out", notice, accountGeneration });
   }, []);
 
   const phase: PlanSessionPhase = state.loading
@@ -292,7 +303,7 @@ export function usePlanSession() {
     setPlans,
     setDraft,
     setLoading,
-    setScreen,
+    setLocation,
     setSaveState,
     setLocalSaveRetry,
     beginPlanIntent,

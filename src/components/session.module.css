@@ -1,10 +1,10 @@
 .centered,
 .onboarding {
-  min-height: 100dvh;
+  min-height: var(--viewport-height);
   display: grid;
   place-content: center;
-  gap: 22px;
-  padding: 24px;
+  gap: var(--space-5);
+  padding: var(--space-6);
   text-align: center;
 }
 
@@ -17,10 +17,10 @@
 }
 
 .loadingLine {
-  width: 220px;
-  height: 3px;
+  width: var(--layout-md);
+  height: var(--micro-3);
   overflow: hidden;
-  border-radius: 9px;
+  border-radius: var(--radius-sm);
   background: var(--sky);
 }
 
@@ -28,14 +28,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
   color: var(--ink);
 }
 
 .loadingBrand h1 {
   margin: 0;
-  font: 700 clamp(42px, 12vw, 56px) / 0.95 var(--display);
-  letter-spacing: -0.045em;
+  font: 700 clamp(var(--text-3xl), var(--fluid-12), var(--text-4xl)) / 0.95
+    var(--display);
+  letter-spacing: var(--tracking-tight);
 }
 
 .loadingLine::after {
@@ -69,9 +70,9 @@
 }
 
 .authPage {
-  min-height: 100dvh;
+  min-height: var(--viewport-height);
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(360px, 0.7fr);
+  grid-template-columns: minmax(0, 1.3fr) minmax(var(--layout-xl), 0.7fr);
 }
 
 .authStory {
@@ -79,54 +80,55 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 100dvh;
-  padding: clamp(30px, 6vw, 88px);
+  min-height: var(--viewport-height);
+  padding: clamp(var(--space-7), var(--fluid-6), var(--space-20));
   overflow: hidden;
   background: var(--ink);
-  color: #fff;
+  color: var(--text-inverse);
 }
 
 .authStory::after {
   content: "";
   position: absolute;
-  width: 45vw;
+  width: var(--fluid-45);
   aspect-ratio: 1;
-  right: -15vw;
-  bottom: -20vw;
-  border: 1px solid rgb(255 255 255 / 12%);
+  right: var(--fluid-negative-15);
+  bottom: var(--fluid-negative-20);
+  border: var(--border-hairline) solid var(--alpha-white-12);
   border-radius: 50%;
   box-shadow:
-    0 0 0 6vw rgb(255 255 255 / 2%),
-    0 0 0 12vw rgb(255 255 255 / 2%);
+    0 0 0 var(--fluid-6) var(--alpha-white-02),
+    0 0 0 var(--fluid-12) var(--alpha-white-02);
 }
 
 .authStory .brandMark {
-  background: #fff;
+  background: var(--surface-panel);
   color: var(--ink);
 }
 
 .authThesis {
   position: relative;
   z-index: 1;
-  max-width: 760px;
+  max-width: var(--layout-8xl);
 }
 
 .authThesis .eyebrow {
-  color: #88c6ef;
+  color: var(--color-blue-300);
 }
 
 .authThesis h1 {
-  max-width: 720px;
+  max-width: var(--layout-7xl);
   margin: 0;
-  font: 650 clamp(44px, 6.5vw, 84px)/0.95 var(--display);
-  letter-spacing: -0.065em;
+  font: 650 clamp(var(--text-4xl), var(--fluid-6-5), var(--text-6xl))/0.95
+    var(--display);
+  letter-spacing: var(--tracking-tighter);
 }
 
 .authThesis > p:last-child {
-  max-width: 620px;
-  margin: 28px 0 0;
-  color: #cbd9e7;
-  font-size: clamp(17px, 2vw, 22px);
+  max-width: var(--layout-5xl);
+  margin: var(--space-7) 0 0;
+  color: var(--text-inverse-soft);
+  font-size: clamp(var(--text-md), var(--fluid-2), var(--text-xl));
   line-height: 1.5;
 }
 
@@ -135,59 +137,61 @@
   z-index: 1;
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 9px 28px;
-  width: min(520px, 100%);
-  color: #aabbd0;
-  font-size: 13px;
+  gap: var(--space-2) var(--space-7);
+  width: min(var(--layout-3xl), 100%);
+  color: var(--text-inverse-muted);
+  font-size: var(--text-sm);
 }
 
 .previewLedger strong {
-  color: #fff;
-  font: 600 13px/1 var(--data);
+  color: var(--text-inverse);
+  font: 600 var(--text-sm)/1 var(--data);
   text-align: right;
 }
 
 .previewLedger i {
   grid-column: 1 / -1;
-  height: 1px;
-  background: rgb(255 255 255 / 13%);
+  height: var(--border-hairline);
+  background: var(--alpha-white-13);
 }
 
 .previewLedger .previewSurplus {
-  color: #7dd8ca;
-  font-size: 18px;
+  color: var(--color-teal-300);
+  font-size: var(--text-lg);
 }
 
 .authPanel {
   align-self: center;
-  width: min(440px, calc(100% - 48px));
+  width: min(var(--layout-2xl), calc(100% - var(--control-md)));
   margin: auto;
-  padding: 42px;
-  border: 1px solid var(--line);
-  border-radius: 28px 28px 28px 8px;
-  background: rgb(255 255 255 / 90%);
+  padding: var(--space-10);
+  border: var(--border-hairline) solid var(--line);
+  border-radius: var(--radius-xl) var(--radius-xl) var(--radius-xl)
+    var(--radius-sm);
+  background: var(--alpha-white-90);
   box-shadow: var(--shadow);
 }
 
 .authPanel h2,
 .onboardingCard h1 {
-  margin: 0 0 24px;
-  font: 650 clamp(26px, 3vw, 38px)/1.05 var(--display);
-  letter-spacing: -0.045em;
+  margin: 0 0 var(--space-6);
+  font: 650 clamp(var(--text-xl), var(--fluid-3), var(--text-3xl))/1.05
+    var(--display);
+  letter-spacing: var(--tracking-tight);
 }
 
 .authForm,
 .onboardingForm {
   display: grid;
-  gap: 17px;
+  gap: var(--space-4);
 }
 
 .authForm label,
 .onboardingForm label {
   display: grid;
-  gap: 7px;
+  gap: var(--space-2);
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 600;
   text-align: left;
 }
@@ -196,56 +200,56 @@
 .onboardingForm input,
 .onboardingForm select {
   width: 100%;
-  min-height: 48px;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fff;
+  min-height: var(--control-md);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-hairline) solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-panel);
   color: var(--ink);
 }
 
 .authForm small {
-  color: #758397;
+  color: var(--color-navy-500);
   font-weight: 400;
 }
 
 .textButton {
-  min-height: 44px;
+  min-height: var(--control-sm);
   border: 0;
-  border-radius: 11px;
+  border-radius: var(--radius-md);
   cursor: pointer;
 }
 
 .textButton {
   width: 100%;
-  margin-top: 10px;
-  background: transparent;
+  margin-top: var(--space-2);
+  background: var(--color-transparent);
   color: var(--blue);
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 
 .privacyNote {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 22px 0 0;
+  gap: var(--space-2);
+  margin: var(--space-5) 0 0;
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 
 .formError,
 .fallbackNotice {
   margin: 0;
-  padding: 10px 12px;
-  border-radius: 9px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
   background: var(--amber-soft);
-  color: #803c0e;
-  font-size: 13px;
+  color: var(--status-warning-text);
+  font-size: var(--text-sm);
 }
 
 .onboarding {
   place-content: start center;
-  padding-top: max(36px, env(safe-area-inset-top));
+  padding-top: max(var(--space-10), env(safe-area-inset-top));
   text-align: left;
 }
 
@@ -254,17 +258,18 @@
 }
 
 .onboardingCard {
-  width: min(680px, calc(100vw - 32px));
-  padding: clamp(24px, 5vw, 50px);
-  border: 1px solid var(--line);
-  border-radius: 30px 30px 30px 8px;
+  width: min(var(--layout-6xl), calc(var(--viewport-width) - var(--space-8)));
+  padding: clamp(var(--space-6), var(--fluid-5), var(--control-md));
+  border: var(--border-hairline) solid var(--line);
+  border-radius: var(--radius-xl) var(--radius-xl) var(--radius-xl)
+    var(--radius-sm);
   background: var(--surface);
   box-shadow: var(--shadow);
 }
 
 .onboardingForm {
   grid-template-columns: 1fr 1fr;
-  margin-top: 28px;
+  margin-top: var(--space-7);
 }
 
 .onboardingForm .primaryButton,
@@ -285,44 +290,46 @@
 .fallbackNotice {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  margin-top: 14px;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
 }
 
-@media (max-width: 600px) {
+@media (--viewport-phone) {
   .authPage {
     display: block;
   }
   .authStory {
-    min-height: 45dvh;
-    padding: max(24px, env(safe-area-inset-top)) 22px 28px;
+    min-height: var(--viewport-auth-panel-height);
+    padding: max(var(--space-6), env(safe-area-inset-top)) var(--space-5)
+      var(--space-7);
   }
   .authThesis {
-    margin-top: 55px;
+    margin-top: var(--space-8);
   }
   .authThesis h1 {
-    font-size: clamp(38px, 12vw, 58px);
+    font-size: clamp(var(--text-3xl), var(--fluid-12), var(--text-4xl));
   }
   .authThesis > p:last-child {
-    margin-top: 18px;
-    font-size: 15px;
+    margin-top: var(--space-4);
+    font-size: var(--text-md);
   }
   .previewLedger {
     display: none;
   }
   .authPanel {
     position: relative;
-    width: calc(100% - 20px);
-    margin: -10px auto 20px;
-    padding: 24px 20px;
-    border-radius: 22px 22px 22px 7px;
+    width: calc(100% - var(--space-5));
+    margin: calc(-1 * var(--space-2)) auto var(--space-5);
+    padding: var(--space-6) var(--space-5);
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg)
+      var(--radius-sm);
   }
   .onboarding {
-    padding-inline: 10px;
+    padding-inline: var(--space-2);
   }
   .onboardingCard {
-    width: calc(100vw - 20px);
-    padding: 23px 18px;
+    width: calc(var(--viewport-width) - var(--space-5));
+    padding: var(--space-6) var(--space-4);
   }
   .onboardingForm {
     grid-template-columns: 1fr;
@@ -333,20 +340,103 @@
   }
 }
 
-@media (orientation: landscape) and (max-height: 500px) and (max-width: 900px) {
+@media (--short-phone-650) {
+  .authStory {
+    min-height: var(--layout-sm);
+    padding: max(var(--space-3), env(safe-area-inset-top)) var(--space-4);
+  }
+
+  .authThesis {
+    margin-top: var(--space-2);
+  }
+
+  .authThesis .eyebrow,
+  .authThesis > p:last-child {
+    display: none;
+  }
+
+  .authThesis h1 {
+    font-size: var(--text-xl);
+  }
+
+  .authPanel {
+    padding: var(--space-4);
+  }
+
+  .authPanel h2 {
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xl);
+  }
+
+  .authForm {
+    gap: var(--space-2);
+  }
+}
+
+@media (--landscape-short-shell) {
+  .authPage {
+    grid-template-columns: minmax(0, 0.85fr) minmax(var(--layout-xl), 1.15fr);
+  }
+
+  .authStory {
+    min-height: var(--viewport-height);
+    padding: var(--space-5);
+  }
+
+  .authThesis h1 {
+    font-size: var(--text-2xl);
+  }
+
+  .authThesis > p:last-child,
+  .previewLedger {
+    display: none;
+  }
+
+  .authPanel {
+    width: calc(100% - var(--space-4));
+    max-height: calc(var(--viewport-height) - var(--space-4));
+    overflow-y: auto;
+    padding: var(--space-4);
+  }
+
+  .authPanel h2 {
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xl);
+  }
+
+  .authForm {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  .authForm > label:last-of-type,
+  .authForm > .primaryButton,
+  .authForm > .formError,
+  .authForm > .fallbackNotice {
+    grid-column: 1 / -1;
+  }
+
+  .textButton {
+    margin-top: var(--space-1);
+  }
+
+  .privacyNote {
+    display: none;
+  }
+
   .onboarding {
     display: block;
-    padding: 10px 70px;
+    padding: var(--space-2) var(--space-16);
   }
   .onboarding > .wordmark {
     display: none;
   }
   .onboardingCard {
     margin: auto;
-    padding: 18px 28px;
+    padding: var(--space-4) var(--space-7);
   }
   .onboardingForm {
-    gap: 10px 17px;
-    margin-top: 12px;
+    gap: var(--space-2) var(--space-4);
+    margin-top: var(--space-3);
   }
 }
