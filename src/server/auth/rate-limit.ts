@@ -48,7 +48,7 @@ async function cleanupExpiredBuckets(sql: Sql, now: Date): Promise<void> {
   );
   await sql`
     WITH expired AS (
-      SELECT scope, key_hash
+      SELECT ctid
       FROM auth_rate_limits
       WHERE window_started_at < ${cutoff}
       ORDER BY window_started_at
@@ -56,9 +56,7 @@ async function cleanupExpiredBuckets(sql: Sql, now: Date): Promise<void> {
       LIMIT ${AUTH_RATE_LIMIT_CLEANUP_BATCH_SIZE}
     )
     DELETE FROM auth_rate_limits AS bucket
-    USING expired
-    WHERE bucket.scope = expired.scope
-      AND bucket.key_hash = expired.key_hash
+    WHERE bucket.ctid IN (SELECT ctid FROM expired)
   `;
 }
 

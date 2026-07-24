@@ -10,8 +10,11 @@ The architecture follows the current Next.js guidance for a server-only data acc
 
 Signup is public and always returns the same accepted response, preserving the
 same boundary behavior for new and existing normalized identities. Shared
-PostgreSQL rate limits permit at most five signup attempts per IP and three per
-normalized email each hour before password hashing or insertion. The browser
+PostgreSQL rate limits permit at most ten signup attempts per IP and ten per
+normalized email each hour before password hashing or insertion. Retries are
+deliberately generous: a public signup that always returns the same accepted
+response must let a real person recover from a typo without being locked out of
+their own address. The browser
 then signs in through the ordinary login boundary, which runs the same
 600,000-iteration PBKDF2 verification path for missing and present identities
 before returning its generic credential error.

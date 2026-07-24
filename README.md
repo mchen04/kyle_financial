@@ -14,8 +14,8 @@ pnpm dev
 ```
 
 Open `http://localhost:3000` and create an account with an email and a password
-of at least 10 characters. Public registration is limited to five attempts per
-IP and three attempts per normalized email each hour. Migrations must run
+of at least 10 characters. Public registration is limited to ten attempts per
+IP and ten attempts per normalized email each hour. Migrations must run
 before the application starts; apply every ordered SQL file in
 [`migrations/`](migrations/) through `pnpm db:migrate`. Never point automated
 tests at production: `TEST_DATABASE_URL` defaults to the isolated local

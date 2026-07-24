@@ -1,7 +1,7 @@
-ALTER TABLE expenses
-ADD COLUMN guidance_bucket text NOT NULL DEFAULT 'wants'
-CHECK (guidance_bucket IN ('needs', 'wants', 'saving'));
+ALTER TABLE expenses ADD COLUMN IF NOT EXISTS guidance_bucket text;
 
+-- Only rows that predate the column are classified, so a replay can never
+-- overwrite a bucket the owner chose deliberately.
 UPDATE expenses
 SET guidance_bucket = CASE
   WHEN lower(trim(category_group)) IN (
@@ -15,4 +15,16 @@ SET guidance_bucket = CASE
     'property tax', 'education', 'rent & utilities', 'dining & groceries'
   ) THEN 'needs'
   ELSE 'wants'
-END;
+END
+WHERE guidance_bucket IS NULL;
+
+ALTER TABLE expenses ALTER COLUMN guidance_bucket SET DEFAULT 'wants';
+ALTER TABLE expenses ALTER COLUMN guidance_bucket SET NOT NULL;
+
+ALTER TABLE expenses
+DROP CONSTRAINT IF EXISTS expenses_guidance_bucket_check;
+ALTER TABLE expenses
+DROP CONSTRAINT IF EXISTS expenses_guidance_bucket;
+ALTER TABLE expenses
+ADD CONSTRAINT expenses_guidance_bucket
+CHECK (guidance_bucket IN ('needs', 'wants', 'saving'));

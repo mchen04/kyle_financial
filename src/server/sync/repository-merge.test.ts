@@ -245,7 +245,7 @@ describe("offline mutation reconciliation", () => {
           },
         ])
       ).acknowledgements,
-    ).toEqual([{ mutationId: deletionId, applied: false, rejected: true }]);
+    ).toEqual([{ mutationId: deletionId, applied: false }]);
     expect(await getPlanByYear(sql, user.id, 2026)).toMatchObject({
       expenses: expect.arrayContaining([
         expect.objectContaining({ id: category.id, name: "Updated elsewhere" }),
@@ -273,6 +273,120 @@ describe("offline mutation reconciliation", () => {
       ]),
       transactions: [transaction],
     });
+  });
+
+  it("rejects only the referenced deletion, not its whole batch", async () => {
+    const user = await createUser(
+      sql,
+      "sync-batch-survives@example.com",
+      "sync batch survives password",
+    );
+    const created = await createPlanWithDefaults(sql, user.id, {
+      year: 2026,
+      stateCode: "TX",
+      filingStatus: "single",
+      grossSalaryCents: 10_000_000,
+      additionalWageIncomeCents: 0,
+      spouseWageIncomeCents: 0,
+      otherOrdinaryIncomeCents: 0,
+      hsaCoverage: "self",
+    });
+    const [referenced, unrelated] = created.expenses;
+    await applySyncMutations(sql, user.id, [
+      {
+        mutationId: "00000000-0000-4000-8000-000000001130",
+        planYear: 2026,
+        field: `transaction:00000000-0000-4000-8000-000000001131`,
+        value: {
+          id: "00000000-0000-4000-8000-000000001131",
+          categoryId: referenced.id,
+          amountCents: 2_500,
+          title: "Anchors the category",
+          date: "2026-07-24",
+          createdAt: "2026-07-24T12:00:00.000Z",
+          updatedAt: "2026-07-24T12:00:00.000Z",
+        },
+        updatedAt: "2026-07-24T12:00:00.000Z",
+      },
+    ]);
+
+    const deletionId = "00000000-0000-4000-8000-000000001132";
+    const renameId = "00000000-0000-4000-8000-000000001133";
+    expect(
+      (
+        await applySyncMutations(sql, user.id, [
+          {
+            mutationId: deletionId,
+            planYear: 2026,
+            field: `expense:${referenced.id}`,
+            value: null,
+            updatedAt: "2026-07-24T12:05:00.000Z",
+          },
+          {
+            mutationId: renameId,
+            planYear: 2026,
+            field: `expense:${unrelated.id}:name`,
+            value: "Survived the batch",
+            updatedAt: "2026-07-24T12:05:01.000Z",
+          },
+        ])
+      ).acknowledgements,
+    ).toEqual([
+      { mutationId: deletionId, applied: false },
+      { mutationId: renameId, applied: true },
+    ]);
+
+    const plan = await getPlanByYear(sql, user.id, 2026);
+    expect(plan?.expenses.find(({ id }) => id === unrelated.id)?.name).toBe(
+      "Survived the batch",
+    );
+    expect(plan?.expenses.some(({ id }) => id === referenced.id)).toBe(true);
+  });
+
+  it("refuses an entity id that belongs to another account's plan", async () => {
+    const owner = await createUser(
+      sql,
+      "sync-id-owner@example.com",
+      "sync id owner password",
+    );
+    const stranger = await createUser(
+      sql,
+      "sync-id-stranger@example.com",
+      "sync id stranger password",
+    );
+    const plan = {
+      year: 2026,
+      stateCode: "TX" as const,
+      filingStatus: "single" as const,
+      grossSalaryCents: 10_000_000,
+      additionalWageIncomeCents: 0,
+      spouseWageIncomeCents: 0,
+      otherOrdinaryIncomeCents: 0,
+      hsaCoverage: "self" as const,
+    };
+    const owned = await createPlanWithDefaults(sql, owner.id, plan);
+    await createPlanWithDefaults(sql, stranger.id, plan);
+    const target = owned.expenses[0];
+
+    const attemptId = "00000000-0000-4000-8000-000000001140";
+    expect(
+      (
+        await applySyncMutations(sql, stranger.id, [
+          {
+            mutationId: attemptId,
+            planYear: 2026,
+            field: `expense:${target.id}`,
+            value: { ...target, name: "Taken over" },
+            updatedAt: "2026-07-24T12:06:00.000Z",
+          },
+        ])
+      ).acknowledgements,
+    ).toEqual([{ mutationId: attemptId, applied: false }]);
+
+    const ownerPlan = await getPlanByYear(sql, owner.id, 2026);
+    expect(ownerPlan?.expenses.find(({ id }) => id === target.id)?.name).toBe(
+      target.name,
+    );
   });
 
   it("merges disjoint expense edits instead of replacing the collection", async () => {
