@@ -127,6 +127,23 @@ describe("distributed authentication throttling", () => {
     expect(results.filter(({ allowed }) => !allowed)).toHaveLength(2);
   });
 
+  it("allows ten signup retries for one identity", async () => {
+    const now = new Date("2026-07-13T18:20:00.000Z");
+    const results = await Promise.all(
+      Array.from({ length: 11 }, () =>
+        consumeAuthenticationIdentityAttempt(
+          sql,
+          "signup",
+          "retry@example.com",
+          now,
+        ),
+      ),
+    );
+
+    expect(results.filter(({ allowed }) => allowed)).toHaveLength(10);
+    expect(results.filter(({ allowed }) => !allowed)).toHaveLength(1);
+  });
+
   it("resets an expired window and stores only hashed keys", async () => {
     const start = new Date("2026-07-13T19:00:00.000Z");
     for (let attempt = 0; attempt < 11; attempt += 1) {

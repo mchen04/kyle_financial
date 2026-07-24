@@ -25,7 +25,7 @@ const AUTHENTICATION_POLICIES: Record<
   },
   signup: {
     ip: { limit: 10, windowSeconds: 60 * 60 },
-    identity: { limit: 3, windowSeconds: 60 * 60 },
+    identity: { limit: 10, windowSeconds: 60 * 60 },
   },
 };
 
