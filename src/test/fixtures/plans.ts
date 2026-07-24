@@ -1,9 +1,24 @@
 import type { BenefitEntry } from "@/domain/benefits";
-import type { PlanInput } from "@/domain/budget";
-import type { StoredPlan } from "@/domain/stored-plan";
+import {
+  canonicalBudgetCategory,
+  type BudgetCategory,
+  type PlanInput,
+  type TransactionEntry,
+} from "@/domain/budget";
+import { normalizeStoredPlan, type StoredPlan } from "@/domain/stored-plan";
 
-export function planInput(overrides: Partial<PlanInput> = {}): PlanInput {
-  return {
+export type CanonicalPlanInput = Omit<
+  PlanInput,
+  "expenses" | "transactions"
+> & {
+  expenses: BudgetCategory[];
+  transactions: TransactionEntry[];
+};
+
+export function planInput(
+  overrides: Partial<PlanInput> = {},
+): CanonicalPlanInput {
+  const plan: PlanInput = {
     year: 2026,
     grossSalaryCents: 10_000_000,
     additionalWageIncomeCents: 0,
@@ -21,6 +36,11 @@ export function planInput(overrides: Partial<PlanInput> = {}): PlanInput {
     benefits: [],
     expenses: [],
     ...overrides,
+  };
+  return {
+    ...plan,
+    expenses: plan.expenses.map(canonicalBudgetCategory),
+    transactions: plan.transactions ?? [],
   };
 }
 
@@ -40,11 +60,11 @@ export function storedPlan(
   year = 2026,
   overrides: Partial<StoredPlan> = {},
 ): StoredPlan {
-  return {
+  return normalizeStoredPlan({
     id: "f09af018-f6c2-4eb1-9380-123173bd9802",
     ...planInput({ year, stateCode: "CA" }),
     updatedAt: "2026-07-12T00:00:00.000Z",
     fieldVersions: {},
     ...overrides,
-  };
+  });
 }

@@ -21,10 +21,10 @@
 .estimateNote {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 22px 0 0;
+  gap: var(--space-2);
+  margin: var(--space-5) 0 0;
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 
 .warning {
@@ -33,10 +33,10 @@
 
 .accountEmail {
   max-width: 100%;
-  margin: 2px 0 8px;
+  margin: var(--micro-2) 0 var(--space-2);
   overflow-wrap: anywhere;
   color: var(--ink-soft);
-  font: 14px/1.4 var(--data);
+  font: var(--text-sm)/1.4 var(--data);
 }
 
 .accountEmail + .muted {
@@ -46,7 +46,7 @@
 .accountGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  gap: var(--space-4);
 }
 
 .accountGrid .wideCard {
@@ -56,14 +56,14 @@
 .accountActions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--space-2);
 }
 
 .accountPrivacy {
-  max-width: 720px;
-  margin: 12px 0 20px;
+  max-width: var(--layout-7xl);
+  margin: var(--space-3) 0 var(--space-5);
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: var(--text-sm);
   line-height: 1.5;
 }
 
@@ -71,30 +71,30 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
-  margin-top: 28px;
-  padding-top: 20px;
-  border-top: 1px solid var(--line);
+  gap: var(--space-4);
+  margin-top: var(--space-7);
+  padding-top: var(--space-5);
+  border-top: var(--border-hairline) solid var(--line);
 }
 
 .deleteAccountRow div {
   display: grid;
-  gap: 4px;
+  gap: var(--space-1);
 }
 
 .deleteAccountRow span {
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: var(--text-sm);
 }
 
 .dangerButton {
-  min-height: 44px;
+  min-height: var(--control-sm);
   flex: 0 0 auto;
-  padding: 0 14px;
-  border: 1px solid #d9966d;
-  border-radius: 10px;
-  background: #fff;
-  color: #934310;
+  padding: 0 var(--space-3);
+  border: var(--border-hairline) solid var(--border-danger);
+  border-radius: var(--radius-sm);
+  background: var(--surface-panel);
+  color: var(--status-danger-text);
   font-weight: 700;
   cursor: pointer;
 }
@@ -106,7 +106,7 @@
 
 .installSteps {
   display: grid;
-  gap: 15px;
+  gap: var(--space-4);
   padding: 0;
   list-style: none;
 }
@@ -114,55 +114,56 @@
 .installSteps li {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
   color: var(--ink-soft);
 }
 
 .installSteps span {
-  width: 30px;
-  height: 30px;
+  width: var(--space-7);
+  height: var(--space-7);
   display: grid;
   place-items: center;
   border-radius: 50%;
   background: var(--sky);
   color: var(--blue-dark);
-  font: 700 12px/1 var(--data);
+  font: 700 var(--text-sm)/1 var(--data);
 }
 
-@media (max-width: 1180px) {
+@media (--viewport-desktop-compact) {
   .accountGrid {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 900px) {
+@media (--viewport-shell) {
   .accountGrid {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 600px) {
+@media (--viewport-phone) {
   .deleteAccountRow {
     align-items: stretch;
     flex-direction: column;
   }
   .wideCard {
-    padding: 16px 13px;
-    border-radius: 17px 17px 6px 17px;
+    padding: var(--space-4) var(--space-3);
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-sm)
+      var(--radius-lg);
   }
 }
 
-@media (max-height: 500px) and (orientation: landscape) {
+@media (--landscape-short) {
   .accountGrid > .wideCard:first-child .accountPrivacy {
     display: none;
   }
   .accountGrid > .wideCard:first-child {
-    padding-block: 16px;
+    padding-block: var(--space-4);
   }
   .accountGrid > .wideCard:first-child h1 {
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
   }
   .accountGrid > .wideCard:first-child .accountEmail + .muted {
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
   }
 }

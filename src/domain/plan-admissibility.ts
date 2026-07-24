@@ -11,6 +11,7 @@ type PlanAggregateInput = Pick<
   | "otherOrdinaryIncomeCents"
   | "benefits"
   | "expenses"
+  | "transactions"
 >;
 
 export function planAggregateError(plan: PlanAggregateInput): string | null {
@@ -39,8 +40,13 @@ export function planAggregateError(plan: PlanAggregateInput): string | null {
   }
 
   for (const expense of plan.expenses) {
+    if (expense.archived) continue;
     aggregate +=
       BigInt(expense.amountCents) * (expense.cadence === "monthly" ? 12n : 1n);
+  }
+
+  for (const transaction of plan.transactions ?? []) {
+    aggregate += BigInt(transaction.amountCents);
   }
 
   return aggregate > BigInt(Number.MAX_SAFE_INTEGER)

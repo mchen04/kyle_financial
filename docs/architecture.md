@@ -4,13 +4,18 @@ Last reviewed: 2026-07-13
 
 ## Decision
 
-Kyle Financial is one Next.js 16 App Router application on Node.js 20 with React 19 and TypeScript. Route handlers provide the JSON boundary, PostgreSQL is the server source of truth, and a small IndexedDB adapter provides the account-scoped offline cache and mutation outbox. The same dependency-free computation module runs in the browser and in Vitest.
+House by 30 is one Next.js 16 App Router application on Node.js 20 with React 19 and TypeScript. Route handlers provide the JSON boundary, PostgreSQL is the server source of truth, and a small IndexedDB adapter provides the account-scoped offline cache and mutation outbox. The same dependency-free computation module runs in the browser and in Vitest.
 
 The architecture follows the current Next.js guidance for a server-only data access layer: only `src/server/**` may import the database client or read secrets; every DAL operation accepts the authenticated account ID and includes it in its query. Route handlers validate input and output with Zod. Session cookies carry opaque random tokens; only a SHA-256 token digest is stored. Passwords use Node `crypto.pbkdf2` with SHA-256, a per-user salt, and a documented work factor, avoiding a native deployment dependency. Login and signup first consume an atomic PostgreSQL fixed-window counter for the Vercel-provided client IP before JSON parsing, then a normalized-email counter after schema validation and before PBKDF2. Counter keys are hashed at rest, concurrent function instances share the same limits, signup volume is bounded per IP, exhausted buckets return `429` with `Retry-After`, and a limiter failure fails closed. Buckets become cleanup-eligible five minutes beyond the longest live policy window, and opportunistic expiry locks and removes at most 100 rows per request while skipping a bucket that another request is reactivating.
 
 Signup always returns the same accepted response. It inserts a new normalized identity only when the request carries the universal HMAC invitation minted by the trusted operator; invalid invitations and existing identities remain indistinguishable at the boundary. The browser then signs in through the ordinary login boundary, which runs the same 600,000-iteration PBKDF2 verification path for missing and present identities before returning its generic credential error. This provides out-of-band signup authorization without introducing an email service: `REGISTRATION_SECRET` stays server-only, the trusted-shell invite command is the only minting surface, and rotating the secret invalidates the prior invitation.
 
-Money is integer cents. Rates are integer millionths (1% = 10,000). Multiplication uses `BigInt`, with half-away-from-zero rounding once at the boundary where a percentage becomes money. Annual amounts are authoritative; monthly displays allocate annual cents deterministically so displayed totals reconcile.
+Money is integer cents. Rates are integer millionths (1% = 10,000).
+Multiplication uses `BigInt`, with half-away-from-zero rounding once at the
+boundary where a percentage becomes money. Annual amounts are authoritative.
+Daily budgeting uses a deterministic remainder allocation so the twelve
+displayed month values sum to the annual cent; selected-month, YTD, and
+full-year rollups share one pure period model.
 
 ## Why this stack
 
@@ -46,7 +51,37 @@ Browser UI ── plan draft ──> pure engine <── versioned JSON tax tabl
 
 ## Data and conflict model
 
-One plan exists per `(user_id, year)`. Benefits and expenses are owned through a plan foreign key. Expenses persist free-form category labels separately from an explicit Need/Want/Saving guidance bucket. Scalar plan fields plus individual benefit/expense properties carry an update timestamp and mutation ID in plan version metadata. Each mutation also carries its server base version, distinguishing a fresh edit on a slow clock from a stale offline edit. Browser edits use the same durable outbox whether nominally online or offline. Future client clocks are clamped to ordered receipt instants; equal instants break ties by mutation ID. Duplicate IDs must carry identical canonical content, with a transaction advisory lock making concurrent delivery idempotent. Bounded batches, per-year freshness, and revision checks prevent oversized, cross-tab, or in-flight responses from discarding newer local work.
+One plan exists per `(user_id, year)`. Benefits and budget categories are owned
+through a plan foreign key. The legacy `expenses` table is now the canonical
+plan-year category store: every row has allocation/cadence,
+Need/Want/Saving role, stable color, sort order, and archive state. It retained
+its table name so the forward migration does not replace or reinterpret
+existing allocations. Actual transactions are separate dated rows keyed to
+both plan and category; a composite foreign key prevents a transaction from
+crossing a plan boundary. Category copy-forward creates new identities and
+copies structure, never transaction history. Renaming or archiving keeps
+historical transaction references valid.
+
+Scalar plan fields plus individual benefit, category, and transaction
+properties carry an update timestamp and mutation ID in plan version metadata.
+Each mutation also carries its server base version, distinguishing a fresh edit
+on a slow clock from a stale offline edit. Browser edits use the same durable
+outbox whether nominally online or offline. Future client clocks are clamped to
+ordered receipt instants; equal instants break ties by mutation ID. Duplicate
+IDs must carry identical canonical content, with a transaction advisory lock
+making concurrent delivery idempotent. Mutation receipts remain for the
+account lifetime because offline retries have no matching expiry; account
+deletion removes them through the user foreign-key cascade. Bounded batches,
+per-year freshness, and revision checks prevent oversized, cross-tab, or
+in-flight responses from discarding newer local work.
+
+Transaction dates are local `YYYY-MM-DD` values stored in PostgreSQL `date`;
+the domain validates and compares their components without passing through UTC.
+Starting savings is optional. The savings-impact function reports planned cash
+savings, payroll saving, employer saving, saving-category funding, and spending
+variance separately; actual variance and funding replace their planned
+counterparts exactly once. An ending balance is derived only when starting
+savings is configured.
 
 The browser database name includes the authenticated user ID. Every private request binds the screen's expected account ID to the cookie-authenticated account; a mismatch returns 409 before access and broadcasts cross-tab eviction. Logout and deletion additionally bind the rendered server session UUID, so a stale close cannot consume a newer same-account cookie even if Web Lock grant beats BroadcastChannel delivery. Web Locks are required to serialize private browser writes and account closure across tabs, while a global shell lock protects remembered identity; an unsupported browser gets an explicit persistence failure rather than an unfenced IndexedDB lease. Logout and deletion refuse any undurable displayed draft, then write a mode-aware indeterminate closure marker before calling the server. A confirmed response makes the marker terminal. If the request may have committed but its response is lost, timed out, or aborted, the indeterminate marker remains and the browser conservatively broadcasts eviction and clears or locks its private local data. Startup and offline fallback honor either marker state; only explicit authentication clears it. On the server, each plan-year sync group validates the actual winning post-reconciliation state inside the same SQL transaction that holds the plan lock.
 

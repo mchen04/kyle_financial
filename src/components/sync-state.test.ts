@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
+import type { BudgetCategory, TransactionEntry } from "@/domain/budget";
 import { storedPlan } from "@/test/fixtures/plans";
+import { commitFastLogEntry } from "@/domain/fast-log";
+import type { StoredPlan } from "@/domain/stored-plan";
 import {
+  applyDraftChange,
   authenticationBroadcastTransition,
   cancelAccountPersistenceRetry,
   canPublishPlanSnapshot,
@@ -8,6 +12,7 @@ import {
   copyForwardIntentSnapshot,
   durableLogoutProblem,
   enqueueSerializedIntent,
+  isCurrentAccountOperation,
   mergePlansWithLocalIntent,
   planIntentForYear,
   prepareCopyForward,
@@ -25,6 +30,66 @@ import {
 } from "./sync-state";
 
 describe("sync durability state", () => {
+  it("fences delayed work across same-account reauthentication", () => {
+    const owner = new AbortController();
+    const runtime = {
+      activeAccount: "account-a" as string | null,
+      accountGeneration: 4,
+    };
+    const isCurrent = () =>
+      isCurrentAccountOperation("account-a", 4, owner.signal, runtime);
+
+    expect(isCurrent()).toBe(true);
+    owner.abort();
+    runtime.activeAccount = null;
+    runtime.accountGeneration = 5;
+    runtime.activeAccount = "account-a";
+    runtime.accountGeneration = 6;
+
+    expect(isCurrent()).toBe(false);
+  });
+
+  it("applies an open Fast Log commit to the latest reconciled plan", () => {
+    const opened = storedPlan(2026);
+    const category: BudgetCategory = {
+      id: "00000000-0000-4000-8000-000000000301",
+      name: "Food",
+      group: "Needs",
+      cadence: "monthly",
+      amountCents: 100_000,
+      sortOrder: 0,
+      guidanceBucket: "needs",
+      colorToken: "blue",
+      archived: false,
+    };
+    const remote: TransactionEntry = {
+      id: "00000000-0000-4000-8000-000000000302",
+      categoryId: category.id,
+      amountCents: 1_000,
+      title: "Remote entry",
+      date: "2026-07-24",
+      createdAt: "2026-07-24T12:00:00.000Z",
+      updatedAt: "2026-07-24T12:00:00.000Z",
+    };
+    const local = {
+      ...remote,
+      id: "00000000-0000-4000-8000-000000000303",
+      title: "Local entry",
+      updatedAt: "2026-07-24T12:01:00.000Z",
+    };
+    const latest: StoredPlan = {
+      ...opened,
+      expenses: [category],
+      transactions: [remote],
+    };
+
+    const committed = applyDraftChange(latest, (current) =>
+      commitFastLogEntry(current, local),
+    );
+
+    expect(committed.transactions).toEqual([remote, local]);
+  });
+
   it("does not publish a response after a newer intent is accepted or while it is not durable", async () => {
     let currentIntentRevision = 3;
     let durableIntentRevision = 3;

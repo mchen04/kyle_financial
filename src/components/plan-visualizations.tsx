@@ -6,12 +6,12 @@ import { money } from "./plan-types";
 import styles from "./plan-visualizations.module.css";
 
 const flowExpenseColors = [
-  "#76a9cf",
-  "#8eb9d7",
-  "#a7c9df",
-  "#bdd7e7",
-  "#6f9fba",
-  "#9db8c8",
+  "var(--data-blue)",
+  "var(--data-cyan)",
+  "var(--data-violet)",
+  "var(--data-amber)",
+  "var(--data-rose)",
+  "var(--data-indigo)",
 ];
 
 function allocateUpTo(values: number[], capacity: number): number[] {
@@ -69,20 +69,20 @@ export function MoneyFlow({
     0,
   );
   const segments = [
-    { label: "Estimated tax", value: tax, color: "#46617e" },
+    { label: "Estimated tax", value: tax, color: "var(--data-slate)" },
     {
       label: result.isPayrollFeasible
         ? "Payroll saving"
         : "Fundable payroll saving",
       value: payrollSaving,
-      color: "#287cae",
+      color: "var(--data-blue)",
     },
     {
       label: result.isPayrollFeasible
         ? "Other payroll deductions"
         : "Fundable other payroll deductions",
       value: payrollCosts,
-      color: "#5a9bc6",
+      color: "var(--data-cyan)",
     },
     ...groupedExpenses.map(([group], index) => ({
       label: `${group} expenses${result.expensesAnnualCents > available ? " (fundable)" : ""}`,
@@ -94,7 +94,7 @@ export function MoneyFlow({
         ? "Cash savings"
         : "Unallocated cash",
       value: available - fundedExpenseTotal,
-      color: "#087e73",
+      color: "var(--data-teal)",
     },
   ].filter(({ value }) => value > 0);
   return (

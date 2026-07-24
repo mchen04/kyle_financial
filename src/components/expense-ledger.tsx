@@ -1,6 +1,12 @@
-import { ArrowDown, ArrowUp, ChevronDown, Plus, Trash2 } from "lucide-react";
+import { Archive, ArrowDown, ArrowUp, ChevronDown, Plus } from "lucide-react";
 import { useState } from "react";
-import { guidanceBucket, type ExpenseEntry } from "@/domain/budget";
+import {
+  addBudgetCategory,
+  guidanceBucket,
+  moveActiveBudgetCategory,
+  patchBudgetCategory,
+  type ExpenseEntry,
+} from "@/domain/budget";
 import type { PlanResult } from "@/domain/tax/engine";
 import { BufferedTextInput } from "./buffered-text-input";
 import { isUnusedDefaultExpense } from "./expense-visibility";
@@ -25,44 +31,28 @@ export function ExpenseLedger({
   const toggleDetails = (id: string) =>
     setOpenDetailIds((current) => ({ ...current, [id]: !current[id] }));
   const showUnusedExpenses = Boolean(expandedUnusedYears[draft.year]);
-  const unusedExpenses = draft.expenses.filter(isUnusedDefaultExpense);
+  const activeExpenses = draft.expenses.filter(({ archived }) => !archived);
+  const unusedExpenses = activeExpenses.filter(isUnusedDefaultExpense);
   const renderedExpenses = showUnusedExpenses
-    ? draft.expenses
-    : draft.expenses.filter((expense) => !isUnusedDefaultExpense(expense));
+    ? activeExpenses
+    : activeExpenses.filter((expense) => !isUnusedDefaultExpense(expense));
   const updateExpense = (id: string, change: Partial<ExpenseEntry>) =>
     onDraft({
       ...draft,
-      expenses: draft.expenses.map((entry) =>
-        entry.id === id ? { ...entry, ...change } : entry,
-      ),
+      expenses: patchBudgetCategory(draft.expenses, id, change),
     });
 
   function addExpense() {
     onDraft({
       ...draft,
-      expenses: [
-        ...draft.expenses,
-        {
-          id: crypto.randomUUID(),
-          name: "New expense",
-          group: "Other",
-          cadence: "monthly",
-          amountCents: 0,
-          sortOrder: draft.expenses.length,
-          guidanceBucket: "wants",
-        },
-      ],
+      expenses: addBudgetCategory(draft.expenses, crypto.randomUUID()),
     });
   }
 
-  function moveExpense(index: number, direction: -1 | 1) {
-    const next = [...draft.expenses];
-    const target = index + direction;
-    if (target < 0 || target >= next.length) return;
-    [next[index], next[target]] = [next[target], next[index]];
+  function moveExpense(categoryId: string, direction: -1 | 1) {
     onDraft({
       ...draft,
-      expenses: next.map((entry, sortOrder) => ({ ...entry, sortOrder })),
+      expenses: moveActiveBudgetCategory(draft.expenses, categoryId, direction),
     });
   }
 
@@ -78,12 +68,12 @@ export function ExpenseLedger({
         </button>
       </div>
       <div className={styles.ledgerTotal}>
-        <span>Planned expenses · {draft.expenses.length} categories</span>
+        <span>Planned expenses · {activeExpenses.length} categories</span>
         <strong>{money(result.expensesMonthlyCents, 2)} / month</strong>
       </div>
       <p className={styles.ledgerHint}>
         Type an amount on any row. Tap <ChevronDown size={13} aria-hidden /> to
-        edit its details or remove it.
+        edit its details or archive it.
       </p>
       {unusedExpenses.length > 0 && (
         <button
@@ -104,7 +94,9 @@ export function ExpenseLedger({
       )}
       <div className={styles.expenseList} id="expense-rows">
         {renderedExpenses.map((expense) => {
-          const index = draft.expenses.findIndex(({ id }) => id === expense.id);
+          const activeIndex = activeExpenses.findIndex(
+            ({ id }) => id === expense.id,
+          );
           const detailsOpen = Boolean(openDetailIds[expense.id]);
           return (
             <div className={styles.expenseRow} key={expense.id}>
@@ -197,38 +189,33 @@ export function ExpenseLedger({
                     <div className={styles.reorderButtons}>
                       <button
                         aria-label={`Move ${expense.name} up`}
-                        onClick={() => moveExpense(index, -1)}
-                        disabled={index === 0}
+                        onClick={() => moveExpense(expense.id, -1)}
+                        disabled={activeIndex === 0}
                       >
                         <ArrowUp size={15} />
                       </button>
                       <button
                         aria-label={`Move ${expense.name} down`}
-                        onClick={() => moveExpense(index, 1)}
-                        disabled={index === draft.expenses.length - 1}
+                        onClick={() => moveExpense(expense.id, 1)}
+                        disabled={activeIndex === activeExpenses.length - 1}
                       >
                         <ArrowDown size={15} />
                       </button>
                     </div>
                   </div>
                   <div className={styles.detailField}>
-                    <span>Remove</span>
+                    <span>Archive</span>
                     <button
                       className={styles.iconButton}
-                      aria-label={`Delete ${expense.name}`}
+                      aria-label={`Archive ${expense.name}`}
                       onClick={() =>
-                        onDraft({
-                          ...draft,
-                          expenses: draft.expenses
-                            .filter(({ id }) => id !== expense.id)
-                            .map((entry, sortOrder) => ({
-                              ...entry,
-                              sortOrder,
-                            })),
+                        updateExpense(expense.id, {
+                          archived: true,
+                          amountCents: 0,
                         })
                       }
                     >
-                      <Trash2 size={16} />
+                      <Archive size={16} />
                     </button>
                   </div>
                 </div>

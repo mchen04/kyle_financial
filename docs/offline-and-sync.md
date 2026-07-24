@@ -10,13 +10,30 @@ The PostgreSQL server is the source of truth. IndexedDB is an account-scoped wor
 
 The app requests persistent browser storage when supported. Installed iOS home-screen storage remains platform-controlled, so server persistence and JSON export are still the durability guarantees.
 
+Account exposes two deliberately labeled export paths. **Export all years**
+downloads the server source of truth when online. **Export this device** creates
+an account-scoped JSON file entirely in the browser from the plans currently in
+memory, so categories and transaction history already cached on that device
+remain exportable offline. The local file identifies itself as a device-cache
+source and never claims to include another device's unsynced work.
+
 ## Offline lifecycle
 
 1. A successful session fetch remembers the account and replaces its plan cache with the server result.
 2. If the session request fails at the network layer, the shell loads that remembered account’s cached plans. A real HTTP 401 never falls back to cached private data.
-3. Every edit immediately recomputes in memory and atomically commits the cached plan plus its outbox mutations in one IndexedDB transaction, even when the browser reports online. Network delivery is a separate debounced step, so a failed request cannot strand the edit in React memory. Scalars diff independently; existing benefits and expenses diff by property under a stable item UUID.
+3. Every edit immediately recomputes in memory and atomically commits the
+   cached plan plus its outbox mutations in one IndexedDB transaction, even
+   when the browser reports online. Network delivery is a separate debounced
+   step, so a failed request cannot strand the edit in React memory. Scalars
+   diff independently; existing benefits, categories, and transactions diff by
+   property under a stable item UUID. A Fast Log transaction and an inline
+   category creation therefore survive a cold offline relaunch before any
+   network delivery.
 4. On reconnect, superseded same-field edits are compacted and the outbox drains valid work in chronological batches of at most 500. An unresolved blank label remains pending as an explicit error but cannot block unrelated valid mutations. After acknowledgement, the client fetches a fresh server snapshot and caches it only when the outbox is still empty and the snapshot is not older than the cached server revision.
-5. Duplicate posts are safe: `(user_id, mutation_id)` is the receipt key. Receipts older than 90 days are pruned during sync.
+5. Duplicate posts are safe: `(user_id, mutation_id)` is the receipt key.
+   Receipts remain until account deletion because an offline outbox mutation
+   has no retry expiry; pruning one earlier would let a delayed duplicate act
+   as a new mutation.
 
 ## Conflict rule
 
@@ -30,9 +47,20 @@ Last-write-wins is applied independently to:
 - other non-wage taxable income;
 - HSA coverage;
 - each benefit UUID and its editable properties;
-- each expense UUID and its editable properties.
+- each category UUID and its editable allocation/name/group/role/color/order/archive properties;
+- each transaction UUID and its editable category/amount/title/note/date
+  properties.
 
-Each plan exposes the server `{updatedAt, mutationId}` version for every scalar/item. Every local mutation records the version it was based on. A matching base applies even when the client clock is slow; when the base is stale, timestamp then mutation UUID resolves the true conflict, with future clocks clamped to receipt time. Whole-item and property mutations consult the same entity version, including tombstones, so an older property cannot corrupt a newer replacement and an update to a deleted row is reported as not applied. Disjoint item edits merge; edits to the same item resolve deterministically.
+Each plan exposes the server `{updatedAt, mutationId}` version for every
+scalar/item. Every local mutation records the version it was based on. A
+matching base applies even when the client clock is slow; when the base is
+stale, timestamp then mutation UUID resolves the true conflict, with future
+clocks clamped to receipt time. Whole-item and property mutations consult the
+same entity version, including tombstones, so an older property cannot corrupt
+a newer replacement and an update to a deleted row is reported as not applied.
+Disjoint item edits merge; edits to the same item resolve deterministically.
+Duplicate transaction creation replays the same receipt and does not create a
+second row.
 
 Queued writes capture their plan-year baseline before asynchronous IndexedDB work begins and advance it only after persistence succeeds. Cache writes apply field mutations to the existing per-year record, so a stale tab cannot erase a disjoint cached edit with a full snapshot. Reconciliation refreshes every year’s baseline together and merges server freshness per year.
 

@@ -18,8 +18,7 @@ export async function GET(request: Request): Promise<Response> {
   return new Response(body, {
     headers: {
       "Content-Type": "application/json; charset=utf-8",
-      "Content-Disposition":
-        'attachment; filename="kyle-financial-export.json"',
+      "Content-Disposition": 'attachment; filename="house-by-30-export.json"',
       "Cache-Control": "no-store",
     },
   });

@@ -6,6 +6,7 @@ import {
   type User,
 } from "@/domain/api-contracts";
 import { storedPlanSchema } from "@/domain/plan-schema";
+import { defaultPlanForToday } from "@/domain/plan-selection";
 import { diffPlanMutations } from "@/domain/sync";
 import {
   cachePlansAndEnqueue,
@@ -156,8 +157,7 @@ export function usePlanSync(session: PlanSessionController) {
         runtimeRef.current.plans = nextPlans;
         setDraft(
           nextPlans.find(({ year }) => year === options.selectedYear) ??
-            nextPlans.at(-1) ??
-            null,
+            defaultPlanForToday(nextPlans),
         );
         runtimeRef.current.savedSnapshots = new Map(
           nextPlans.map((plan) => [plan.year, JSON.stringify(plan)]),

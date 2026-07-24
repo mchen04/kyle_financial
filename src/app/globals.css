@@ -1,67 +1,289 @@
 :root {
-  --ink: #12233f;
-  --ink-soft: #53647b;
-  --paper: #f7fafc;
-  --surface: #fff;
-  --sky: #dcebf8;
-  --blue: #1769aa;
-  --blue-dark: #0f4f82;
-  --teal: #087e73;
-  --amber: #a65318;
-  --amber-soft: #fff1e7;
-  --line: #d7e0e8;
-  --shadow: 0 18px 50px rgb(18 35 63 / 8%);
-  --display: ui-rounded, "Avenir Next", Avenir, "Segoe UI", sans-serif;
-  --body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --data: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  /* Primitive palette: the only authored color-literal registry. */
+  --color-navy-950: #12233f;
+  --color-navy-700: #53647b;
+  --color-navy-600: #5f6d7d;
+  --color-navy-500: #758397;
+  --color-navy-400: #7a8798;
+  --color-navy-300: #8b98a7;
+  --color-navy-200: #aab4c1;
+  --color-paper-50: #f7fafc;
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+  --color-sky-100: #dcebf8;
+  --color-sky-200: #cfe0ee;
+  --color-sky-300: #aabbd0;
+  --color-sky-50: #cbd9e7;
+  --color-blue-700: #0f4f82;
+  --color-blue-600: #1769aa;
+  --color-blue-300: #88c6ef;
+  --color-teal-700: #087e73;
+  --color-teal-300: #7dd8ca;
+  --color-amber-800: #71360f;
+  --color-amber-700: #803c0e;
+  --color-amber-600: #934310;
+  --color-amber-500: #a65318;
+  --color-amber-300: #d9966d;
+  --color-amber-200: #e8c4ac;
+  --color-amber-100: #fff1e7;
+  --color-line-300: #d7e0e8;
+  --color-line-200: #e8edf2;
+  --color-line-100: #e9eef2;
+  --color-violet-600: #6e5aa6;
+  --color-rose-600: #a84e68;
+  --color-cyan-600: #177f8f;
+  --color-green-600: #4f7a3f;
+  --color-orange-600: #b0642d;
+  --color-indigo-600: #425fa4;
+  --color-pink-600: #a64f89;
+  --color-lime-700: #5f741f;
+  --color-slate-600: #607080;
+  --alpha-paper-88: rgb(247 250 252 / 88%);
+  --alpha-paper-94: rgb(255 255 255 / 94%);
+  --alpha-white-90: rgb(255 255 255 / 90%);
+  --alpha-white-13: rgb(255 255 255 / 13%);
+  --alpha-white-12: rgb(255 255 255 / 12%);
+  --alpha-white-02: rgb(255 255 255 / 2%);
+  --alpha-sky-38: rgb(220 235 248 / 38%);
+  --alpha-focus: rgb(23 105 170 / 35%);
+  --alpha-action-shadow: rgb(23 105 170 / 20%);
+  --alpha-ink-shadow-16: rgb(18 35 63 / 16%);
+  --alpha-ink-shadow-08: rgb(18 35 63 / 8%);
+  --alpha-ink-shadow-04: rgb(18 35 63 / 4%);
+
+  /* Semantic roles. */
+  --surface-canvas: var(--color-paper-50);
+  --surface-panel: var(--color-white);
+  --surface-raised: var(--color-white);
+  --surface-accent: var(--color-sky-100);
+  --surface-warning: var(--color-amber-100);
+  --surface-glass: var(--alpha-paper-88);
+  --surface-glass-strong: var(--alpha-paper-94);
+  --text-primary: var(--color-navy-950);
+  --text-secondary: var(--color-navy-700);
+  --text-tertiary: var(--color-navy-400);
+  --text-placeholder: var(--color-navy-300);
+  --text-disabled: var(--color-navy-200);
+  --text-inverse: var(--color-white);
+  --text-inverse-soft: var(--color-sky-50);
+  --text-inverse-muted: var(--color-sky-300);
+  --text-action: var(--color-blue-600);
+  --text-action-strong: var(--color-blue-700);
+  --status-positive: var(--color-teal-700);
+  --status-warning: var(--color-amber-500);
+  --status-warning-text: var(--color-amber-700);
+  --status-danger-text: var(--color-amber-600);
+  --border-default: var(--color-line-300);
+  --border-subtle: var(--color-line-100);
+  --border-warning: var(--color-amber-200);
+  --border-danger: var(--color-amber-300);
+  --focus-ring: var(--alpha-focus);
+
+  /* Data visualization roles remain stable across every surface. */
+  --data-blue: var(--color-blue-600);
+  --data-teal: var(--color-teal-700);
+  --data-violet: var(--color-violet-600);
+  --data-amber: var(--color-amber-500);
+  --data-rose: var(--color-rose-600);
+  --data-cyan: var(--color-cyan-600);
+  --data-green: var(--color-green-600);
+  --data-orange: var(--color-orange-600);
+  --data-indigo: var(--color-indigo-600);
+  --data-pink: var(--color-pink-600);
+  --data-lime: var(--color-lime-700);
+  --data-slate: var(--color-slate-600);
+
+  /* 4px base grid; ordinary layout uses the 8px rhythm. */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --micro-2: 2px;
+  --micro-3: 3px;
+
+  --font-display: ui-rounded, "Avenir Next", Avenir, "Segoe UI", sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-data: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --text-xs: 0.6875rem;
+  --text-sm: 0.8125rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.5rem;
+  --text-4xl: 3.5rem;
+  --text-5xl: 4.25rem;
+  --text-6xl: 5.25rem;
+  --text-7xl: 7rem;
+  --leading-tight: 1.05;
+  --leading-body: 1.5;
+  --tracking-tighter: -0.065em;
+  --tracking-tight: -0.04em;
+  --tracking-snug: -0.025em;
+  --tracking-wide: 0.05em;
+  --tracking-wider: 0.08em;
+  --weight-medium: 600;
+  --weight-bold: 700;
+
+  --control-sm: 44px;
+  --control-md: 48px;
+  --control-lg: 56px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+  --border-hairline: 1px;
+  --shadow-card: 0 8px 26px var(--alpha-ink-shadow-04);
+  --shadow-floating: 0 12px 32px var(--alpha-ink-shadow-16);
+  --shadow-page: 0 18px 50px var(--alpha-ink-shadow-08);
+  --motion-fast: 120ms;
+  --motion-standard: 180ms;
+  --layer-content: 1;
+  --layer-sticky: 10;
+  --layer-nav: 20;
+  --layer-sheet: 40;
+  --layer-toast: 50;
+  --content-max: 1500px;
+  --content-max-wide: 2400px;
+  --content-max-form: 1200px;
+  --chart-max: 520px;
+  --input-compact-width: 96px;
+  --sidebar-width: 208px;
+  --topbar-height: 72px;
+  --bottom-nav-height: 72px;
+  --sheet-max: 640px;
+  --layout-2xs: 96px;
+  --layout-xs: 120px;
+  --layout-sm: 160px;
+  --layout-copy-min: 192px;
+  --layout-md: 224px;
+  --layout-panel-sm: 256px;
+  --layout-lg: 280px;
+  --layout-card: 320px;
+  --layout-xl: 360px;
+  --layout-panel: 400px;
+  --layout-2xl: 440px;
+  --layout-3xl: 520px;
+  --layout-4xl: 560px;
+  --layout-5xl: 620px;
+  --layout-6xl: 680px;
+  --layout-7xl: 720px;
+  --layout-8xl: 760px;
+  --layout-9xl: 860px;
+  --layout-10xl: 900px;
+  --measure-compact: 18ch;
+  --measure-copy: 62ch;
+  --viewport-width: 100vw;
+  --viewport-height: 100dvh;
+  --viewport-sheet-height: 90dvh;
+  --viewport-auth-panel-height: 34dvh;
+  --fluid-2: 2vw;
+  --fluid-2-1: 2.1vw;
+  --fluid-2-5: 2.5vw;
+  --fluid-3: 3vw;
+  --fluid-3-5: 3.5vw;
+  --fluid-5: 5vw;
+  --fluid-6: 6vw;
+  --fluid-6-5: 6.5vw;
+  --fluid-7: 7vw;
+  --fluid-9: 9vw;
+  --fluid-10: 10vw;
+  --fluid-12: 12vw;
+  --fluid-18: 18vw;
+  --fluid-45: 45vw;
+  --fluid-negative-15: -15vw;
+  --fluid-negative-20: -20vw;
+
+  /* Compatibility aliases consumed by the existing planner surfaces. */
+  --ink: var(--text-primary);
+  --ink-soft: var(--text-secondary);
+  --paper: var(--surface-canvas);
+  --surface: var(--surface-panel);
+  --sky: var(--surface-accent);
+  --blue: var(--text-action);
+  --blue-dark: var(--text-action-strong);
+  --blue-soft: var(--color-sky-200);
+  --teal: var(--status-positive);
+  --amber: var(--status-warning);
+  --amber-soft: var(--surface-warning);
+  --line: var(--border-default);
+  --shadow: var(--shadow-page);
+  --display: var(--font-display);
+  --body: var(--font-body);
+  --data: var(--font-data);
 }
 
 * {
   box-sizing: border-box;
 }
+
 html {
   min-height: 100%;
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--surface-canvas);
+  color: var(--text-primary);
 }
+
 body {
   min-height: 100dvh;
   margin: 0;
   overflow-x: hidden;
   background:
-    linear-gradient(180deg, rgb(220 235 248 / 38%), transparent 22rem),
-    var(--paper);
-  font-family: var(--body);
+    linear-gradient(180deg, var(--alpha-sky-38), transparent 22rem),
+    var(--surface-canvas);
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
+
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
+
 button,
 a,
 input,
 select,
+textarea,
 summary {
   -webkit-tap-highlight-color: transparent;
 }
+
 button,
 a {
   touch-action: manipulation;
 }
+
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible,
+textarea:focus-visible,
 summary:focus-visible {
-  outline: 3px solid rgb(23 105 170 / 35%);
+  outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
 }
+
 input,
-select {
-  font-size: 16px;
+select,
+textarea {
+  font-size: var(--text-md);
 }
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

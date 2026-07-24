@@ -18,6 +18,7 @@ import {
   syncFieldSchema,
   type SyncField,
   type SyncTarget,
+  TRANSACTION_SYNC_PROPERTIES,
 } from "./sync-field";
 
 export type { FieldVersion } from "./stored-plan";
@@ -30,6 +31,7 @@ export {
   parseSyncTarget,
   SCALAR_SYNC_FIELDS,
   syncFieldForTarget,
+  TRANSACTION_SYNC_PROPERTIES,
 } from "./sync-field";
 export type {
   BenefitSyncProperty,
@@ -38,6 +40,7 @@ export type {
   ScalarSyncField,
   SyncField,
   SyncTarget,
+  TransactionSyncProperty,
 } from "./sync-field";
 
 export interface SyncMutation {
@@ -191,6 +194,21 @@ export function diffPlanMutations(
       EXPENSE_SYNC_PROPERTIES,
       (id, property) => ({
         kind: "expense",
+        id,
+        ...(property === undefined ? {} : { property }),
+      }),
+      current.year,
+      updatedAt,
+      createId,
+      () => false,
+      previous.fieldVersions,
+    ),
+    ...collectionMutations(
+      previous.transactions,
+      current.transactions,
+      TRANSACTION_SYNC_PROPERTIES,
+      (id, property) => ({
+        kind: "transaction",
         id,
         ...(property === undefined ? {} : { property }),
       }),

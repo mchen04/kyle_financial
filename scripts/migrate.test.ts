@@ -1,3 +1,7 @@
+import { readFile, readdir } from "node:fs/promises";
+import { resolve } from "node:path";
+import { randomUUID } from "node:crypto";
+import postgres from "postgres";
 import { describe, expect, it } from "vitest";
 import { migrate } from "./migrate";
 import { testDatabaseUrl, testSql } from "../src/test/database";
@@ -21,6 +25,7 @@ describe("database migrations", () => {
         "expenses",
         "plans",
         "sessions",
+        "transactions",
         "users",
       ]);
       const columns = await sql<{ column_name: string }[]>`
@@ -30,20 +35,26 @@ describe("database migrations", () => {
           AND (
             (table_name = 'plans' AND column_name IN (
               'spouse_wage_income_cents', 'other_ordinary_income_cents',
-              'primary_hsa_catch_up_eligible', 'spouse_hsa_catch_up_eligible'
+              'primary_hsa_catch_up_eligible', 'spouse_hsa_catch_up_eligible',
+              'starting_savings_cents'
             ))
             OR (table_name = 'benefits' AND column_name = 'owner')
-            OR (table_name = 'expenses' AND column_name = 'guidance_bucket')
+            OR (table_name = 'expenses' AND column_name IN (
+              'guidance_bucket', 'color_token', 'archived'
+            ))
           )
         ORDER BY column_name
       `;
       expect(columns.map(({ column_name }) => column_name)).toEqual([
+        "archived",
+        "color_token",
         "guidance_bucket",
         "other_ordinary_income_cents",
         "owner",
         "primary_hsa_catch_up_eligible",
         "spouse_hsa_catch_up_eligible",
         "spouse_wage_income_cents",
+        "starting_savings_cents",
       ]);
       const abandonedChildMetadata = await sql<{ column_name: string }[]>`
         SELECT column_name
@@ -141,6 +152,95 @@ describe("database migrations", () => {
     } finally {
       await migrate(testDatabaseUrl()).catch(() => undefined);
       await sql.end();
+    }
+  });
+
+  it("upgrades an existing yearly plan without inventing transactions", async () => {
+    const schema = `kf_test_existing_${randomUUID().replaceAll("-", "").slice(0, 12)}`;
+    const admin = testSql();
+    const url = new URL(testDatabaseUrl());
+    url.searchParams.set("options", `-csearch_path=${schema}`);
+    await admin`CREATE SCHEMA ${admin(schema)}`;
+    const legacySql = postgres(url.toString(), {
+      max: 1,
+      onnotice: () => undefined,
+    });
+    try {
+      const migrationFiles = (await readdir(resolve("migrations")))
+        .filter((name) => /^\d+_.+\.sql$/.test(name) && name < "012_")
+        .sort();
+      for (const file of migrationFiles) {
+        await legacySql.unsafe(
+          await readFile(resolve("migrations", file), "utf8"),
+        );
+      }
+      await legacySql`
+        CREATE TABLE app_migrations (
+          name text PRIMARY KEY,
+          applied_at timestamptz NOT NULL DEFAULT now()
+        )
+      `;
+      for (const file of migrationFiles)
+        await legacySql`INSERT INTO app_migrations (name) VALUES (${file})`;
+      const seeded = await legacySql<{ plan_id: string; expense_id: string }[]>`
+        WITH existing_user AS (
+          INSERT INTO users (email, password_hash)
+          VALUES ('existing-daily-migration@example.com', 'migration-test-hash')
+          RETURNING id
+        ), existing_plan AS (
+          INSERT INTO plans (
+            user_id, year, state_code, filing_status, hsa_coverage
+          )
+          SELECT id, 2026, 'CA', 'single', 'self' FROM existing_user
+          RETURNING id
+        ), existing_expense AS (
+          INSERT INTO expenses (
+            plan_id, name, category_group, cadence, amount_cents, sort_order
+          )
+          SELECT id, 'Rent', 'Home', 'monthly', 250000, 4
+          FROM existing_plan
+          RETURNING id, plan_id
+        )
+        SELECT plan_id, id AS expense_id FROM existing_expense
+      `;
+
+      expect(await migrate(url.toString())).toEqual([
+        "012_daily_money_cockpit.sql",
+      ]);
+      const upgraded = await legacySql<
+        {
+          id: string;
+          color_token: string;
+          archived: boolean;
+          starting_savings_cents: string | null;
+        }[]
+      >`
+        SELECT expenses.id, expenses.color_token, expenses.archived,
+               plans.starting_savings_cents
+        FROM expenses
+        JOIN plans ON plans.id = expenses.plan_id
+        WHERE plans.id = ${seeded[0].plan_id}
+      `;
+      expect(upgraded).toEqual([
+        {
+          id: seeded[0].expense_id,
+          color_token: "rose",
+          archived: false,
+          starting_savings_cents: null,
+        },
+      ]);
+      expect(
+        (
+          await legacySql<{ count: string }[]>`
+            SELECT count(*)::text AS count FROM transactions
+          `
+        )[0].count,
+      ).toBe("0");
+      expect(await migrate(url.toString())).toEqual([]);
+    } finally {
+      await legacySql.end();
+      await admin`DROP SCHEMA IF EXISTS ${admin(schema)} CASCADE`;
+      await admin.end();
     }
   });
 });

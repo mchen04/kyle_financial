@@ -309,4 +309,80 @@ describe("offline mutation reconciliation", () => {
     `;
     expect(Number(receipts[0].count)).toBe(3);
   });
+
+  it("retains receipts for the full lifetime of an offline retry", async () => {
+    const user = await createUser(
+      sql,
+      "sync-lifetime-receipt@example.com",
+      "sync lifetime receipt password",
+    );
+    await createPlanWithDefaults(sql, user.id, {
+      year: 2047,
+      stateCode: "CA",
+      filingStatus: "single",
+      grossSalaryCents: 10_000_000,
+      additionalWageIncomeCents: 0,
+      spouseWageIncomeCents: 0,
+      otherOrdinaryIncomeCents: 0,
+      hsaCoverage: "self",
+    });
+    const oldMutation = {
+      mutationId: "00000000-0000-4000-8000-000000000110",
+      planYear: 2047,
+      field: "stateCode" as const,
+      value: "TX",
+      updatedAt: "2099-01-01T00:00:00.000Z",
+    };
+    const newerMutation = {
+      ...oldMutation,
+      mutationId: "00000000-0000-4000-8000-000000000111",
+      value: "NY",
+    };
+    const RealDate = Date;
+    let now = RealDate.parse("2026-07-24T12:00:00.000Z");
+    class ControlledDate extends RealDate {
+      constructor(value?: string | number | Date) {
+        super(value ?? now);
+      }
+
+      static now(): number {
+        return now;
+      }
+    }
+    vi.stubGlobal("Date", ControlledDate);
+    try {
+      expect(
+        (await applySyncMutations(sql, user.id, [oldMutation]))
+          .acknowledgements,
+      ).toEqual([{ mutationId: oldMutation.mutationId, applied: true }]);
+      await sql`
+        UPDATE applied_mutations
+        SET applied_at = now() - interval '91 days'
+        WHERE user_id = ${user.id}
+          AND mutation_id = ${oldMutation.mutationId}
+      `;
+
+      now += 1_000;
+      expect(
+        (await applySyncMutations(sql, user.id, [newerMutation]))
+          .acknowledgements,
+      ).toEqual([{ mutationId: newerMutation.mutationId, applied: true }]);
+      expect((await getPlanByYear(sql, user.id, 2047))?.stateCode).toBe("NY");
+      const retained = await sql<{ count: string }[]>`
+        SELECT count(*) FROM applied_mutations
+        WHERE user_id = ${user.id}
+          AND mutation_id = ${oldMutation.mutationId}
+      `;
+      expect(Number(retained[0].count)).toBe(1);
+
+      now += 1_000;
+      expect(
+        (await applySyncMutations(sql, user.id, [oldMutation]))
+          .acknowledgements,
+      ).toEqual([{ mutationId: oldMutation.mutationId, applied: true }]);
+      expect((await getPlanByYear(sql, user.id, 2047))?.stateCode).toBe("NY");
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });

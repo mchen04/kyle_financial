@@ -8,7 +8,7 @@ import {
   type PlanBasicsInput,
   type UpdatePlanBasicsInput,
 } from "@/domain/plan-schema";
-import type { StoredPlan } from "@/domain/stored-plan";
+import { normalizeStoredPlan, type StoredPlan } from "@/domain/stored-plan";
 import { diffPlanMutations } from "@/domain/sync";
 import {
   createPlanWithDefaults as createNormalizedPlanWithDefaults,
@@ -68,7 +68,7 @@ async function persistPlanIntent(
   current: StoredPlan,
   input: FullPlan,
 ) {
-  const next = { ...current, ...input };
+  const next = normalizeStoredPlan({ ...current, ...input });
   const mutations = diffPlanMutations(current, next, new Date().toISOString());
   await applySyncMutations(sql, userId, mutations);
   return getPlanByYear(sql, userId, current.year);

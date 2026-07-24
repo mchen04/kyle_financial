@@ -1,0 +1,304 @@
+.eyebrow {
+  margin: 0 0 var(--space-1);
+  color: var(--text-action-strong);
+  font: var(--weight-bold) var(--text-xs) / 1 var(--font-data);
+  letter-spacing: var(--tracking-wider);
+}
+
+.sheetBackdrop {
+  position: fixed;
+  z-index: var(--layer-sheet);
+  inset: 0;
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  padding: var(--space-4);
+  background: var(--alpha-ink-shadow-16);
+  backdrop-filter: blur(var(--space-1));
+}
+
+.sheet {
+  width: min(var(--sheet-max), 100%);
+  max-height: min(var(--viewport-sheet-height), var(--layout-9xl));
+  overflow: auto;
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  padding-bottom: max(var(--space-6), env(safe-area-inset-bottom));
+  border-radius: var(--radius-xl);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-floating);
+}
+
+.sheet header,
+.sheet footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.sheet header button {
+  width: var(--control-sm);
+  min-height: var(--control-sm);
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-transparent);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.sheet header svg {
+  width: var(--icon-md);
+}
+
+.sheet h2 {
+  margin: 0;
+  font: var(--weight-bold) var(--text-xl) / 1.15 var(--font-display);
+}
+
+.sheetFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.sheetScrollCue,
+.sheetActionShort {
+  display: none;
+}
+
+.sheetFields > label,
+.inlineCategory label {
+  display: grid;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.sheetFields input,
+.sheetFields select,
+.inlineCategory input {
+  width: 100%;
+  min-height: var(--control-md);
+  padding: 0 var(--space-3);
+  border: var(--border-hairline) solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface-panel);
+  color: var(--text-primary);
+}
+
+.amountField {
+  grid-column: 1 / -1;
+}
+
+.amountField > span {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-primary);
+  font: var(--weight-bold) var(--text-2xl) / 1 var(--font-display);
+}
+
+.amountField input {
+  min-height: var(--control-lg);
+  border: 0;
+  border-bottom: var(--micro-2) solid var(--border-default);
+  border-radius: 0;
+  font-size: var(--text-2xl);
+}
+
+.inlineAction,
+.inlineCategory {
+  grid-column: 1 / -1;
+}
+
+.inlineAction {
+  min-height: var(--control-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0;
+  border: 0;
+  background: var(--color-transparent);
+  color: var(--text-action-strong);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+
+.inlineAction svg {
+  width: var(--icon-sm);
+}
+
+.inlineCategory {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--space-2);
+}
+
+.formError {
+  margin: 0;
+  padding: var(--space-3);
+  border: var(--border-hairline) solid var(--border-danger);
+  border-radius: var(--radius-sm);
+  background: var(--surface-warning);
+  color: var(--status-danger-text);
+}
+
+.formStatus {
+  margin: 0;
+  color: var(--text-action-strong);
+  font-weight: var(--weight-bold);
+}
+
+.dangerButton {
+  min-height: var(--control-sm);
+  padding: 0 var(--space-4);
+  border: var(--border-hairline) solid var(--border-danger);
+  border-radius: var(--radius-sm);
+  background: var(--color-transparent);
+  color: var(--status-danger-text);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+
+.primaryAction,
+.secondaryAction,
+.inlineCategory button {
+  min-height: var(--control-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-4);
+  border: var(--border-hairline) solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface-panel);
+  color: var(--text-action-strong);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+
+.secondaryAction {
+  margin-left: auto;
+}
+
+.primaryAction {
+  border-color: var(--text-action);
+  background: var(--text-action);
+  color: var(--text-inverse);
+}
+
+.primaryAction svg {
+  width: var(--icon-sm);
+}
+
+@media (--viewport-compact) {
+  .sheetFields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sheetBackdrop {
+    padding: 0;
+  }
+
+  .sheet {
+    max-height: calc(var(--viewport-height) - env(safe-area-inset-top));
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+
+  .sheet footer {
+    flex-wrap: wrap;
+  }
+
+  .secondaryAction {
+    margin-left: 0;
+  }
+}
+
+@media (--landscape-short) {
+  .sheet {
+    width: min(var(--layout-10xl), 100%);
+    max-height: var(--viewport-height);
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .sheetFields {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  .amountField,
+  .inlineAction,
+  .inlineCategory {
+    grid-column: auto;
+  }
+
+  .amountField input {
+    min-height: var(--control-sm);
+    font-size: var(--text-xl);
+  }
+
+  .inlineAction {
+    align-self: end;
+  }
+
+  .sheet footer {
+    min-height: var(--control-sm);
+  }
+}
+
+@media (--short-phone-667) {
+  .sheet {
+    height: calc(var(--viewport-height) - env(safe-area-inset-top));
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sheetFields {
+    min-height: 0;
+    overflow-y: auto;
+    gap: var(--space-1);
+    padding-bottom: var(--space-2);
+  }
+
+  .sheetFields > label {
+    gap: var(--space-1);
+  }
+
+  .sheetFields input,
+  .sheetFields select {
+    min-height: var(--control-sm);
+  }
+
+  .sheetScrollCue {
+    display: block;
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+    text-align: center;
+  }
+
+  .sheet footer {
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    padding-block: var(--space-2)
+      max(var(--space-2), env(safe-area-inset-bottom));
+    border-top: var(--border-hairline) solid var(--border-subtle);
+    background: var(--surface-raised);
+  }
+
+  .sheetActionFull {
+    display: none;
+  }
+
+  .sheetActionShort {
+    display: inline;
+  }
+}

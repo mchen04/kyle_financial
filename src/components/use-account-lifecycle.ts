@@ -5,6 +5,7 @@ import {
   type User,
 } from "@/domain/api-contracts";
 import { storedPlanSchema } from "@/domain/plan-schema";
+import { defaultPlanForToday } from "@/domain/plan-selection";
 import {
   lastRememberedUser,
   queuedMutations,
@@ -19,6 +20,7 @@ import {
   authenticationBroadcastTransition,
   copyForwardIntentSnapshot,
   durableLogoutProblem,
+  isCurrentAccountOperation,
   planIntentForYear,
   prepareCopyForward,
   shouldEvictAccount,
@@ -206,7 +208,7 @@ export function useAccountLifecycle(
           ) {
             setPlans(offlinePlans);
             runtimeRef.current.plans = offlinePlans;
-            setDraft(offlinePlans.at(-1) ?? null);
+            setDraft(defaultPlanForToday(offlinePlans));
             runtimeRef.current.savedSnapshots = new Map(
               offlinePlans.map((plan) => [plan.year, JSON.stringify(plan)]),
             );
@@ -480,10 +482,26 @@ export function useAccountLifecycle(
   const copyForward = useCallback(
     async (sourcePlan: StoredPlan, targetYear: number) => {
       if (!user) return;
+      const accountGeneration = runtimeRef.current.accountGeneration;
+      const ownerSignal = getOwnerSignal();
+      const isCurrentAccount = () =>
+        isCurrentAccountOperation(
+          user.id,
+          accountGeneration,
+          ownerSignal,
+          runtimeRef.current,
+        );
+      const requireCurrentAccount = () => {
+        if (!isCurrentAccount())
+          throw new DOMException("The account session changed.", "AbortError");
+      };
+      requireCurrentAccount();
       window.clearTimeout(runtimeRef.current.syncTimer);
       await runtimeRef.current.localWriteChain;
-      const durabilityProblem = () =>
-        durableLogoutProblem({
+      requireCurrentAccount();
+      const durabilityProblem = () => {
+        requireCurrentAccount();
+        return durableLogoutProblem({
           draftSnapshot: copyForwardIntentSnapshot(sourcePlan),
           durableSnapshot: (() => {
             const snapshot = runtimeRef.current.savedSnapshots.get(
@@ -501,38 +519,60 @@ export function useAccountLifecycle(
             runtimeRef.current.reconciliationPersistenceFailure,
           rejectedWriteFailure: runtimeRef.current.rejectedWriteFailure,
         });
-      await withCopyForwardIntentLock(user.id, async () => {
-        await prepareCopyForward({
-          localWrites: Promise.resolve(),
-          durabilityProblem,
-          reconcile: () => reconcileFor(user),
-          queuedMutationCount: async () =>
-            (await queuedMutations(user.id)).length,
-        });
-        const reconciledSource = planIntentForYear(
-          runtimeRef.current.plans,
-          sourcePlan.year,
-        );
-        if (!reconciledSource)
-          throw new Error("The source plan is no longer available.");
-        await jsonRequest(
-          "/api/plans/copy",
-          planResponseSchema,
-          {
-            method: "POST",
-            body: JSON.stringify({
-              sourceYear: sourcePlan.year,
-              targetYear,
-              expectedSourceUpdatedAt: reconciledSource.updatedAt,
-              expectedSourceFieldVersions: reconciledSource.fieldVersions,
-            }),
-          },
-          user.id,
-        );
+      };
+      await withCopyForwardIntentLock(
+        user.id,
+        async () => {
+          requireCurrentAccount();
+          await prepareCopyForward({
+            localWrites: Promise.resolve(),
+            durabilityProblem,
+            reconcile: async () => {
+              requireCurrentAccount();
+              await reconcileFor(user);
+              requireCurrentAccount();
+            },
+            queuedMutationCount: async () => {
+              requireCurrentAccount();
+              const count = (await queuedMutations(user.id)).length;
+              requireCurrentAccount();
+              return count;
+            },
+          });
+          requireCurrentAccount();
+          const reconciledSource = planIntentForYear(
+            runtimeRef.current.plans,
+            sourcePlan.year,
+          );
+          if (!reconciledSource)
+            throw new Error("The source plan is no longer available.");
+          await jsonRequest(
+            "/api/plans/copy",
+            planResponseSchema,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                sourceYear: sourcePlan.year,
+                targetYear,
+                expectedSourceUpdatedAt: reconciledSource.updatedAt,
+                expectedSourceFieldVersions: reconciledSource.fieldVersions,
+              }),
+              signal: ownerSignal,
+            },
+            user.id,
+          );
+          requireCurrentAccount();
+        },
+        ownerSignal,
+      );
+      requireCurrentAccount();
+      await loadPlansFor(user, {
+        selectedYear: targetYear,
+        generation: accountGeneration,
+        signal: ownerSignal,
       });
-      await loadPlansFor(user, { selectedYear: targetYear });
     },
-    [user, runtimeRef, loadPlansFor, reconcileFor],
+    [user, runtimeRef, getOwnerSignal, loadPlansFor, reconcileFor],
   );
 
   return { authenticate, closeAccount, copyForward };

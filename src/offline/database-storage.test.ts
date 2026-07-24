@@ -13,11 +13,13 @@ import {
   cachedPlans,
   clearAccountCache,
   clearRememberedUser,
+  compactedMutationBatch,
   enqueueMutations,
   lastRememberedUser,
   queuedMutations,
   rememberUser,
   removeMutations,
+  startupPlanState,
   withCopyForwardIntentLock,
 } from "./database";
 
@@ -155,6 +157,34 @@ describe("account-scoped offline storage", () => {
     releaseCopy();
     await Promise.all([copy, write]);
     expect(events).toEqual(["copy-ready", "copy-finished", "write-admitted"]);
+  });
+
+  it("cancels a copy-forward waiting on a superseded account session", async () => {
+    vi.stubGlobal("navigator", { locks: lockManager() });
+    let releaseCurrentCopy: () => void = () => undefined;
+    const currentCopyPaused = new Promise<void>((resolve) => {
+      releaseCurrentCopy = resolve;
+    });
+    const currentCopy = withCopyForwardIntentLock(
+      "user-a",
+      () => currentCopyPaused,
+    );
+    await Promise.resolve();
+
+    const staleOwner = new AbortController();
+    const staleCopy = withCopyForwardIntentLock(
+      "user-a",
+      async () => undefined,
+      staleOwner.signal,
+    );
+    const rejectedCopy = expect(staleCopy).rejects.toMatchObject({
+      name: "AbortError",
+    });
+    staleOwner.abort();
+
+    await rejectedCopy;
+    releaseCurrentCopy();
+    await currentCopy;
   });
 
   it("cancels a stale intent before it can acquire the write locks", async () => {
@@ -413,5 +443,93 @@ describe("account-scoped offline storage", () => {
     ).rejects.toThrow("reused with different content");
     expect((await cachedPlans("user-a"))[0].grossSalaryCents).toBe(12_000_000);
     expect(await queuedMutations("user-a")).toEqual([mutation]);
+  });
+
+  it("durably caches category and transaction changes for a cold offline restart", async () => {
+    const coffeeCategoryId = "00000000-0000-4000-8000-000000000202";
+    const category = {
+      id: "00000000-0000-4000-8000-000000000201",
+      name: "Groceries",
+      group: "Everyday",
+      cadence: "monthly" as const,
+      amountCents: 50_000,
+      sortOrder: 0,
+      guidanceBucket: "needs" as const,
+      colorToken: "blue" as const,
+      archived: false,
+    };
+    const base = { ...plan(), expenses: [category], transactions: [] };
+    await cachePlansIfOutboxEmpty("user-a", [base]);
+    const createdAt = "2026-07-23T12:00:00.000Z";
+    const next = {
+      ...base,
+      expenses: [
+        { ...category, name: "Food at home" },
+        {
+          ...category,
+          id: coffeeCategoryId,
+          name: "Coffee",
+          guidanceBucket: "wants" as const,
+          colorToken: "amber" as const,
+          sortOrder: 1,
+        },
+      ],
+      transactions: [
+        {
+          id: "00000000-0000-4000-8000-000000000203",
+          categoryId: coffeeCategoryId,
+          amountCents: 1_234,
+          title: "Market",
+          date: "2026-07-23",
+          createdAt,
+          updatedAt: createdAt,
+        },
+      ],
+    };
+    let mutationSequence = 300;
+    const mutations = diffPlanMutations(
+      base,
+      next,
+      createdAt,
+      () =>
+        `00000000-0000-4000-8000-${String(mutationSequence++).padStart(12, "0")}`,
+    );
+    await cachePlansAndEnqueue("user-a", [next], mutations);
+
+    expect((await cachedPlans("user-a"))[0]).toMatchObject({
+      expenses: [
+        { name: "Food at home" },
+        { name: "Coffee", colorToken: "amber" },
+      ],
+      transactions: [{ title: "Market", amountCents: 1_234 }],
+    });
+    const restarted = await startupPlanState("user-a", [base]);
+    expect(restarted.cachedPlans[0]).toMatchObject({
+      transactions: [{ title: "Market" }],
+    });
+    expect(restarted.pendingMutations.map(({ field }) => field)).toEqual([
+      `expense:${category.id}:name`,
+      `expense:${coffeeCategoryId}`,
+      "transaction:00000000-0000-4000-8000-000000000203",
+    ]);
+    const deliveryBatch = await compactedMutationBatch("user-a");
+    expect(deliveryBatch.map(({ field }) => field)).toEqual([
+      `expense:${category.id}:name`,
+      `expense:${coffeeCategoryId}`,
+      "transaction:00000000-0000-4000-8000-000000000203",
+    ]);
+    expect(deliveryBatch.map(({ updatedAt }) => Date.parse(updatedAt))).toEqual(
+      deliveryBatch
+        .map(({ updatedAt }) => Date.parse(updatedAt))
+        .toSorted((left, right) => left - right),
+    );
+    expect(new Set(deliveryBatch.map(({ updatedAt }) => updatedAt)).size).toBe(
+      deliveryBatch.length,
+    );
+    await removeMutations(
+      "user-a",
+      deliveryBatch.map(({ mutationId }) => mutationId),
+    );
+    expect(await compactedMutationBatch("user-a")).toEqual([]);
   });
 });

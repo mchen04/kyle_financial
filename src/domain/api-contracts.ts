@@ -45,7 +45,7 @@ export const syncResponseSchema = z.object({
 export const okResponseSchema = z.object({ ok: z.literal(true) });
 export const accountExportSchema = z.object({
   format: z.literal("kyle-financial-export"),
-  version: z.literal(1),
+  version: z.literal(2),
   exportedAt: z.iso.datetime(),
   account: z.object({ email: z.email() }),
   plans: z.array(storedPlanSchema),

@@ -1,15 +1,17 @@
 import type { Metadata, Viewport } from "next";
 import { PwaRuntime } from "@/components/pwa-runtime";
+import { PRODUCT_DESCRIPTION, PRODUCT_NAME } from "@/domain/brand";
+import { PWA_BACKGROUND_COLOR } from "@/domain/ui-tokens";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Kyle Financial",
-  description: "A durable yearly plan for every dollar you earn.",
-  applicationName: "Kyle Financial",
+  title: PRODUCT_NAME,
+  description: PRODUCT_DESCRIPTION,
+  applicationName: PRODUCT_NAME,
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Kyle Financial",
+    title: PRODUCT_NAME,
   },
   icons: {
     apple: "/apple-touch-icon.png",
@@ -20,7 +22,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#f7fafc",
+  themeColor: PWA_BACKGROUND_COLOR,
 };
 
 export default function RootLayout({

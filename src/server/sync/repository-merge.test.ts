@@ -1,4 +1,5 @@
 import { afterAll, describe, expect, it } from "vitest";
+import { diffPlanMutations } from "@/domain/sync";
 import { createUser } from "@/server/auth/repository";
 import { copyPlanToYear, getPlanByYear } from "@/server/plans/repository";
 import { testSql } from "@/test/database";
@@ -12,6 +13,268 @@ afterAll(async () => {
 });
 
 describe("offline mutation reconciliation", () => {
+  it("rejects future-dated actuals at the durable sync boundary", async () => {
+    const user = await createUser(
+      sql,
+      "sync-future-actual@example.com",
+      "sync future actual password",
+    );
+    const created = await createPlanWithDefaults(sql, user.id, {
+      year: 2026,
+      stateCode: "TX",
+      filingStatus: "single",
+      grossSalaryCents: 10_000_000,
+      additionalWageIncomeCents: 0,
+      spouseWageIncomeCents: 0,
+      otherOrdinaryIncomeCents: 0,
+      hsaCoverage: "self",
+    });
+    const transactionId = "00000000-0000-4000-8000-000000001090";
+    const result = await applySyncMutations(sql, user.id, [
+      {
+        mutationId: "00000000-0000-4000-8000-000000001091",
+        planYear: 2026,
+        field: `transaction:${transactionId}`,
+        value: {
+          id: transactionId,
+          categoryId: created.expenses[0].id,
+          amountCents: 500,
+          title: "Future actual",
+          date: "2026-12-31",
+          createdAt: "2026-07-24T12:00:00.000Z",
+          updatedAt: "2026-07-24T12:00:00.000Z",
+        },
+        updatedAt: "2026-07-24T12:00:00.000Z",
+      },
+    ]);
+
+    expect(result.acknowledgements).toEqual([
+      {
+        mutationId: "00000000-0000-4000-8000-000000001091",
+        applied: false,
+        rejected: true,
+      },
+    ]);
+    expect((await getPlanByYear(sql, user.id, 2026))?.transactions).toEqual([]);
+
+    const correctionId = "00000000-0000-4000-8000-000000001092";
+    expect(
+      (
+        await applySyncMutations(sql, user.id, [
+          {
+            mutationId: correctionId,
+            planYear: 2026,
+            field: `transaction:${transactionId}:date`,
+            value: "2026-07-24",
+            updatedAt: "2026-07-24T12:01:00.000Z",
+          },
+        ])
+      ).acknowledgements,
+    ).toEqual([{ mutationId: correctionId, applied: false }]);
+
+    const replacementId = "00000000-0000-4000-8000-000000001093";
+    const replacement = {
+      id: transactionId,
+      categoryId: created.expenses[0].id,
+      amountCents: 500,
+      title: "Corrected actual",
+      date: "2026-07-24",
+      createdAt: "2026-07-24T12:00:00.000Z",
+      updatedAt: "2026-07-24T12:01:00.000Z",
+    };
+    expect(
+      (
+        await applySyncMutations(sql, user.id, [
+          {
+            mutationId: replacementId,
+            planYear: 2026,
+            field: `transaction:${transactionId}`,
+            value: replacement,
+            updatedAt: "2026-07-24T12:01:00.000Z",
+          },
+        ])
+      ).acknowledgements,
+    ).toEqual([{ mutationId: replacementId, applied: true }]);
+    expect((await getPlanByYear(sql, user.id, 2026))?.transactions).toEqual([
+      replacement,
+    ]);
+  });
+
+  it("replays an inline category and its transaction exactly once", async () => {
+    const user = await createUser(
+      sql,
+      "sync-inline-category@example.com",
+      "sync inline category password",
+    );
+    const created = await createPlanWithDefaults(sql, user.id, {
+      year: 2026,
+      stateCode: "TX",
+      filingStatus: "single",
+      grossSalaryCents: 10_000_000,
+      additionalWageIncomeCents: 0,
+      spouseWageIncomeCents: 0,
+      otherOrdinaryIncomeCents: 0,
+      hsaCoverage: "self",
+    });
+    const category = {
+      ...created.expenses[0],
+      id: "00000000-0000-4000-8000-000000001101",
+      name: "Coffee",
+      sortOrder: created.expenses.length,
+      guidanceBucket: "wants" as const,
+      colorToken: "amber" as const,
+    };
+    const transaction = {
+      id: "00000000-0000-4000-8000-000000001102",
+      categoryId: category.id,
+      amountCents: 525,
+      title: "Latte",
+      date: "2026-07-24",
+      createdAt: "2026-07-24T12:00:00.000Z",
+      updatedAt: "2026-07-24T12:00:00.000Z",
+    };
+    let mutationSequence = 1103;
+    const intentTimestamp = "2026-07-24T12:00:00.000Z";
+    const mutations = diffPlanMutations(
+      created,
+      {
+        ...created,
+        expenses: [...created.expenses, category],
+        transactions: [transaction],
+      },
+      intentTimestamp,
+      () =>
+        `00000000-0000-4000-8000-${String(mutationSequence++).padStart(12, "0")}`,
+    ).map((mutation, index) => ({
+      ...mutation,
+      updatedAt: new Date(Date.parse(intentTimestamp) + index).toISOString(),
+      intentUpdatedAt: intentTimestamp,
+    }));
+
+    expect(mutations.map(({ field }) => field)).toEqual([
+      `expense:${category.id}`,
+      `transaction:${transaction.id}`,
+    ]);
+    expect(
+      (
+        await applySyncMutations(sql, user.id, mutations)
+      ).acknowledgements.every(({ applied }) => applied),
+    ).toBe(true);
+    expect(
+      (
+        await applySyncMutations(sql, user.id, mutations)
+      ).acknowledgements.every(({ applied }) => applied),
+    ).toBe(true);
+
+    const restored = await getPlanByYear(sql, user.id, 2026);
+    expect(restored?.expenses.filter(({ id }) => id === category.id)).toEqual([
+      category,
+    ]);
+    expect(
+      restored?.transactions.filter(({ id }) => id === transaction.id),
+    ).toEqual([transaction]);
+  });
+
+  it("preserves remote transactions across category replacement and rejects referenced deletion", async () => {
+    const user = await createUser(
+      sql,
+      "sync-category-reference@example.com",
+      "sync category reference password",
+    );
+    const created = await createPlanWithDefaults(sql, user.id, {
+      year: 2026,
+      stateCode: "TX",
+      filingStatus: "single",
+      grossSalaryCents: 10_000_000,
+      additionalWageIncomeCents: 0,
+      spouseWageIncomeCents: 0,
+      otherOrdinaryIncomeCents: 0,
+      hsaCoverage: "self",
+    });
+    const category = created.expenses[0];
+    const transaction = {
+      id: "00000000-0000-4000-8000-000000001121",
+      categoryId: category.id,
+      amountCents: 1_250,
+      title: "Remote lunch",
+      date: "2026-07-24",
+      createdAt: "2026-07-24T12:00:00.000Z",
+      updatedAt: "2026-07-24T12:00:00.000Z",
+    };
+    await applySyncMutations(sql, user.id, [
+      {
+        mutationId: "00000000-0000-4000-8000-000000001122",
+        planYear: 2026,
+        field: `transaction:${transaction.id}`,
+        value: transaction,
+        updatedAt: "2026-07-24T12:00:00.000Z",
+      },
+    ]);
+
+    const replacementId = "00000000-0000-4000-8000-000000001123";
+    expect(
+      (
+        await applySyncMutations(sql, user.id, [
+          {
+            mutationId: replacementId,
+            planYear: 2026,
+            field: `expense:${category.id}`,
+            value: { ...category, name: "Updated elsewhere" },
+            updatedAt: "2026-07-24T12:01:00.000Z",
+          },
+        ])
+      ).acknowledgements,
+    ).toEqual([{ mutationId: replacementId, applied: true }]);
+    expect(await getPlanByYear(sql, user.id, 2026)).toMatchObject({
+      expenses: expect.arrayContaining([
+        expect.objectContaining({ id: category.id, name: "Updated elsewhere" }),
+      ]),
+      transactions: [transaction],
+    });
+
+    const deletionId = "00000000-0000-4000-8000-000000001124";
+    expect(
+      (
+        await applySyncMutations(sql, user.id, [
+          {
+            mutationId: deletionId,
+            planYear: 2026,
+            field: `expense:${category.id}`,
+            value: null,
+            updatedAt: "2026-07-24T12:02:00.000Z",
+          },
+        ])
+      ).acknowledgements,
+    ).toEqual([{ mutationId: deletionId, applied: false, rejected: true }]);
+    expect(await getPlanByYear(sql, user.id, 2026)).toMatchObject({
+      expenses: expect.arrayContaining([
+        expect.objectContaining({ id: category.id, name: "Updated elsewhere" }),
+      ]),
+      transactions: [transaction],
+    });
+
+    const correctionId = "00000000-0000-4000-8000-000000001125";
+    expect(
+      (
+        await applySyncMutations(sql, user.id, [
+          {
+            mutationId: correctionId,
+            planYear: 2026,
+            field: `expense:${category.id}`,
+            value: { ...category, name: "Restored locally" },
+            updatedAt: "2026-07-24T12:03:00.000Z",
+          },
+        ])
+      ).acknowledgements,
+    ).toEqual([{ mutationId: correctionId, applied: true }]);
+    expect(await getPlanByYear(sql, user.id, 2026)).toMatchObject({
+      expenses: expect.arrayContaining([
+        expect.objectContaining({ id: category.id, name: "Restored locally" }),
+      ]),
+      transactions: [transaction],
+    });
+  });
+
   it("merges disjoint expense edits instead of replacing the collection", async () => {
     const user = await createUser(
       sql,
@@ -431,5 +694,133 @@ describe("offline mutation reconciliation", () => {
       primaryHsaFamilyAllocationPpm: 700_000,
       spouseHsaFamilyAllocationPpm: 300_000,
     });
+  });
+
+  it("creates, edits, recategorizes, archives, and deletes actual transactions", async () => {
+    const user = await createUser(
+      sql,
+      "sync-daily-transactions@example.com",
+      "sync daily transactions password",
+    );
+    const created = await createPlanWithDefaults(sql, user.id, {
+      year: 2025,
+      stateCode: "TX",
+      filingStatus: "single",
+      grossSalaryCents: 10_000_000,
+      additionalWageIncomeCents: 0,
+      spouseWageIncomeCents: 0,
+      otherOrdinaryIncomeCents: 0,
+      hsaCoverage: "self",
+    });
+    const [firstCategory, secondCategory] = created.expenses;
+    const transactionId = "00000000-0000-4000-8000-000000001000";
+    const actual = {
+      id: transactionId,
+      categoryId: firstCategory.id,
+      amountCents: 12_345,
+      title: "Neighborhood market",
+      note: "Weekly groceries",
+      date: "2025-07-23",
+      createdAt: "2026-07-23T12:00:00.000Z",
+      updatedAt: "2026-07-23T12:00:00.000Z",
+    };
+    const createMutation = {
+      mutationId: "00000000-0000-4000-8000-000000001001",
+      planYear: 2025,
+      field: `transaction:${transactionId}`,
+      value: actual,
+      updatedAt: "2026-07-23T12:00:00.000Z",
+    };
+    const createResult = await applySyncMutations(sql, user.id, [
+      createMutation,
+    ]);
+    expect(createResult.acknowledgements[0].applied).toBe(true);
+    expect((await getPlanByYear(sql, user.id, 2025))?.transactions).toEqual([
+      actual,
+    ]);
+    expect(
+      (await applySyncMutations(sql, user.id, [createMutation]))
+        .acknowledgements[0].applied,
+    ).toBe(true);
+    expect(
+      (await getPlanByYear(sql, user.id, 2025))?.transactions,
+    ).toHaveLength(1);
+
+    const editResult = await applySyncMutations(sql, user.id, [
+      {
+        mutationId: "00000000-0000-4000-8000-000000001002",
+        planYear: 2025,
+        field: `expense:${firstCategory.id}:name`,
+        value: "Archived groceries",
+        updatedAt: "2026-07-23T12:01:00.000Z",
+      },
+      {
+        mutationId: "00000000-0000-4000-8000-000000001003",
+        planYear: 2025,
+        field: `expense:${firstCategory.id}:archived`,
+        value: true,
+        updatedAt: "2026-07-23T12:01:01.000Z",
+      },
+      {
+        mutationId: "00000000-0000-4000-8000-000000001004",
+        planYear: 2025,
+        field: `transaction:${transactionId}:categoryId`,
+        value: secondCategory.id,
+        updatedAt: "2026-07-23T12:01:02.000Z",
+      },
+      {
+        mutationId: "00000000-0000-4000-8000-000000001005",
+        planYear: 2025,
+        field: `transaction:${transactionId}:amountCents`,
+        value: 22_222,
+        updatedAt: "2026-07-23T12:01:03.000Z",
+      },
+      {
+        mutationId: "00000000-0000-4000-8000-000000001006",
+        planYear: 2025,
+        field: `transaction:${transactionId}:updatedAt`,
+        value: "2026-07-23T12:01:03.000Z",
+        updatedAt: "2026-07-23T12:01:04.000Z",
+      },
+    ]);
+    expect(editResult.acknowledgements.every(({ applied }) => applied)).toBe(
+      true,
+    );
+    const edited = await getPlanByYear(sql, user.id, 2025);
+    expect(
+      edited?.expenses.find(({ id }) => id === firstCategory.id),
+    ).toMatchObject({ name: "Archived groceries", archived: true });
+    expect(edited?.transactions?.[0]).toMatchObject({
+      categoryId: secondCategory.id,
+      amountCents: 22_222,
+    });
+
+    const copied = await copyPlanToYear(
+      sql,
+      user.id,
+      2025,
+      2026,
+      edited!.updatedAt,
+      edited!.fieldVersions,
+    );
+    expect(copied.transactions).toEqual([]);
+    expect(
+      copied.expenses.find(({ name }) => name === "Archived groceries"),
+    ).toMatchObject({
+      colorToken: firstCategory.colorToken,
+      archived: true,
+    });
+
+    const deletion = await applySyncMutations(sql, user.id, [
+      {
+        mutationId: "00000000-0000-4000-8000-000000001007",
+        planYear: 2025,
+        field: `transaction:${transactionId}`,
+        value: null,
+        updatedAt: "2026-07-23T12:02:00.000Z",
+      },
+    ]);
+    expect(deletion.acknowledgements[0].applied).toBe(true);
+    expect((await getPlanByYear(sql, user.id, 2025))?.transactions).toEqual([]);
   });
 });

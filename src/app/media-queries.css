@@ -1,0 +1,18 @@
+@custom-media --viewport-xs (max-width: 350px);
+@custom-media --viewport-narrow (max-width: 360px);
+@custom-media --viewport-small (max-width: 380px);
+@custom-media --viewport-phone (max-width: 600px);
+@custom-media --viewport-compact (max-width: 720px);
+@custom-media --viewport-shell (max-width: 900px);
+@custom-media --viewport-cockpit (max-width: 1000px);
+@custom-media --viewport-desktop-compact (max-width: 1180px);
+@custom-media --viewport-wide-max (max-width: 2200px);
+@custom-media --viewport-wide-min (min-width: 2200px);
+@custom-media --viewport-ultrawide (min-width: 2201px);
+@custom-media --landscape-short (orientation: landscape) and (max-height: 500px);
+@custom-media --landscape-short-shell (orientation: landscape) and (max-height: 500px) and (max-width: 900px);
+@custom-media --short-phone-650 (max-height: 650px) and (max-width: 600px);
+@custom-media --short-phone-667 (max-height: 667px) and (max-width: 375px);
+@custom-media --short-phone-740 (max-height: 740px) and (max-width: 600px);
+@custom-media --short-shell-740 (max-height: 740px) and (max-width: 900px);
+@custom-media --short-phone-896 (max-height: 896px) and (max-width: 600px);

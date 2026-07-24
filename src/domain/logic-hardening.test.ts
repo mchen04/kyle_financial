@@ -219,6 +219,9 @@ describe("metamorphic behavior", () => {
           cadence: "monthly" as const,
           amountCents: 200_000,
           sortOrder: 0,
+          guidanceBucket: "needs" as const,
+          colorToken: "blue" as const,
+          archived: false,
         },
       ],
     };

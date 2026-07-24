@@ -144,6 +144,22 @@ export function isCurrentAccountLifecycle(
   );
 }
 
+export function isCurrentAccountOperation(
+  accountId: string,
+  accountGeneration: number,
+  ownerSignal: AbortSignal,
+  current: {
+    activeAccount: string | null;
+    accountGeneration: number;
+  },
+): boolean {
+  return (
+    !ownerSignal.aborted &&
+    current.activeAccount === accountId &&
+    current.accountGeneration === accountGeneration
+  );
+}
+
 export function cancelAccountPersistenceRetry(
   current: AccountPersistenceRetry | null,
   accountId?: string,
@@ -194,6 +210,16 @@ export function replacePlanIntent<T extends { year: number }>(
   draft: T,
 ): T[] {
   return plans.map((plan) => (plan.year === draft.year ? draft : plan));
+}
+
+export type PlanDraftChange =
+  StoredPlan | ((current: StoredPlan) => StoredPlan);
+
+export function applyDraftChange(
+  current: StoredPlan,
+  change: PlanDraftChange,
+): StoredPlan {
+  return typeof change === "function" ? change(current) : change;
 }
 
 export function planIntentForYear<T extends { year: number }>(

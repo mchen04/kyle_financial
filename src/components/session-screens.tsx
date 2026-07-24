@@ -3,6 +3,7 @@
 import { ChevronRight, RefreshCw, ShieldCheck } from "lucide-react";
 import { FormEvent, useRef, useState } from "react";
 import { planResponseSchema, type User } from "@/domain/api-contracts";
+import { PRODUCT_MARK, PRODUCT_NAME } from "@/domain/brand";
 import { STATE_OPTIONS } from "@/domain/tax/jurisdictions";
 import {
   centsFromInput,
@@ -22,8 +23,8 @@ export function LoadingView() {
       aria-label="Loading your plan"
     >
       <div className={styles.loadingBrand}>
-        <div className={styles.brandMark}>KF</div>
-        <h1>Kyle Financial</h1>
+        <div className={styles.brandMark}>{PRODUCT_MARK}</div>
+        <h1>{PRODUCT_NAME}</h1>
       </div>
       <div className={styles.loadingLine} />
       <p>Opening your plan…</p>
@@ -85,14 +86,12 @@ export function AuthView({
         <Wordmark />
         <div className={styles.authThesis}>
           <p className={styles.eyebrow}>
-            A yearly plan, not another transaction feed
+            Plan the year. Know what is left today.
           </p>
-          <h1 id="welcome-title">
-            Know what&apos;s left before the year begins.
-          </h1>
+          <h1 id="welcome-title">One honest plan for every day money moves.</h1>
           <p>
-            Turn salary, taxes, benefits, and the life you actually plan to live
-            into one honest monthly number.
+            Set the long view from salary, taxes, benefits, and planned
+            spending. Then log real expenses and see what is safe to spend now.
           </p>
         </div>
         <div className={styles.previewLedger} aria-hidden="true">
@@ -102,7 +101,7 @@ export function AuthView({
           <span>Taxes · benefits · life</span>
           <strong>accounted for</strong>
           <i />
-          <span>What&apos;s left each month</span>
+          <span>What&apos;s safe this month</span>
           <strong className={styles.previewSurplus}>$2,184</strong>
         </div>
       </section>
@@ -111,10 +110,12 @@ export function AuthView({
         aria-label={mode === "signup" ? "Create account" : "Sign in"}
       >
         <p className={styles.eyebrow}>
-          {mode === "signup" ? "Start your plan" : "Welcome back"}
+          {mode === "signup" ? "Start your cockpit" : "Welcome back"}
         </p>
         <h2>
-          {mode === "signup" ? "Create your private account" : "Open your plan"}
+          {mode === "signup"
+            ? "Create your private account"
+            : "Open your money cockpit"}
         </h2>
         <form onSubmit={submit} className={styles.authForm}>
           {notice && (
@@ -277,12 +278,12 @@ export function Onboarding({
         <p className={styles.eyebrow}>
           Three details · sensible defaults do the rest
         </p>
-        <h1>Build your {currentYear} plan</h1>
+        <h1>Build the plan behind your daily budget</h1>
         <p className={styles.muted}>
-          Start with a rough income estimate. You can change every value after
-          this step. We add an editable expense checklist at $0 so you can fill
-          in only what applies. Tax figures are planning estimates, not tax
-          advice.
+          Start with a rough {currentYear} income estimate. You can change every
+          value later. We add editable categories at $0; fund the ones that
+          apply, then use Home to log real spending against them. Tax figures
+          are planning estimates, not tax advice.
         </p>
         <form onSubmit={submit} className={styles.onboardingForm}>
           <label>
@@ -332,7 +333,7 @@ export function Onboarding({
             </p>
           )}
           <button className={styles.primaryButton} disabled={busy}>
-            {busy ? "Opening your plan…" : "See my plan"}{" "}
+            {busy ? "Opening your cockpit…" : "Open my cockpit"}{" "}
             {busy ? (
               <RefreshCw size={17} className={styles.spin} />
             ) : (
@@ -348,7 +349,8 @@ export function Onboarding({
 function Wordmark() {
   return (
     <div className={styles.wordmark}>
-      <span className={styles.brandMark}>KF</span>Kyle Financial
+      <span className={styles.brandMark}>{PRODUCT_MARK}</span>
+      {PRODUCT_NAME}
     </div>
   );
 }

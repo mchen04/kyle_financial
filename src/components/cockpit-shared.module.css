@@ -1,0 +1,192 @@
+.actionCard {
+  composes: actionCard from "./daily-cockpit.module.css";
+}
+
+.actionRail {
+  composes: actionRail from "./daily-cockpit.module.css";
+  composes: actionRail from "./daily-cockpit-responsive.module.css";
+}
+
+.activityGroups {
+  composes: activityGroups from "./daily-cockpit.module.css";
+}
+
+.activitySummary {
+  composes: activitySummary from "./daily-cockpit.module.css";
+}
+
+.backHeader {
+  composes: backHeader from "./daily-cockpit.module.css";
+}
+
+.budgetSurface {
+  composes: budgetSurface from "./daily-cockpit.module.css";
+  composes: budgetSurface from "./daily-cockpit-responsive.module.css";
+}
+
+.categoryRow {
+  composes: categoryRow from "./daily-cockpit.module.css";
+  composes: categoryRow from "./daily-cockpit-responsive.module.css";
+}
+
+.categoryRows {
+  composes: categoryRows from "./daily-cockpit.module.css";
+}
+
+.dateHeading {
+  composes: dateHeading from "./daily-cockpit.module.css";
+}
+
+.detailMetrics {
+  composes: detailMetrics from "./daily-cockpit.module.css";
+  composes: detailMetrics from "./daily-cockpit-responsive.module.css";
+}
+
+.emptyHero {
+  composes: emptyHero from "./daily-cockpit.module.css";
+  composes: emptyHero from "./daily-cockpit-responsive.module.css";
+}
+
+.emptyState {
+  composes: emptyState from "./daily-cockpit.module.css";
+}
+
+.eyebrow {
+  composes: eyebrow from "./daily-cockpit.module.css";
+}
+
+.filters {
+  composes: filters from "./daily-cockpit.module.css";
+  composes: filters from "./daily-cockpit-responsive.module.css";
+}
+
+.homeGrid {
+  composes: homeGrid from "./daily-cockpit.module.css";
+  composes: homeGrid from "./daily-cockpit-responsive.module.css";
+}
+
+.linkGrid {
+  composes: linkGrid from "./daily-cockpit.module.css";
+  composes: linkGrid from "./daily-cockpit-responsive.module.css";
+}
+
+.loadMore {
+  composes: loadMore from "./daily-cockpit.module.css";
+}
+
+.mathBreakdown {
+  composes: mathBreakdown from "./daily-cockpit.module.css";
+  composes: mathBreakdown from "./daily-cockpit-responsive.module.css";
+}
+
+.mathNote {
+  composes: mathNote from "./daily-cockpit.module.css";
+}
+
+.monthStepper {
+  composes: monthStepper from "./daily-cockpit.module.css";
+  composes: monthStepper from "./daily-cockpit-responsive.module.css";
+}
+
+.offlineHome {
+  composes: offlineHome from "./daily-cockpit.module.css";
+  composes: offlineHome from "./daily-cockpit-responsive.module.css";
+}
+
+.pageIntro {
+  composes: pageIntro from "./daily-cockpit.module.css";
+}
+
+.panel {
+  composes: panel from "./daily-cockpit.module.css";
+  composes: panel from "./daily-cockpit-responsive.module.css";
+}
+
+.periodControl {
+  composes: periodControl from "./daily-cockpit.module.css";
+  composes: periodControl from "./daily-cockpit-responsive.module.css";
+}
+
+.periodTabs {
+  composes: periodTabs from "./daily-cockpit.module.css";
+  composes: periodTabs from "./daily-cockpit-responsive.module.css";
+}
+
+.planGrid {
+  composes: planGrid from "./daily-cockpit.module.css";
+  composes: planGrid from "./daily-cockpit-responsive.module.css";
+}
+
+.planHub {
+  composes: planHub from "./daily-cockpit.module.css";
+  composes: planHub from "./daily-cockpit-responsive.module.css";
+}
+
+.planOutcome {
+  composes: planOutcome from "./daily-cockpit.module.css";
+  composes: planOutcome from "./daily-cockpit-responsive.module.css";
+}
+
+.runwayCard {
+  composes: runwayCard from "./daily-cockpit.module.css";
+  composes: runwayCard from "./daily-cockpit-responsive.module.css";
+}
+
+.runwayHeadline {
+  composes: runwayHeadline from "./daily-cockpit.module.css";
+  composes: runwayHeadline from "./daily-cockpit-responsive.module.css";
+}
+
+.runwayMetrics {
+  composes: runwayMetrics from "./daily-cockpit.module.css";
+  composes: runwayMetrics from "./daily-cockpit-responsive.module.css";
+}
+
+.runwayTrack {
+  composes: runwayTrack from "./daily-cockpit.module.css";
+}
+
+.sectionHeading {
+  composes: sectionHeading from "./daily-cockpit.module.css";
+  composes: sectionHeading from "./daily-cockpit-responsive.module.css";
+}
+
+.srOnly {
+  composes: srOnly from "./daily-cockpit.module.css";
+}
+
+.surfaceHeader {
+  composes: surfaceHeader from "./daily-cockpit.module.css";
+  composes: surfaceHeader from "./daily-cockpit-responsive.module.css";
+}
+
+.surfaceStack {
+  composes: surfaceStack from "./daily-cockpit.module.css";
+  composes: surfaceStack from "./daily-cockpit-responsive.module.css";
+}
+
+.textButton {
+  composes: textButton from "./daily-cockpit.module.css";
+}
+
+.toolbar {
+  composes: toolbar from "./daily-cockpit.module.css";
+  composes: toolbar from "./daily-cockpit-responsive.module.css";
+}
+
+.transactionNote {
+  composes: transactionNote from "./daily-cockpit.module.css";
+}
+
+.transactionRow {
+  composes: transactionRow from "./daily-cockpit.module.css";
+  composes: transactionRow from "./daily-cockpit-responsive.module.css";
+}
+
+.transactionRows {
+  composes: transactionRows from "./daily-cockpit.module.css";
+}
+
+.wrapHero {
+  composes: wrapHero from "./daily-cockpit.module.css";
+}

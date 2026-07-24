@@ -1,0 +1,288 @@
+@media (--viewport-cockpit) {
+  .surfaceHeader {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .periodControl {
+    width: 100%;
+    justify-items: stretch;
+  }
+
+  .periodTabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .monthStepper {
+    justify-content: center;
+  }
+
+  .planGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (--viewport-compact) {
+  .surfaceStack {
+    gap: var(--space-4);
+  }
+
+  .surfaceHeader h1 {
+    font-size: clamp(var(--text-2xl), var(--fluid-12), var(--text-4xl));
+  }
+
+  .runwayCard {
+    gap: var(--space-4);
+    padding: var(--space-6);
+  }
+
+  .runwayHeadline > strong {
+    font-size: clamp(var(--text-4xl), var(--fluid-18), var(--text-6xl));
+  }
+
+  .runwayMetrics,
+  .detailMetrics,
+  .homeGrid,
+  .actionRail,
+  .linkGrid,
+  .planOutcome {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .runwayMetrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .runwayCard {
+    margin-bottom: calc(var(--control-md) + var(--space-4));
+  }
+
+  .mathBreakdown {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .runwayMetrics div {
+    display: block;
+  }
+
+  .panel,
+  .planOutcome {
+    padding: var(--space-4);
+  }
+
+  .sectionHeading,
+  .toolbar {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .categoryRow,
+  .transactionRow {
+    grid-template-columns: var(--space-3) minmax(0, 1fr) auto;
+    padding-right: calc(var(--control-md) + var(--space-3));
+  }
+
+  .categoryRow > svg,
+  .transactionRow > svg {
+    display: none;
+  }
+
+  .categoryRow em {
+    max-width: var(--layout-2xs);
+    font-size: var(--text-sm);
+  }
+
+  .filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .surfaceStack:has(.emptyHero) .emptyHero > svg,
+  .surfaceStack:has(.emptyHero) .emptyHero button {
+    display: none;
+  }
+}
+
+@media (--viewport-narrow) {
+  .runwayCard,
+  .panel {
+    padding: var(--space-3);
+  }
+
+  .monthStepper {
+    grid-template-columns: var(--control-sm) minmax(0, 1fr) var(--control-sm);
+  }
+
+  .mathBreakdown {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (--landscape-short) {
+  .surfaceStack {
+    gap: var(--space-3);
+  }
+
+  .surfaceHeader {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(var(--layout-lg), 1.2fr);
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .surfaceHeader h1 {
+    max-width: none;
+    font-size: var(--text-xl);
+    letter-spacing: var(--tracking-snug);
+  }
+
+  .surfaceHeader p:last-child {
+    display: none;
+  }
+
+  .periodControl {
+    width: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .monthStepper {
+    grid-template-columns:
+      var(--control-sm) minmax(var(--layout-2xs), auto)
+      var(--control-sm);
+    justify-self: center;
+  }
+
+  .runwayCard {
+    padding: var(--space-4);
+  }
+
+  .runwayHeadline > strong {
+    font-size: var(--text-2xl);
+  }
+
+  .runwayMetrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .runwayMetrics div {
+    display: block;
+  }
+
+  .runwayMetrics dd {
+    font-size: var(--text-lg);
+  }
+}
+
+@media (--short-shell-740) {
+  .surfaceStack:has(.runwayCard) .surfaceHeader > div:first-child {
+    display: none;
+  }
+
+  .surfaceStack:has(.runwayCard) .surfaceHeader {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .runwayCard {
+    gap: var(--space-3);
+    margin-bottom: calc(var(--control-lg) + var(--space-3));
+    padding: var(--space-4);
+  }
+
+  .runwayMetrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .runwayMetrics div {
+    display: block;
+  }
+
+  .runwayMetrics dd {
+    font-size: var(--text-md);
+  }
+
+  .surfaceStack:has(.emptyHero) .surfaceHeader > div:first-child {
+    display: none;
+  }
+
+  .surfaceStack:has(.emptyHero) .surfaceHeader {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .emptyHero {
+    min-height: var(--layout-sm);
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-3)
+      calc(var(--control-md) + var(--space-3));
+  }
+
+  .offlineHome .runwayCard {
+    gap: var(--space-2);
+  }
+
+  .offlineHome .runwayHeadline > strong {
+    font-size: var(--text-2xl);
+  }
+
+  .offlineHome .runwayHeadline {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+
+  .offlineHome .runwayHeadline > small {
+    display: none;
+  }
+
+  .planHub .surfaceHeader h1 {
+    font-size: var(--text-2xl);
+  }
+
+  .planHub .surfaceHeader p:last-child {
+    display: none;
+  }
+
+  .planHub .planOutcome {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+    padding: var(--space-4);
+  }
+
+  .planHub .planOutcome strong {
+    font-size: var(--text-xl);
+  }
+
+  .planHub .planOutcome input {
+    width: var(--input-compact-width);
+  }
+
+  .budgetSurface .surfaceHeader .eyebrow {
+    display: none;
+  }
+
+  .budgetSurface .surfaceHeader h1 {
+    font-size: var(--text-xl);
+  }
+}
+
+@media (--short-phone-740) {
+  .surfaceStack:has(.emptyHero) .surfaceHeader > div:first-child {
+    display: none;
+  }
+
+  .surfaceStack:has(.emptyHero) .surfaceHeader {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (--short-phone-896) {
+  .offlineHome .surfaceHeader > div:first-child {
+    display: none;
+  }
+
+  .offlineHome .surfaceHeader {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

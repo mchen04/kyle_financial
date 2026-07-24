@@ -1,0 +1,253 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import { ChevronLeft } from "lucide-react";
+import { useState } from "react";
+import type { User } from "@/domain/api-contracts";
+import type { SelectedPeriod } from "@/domain/daily-money";
+import type { PlanResult } from "@/domain/tax/engine";
+import {
+  ActivitySurface,
+  BudgetSurface,
+  CategoryDetailSurface,
+  EditBudgetSurface,
+  HomeSurface,
+  ManageCategoriesSurface,
+  MonthlyWrapSurface,
+  PlanHub,
+} from "./daily-cockpit";
+import {
+  currentHsaFamilyAllocation,
+  type HsaFamilyAllocation,
+} from "./hsa-controls";
+import { PlanScreen } from "./plan-screen";
+import type {
+  SaveState,
+  Screen,
+  StoredPlan,
+  WorkspaceRoute,
+} from "./plan-types";
+import styles from "./financial-app.module.css";
+
+const AccountScreen = dynamic(() =>
+  import("./account-screen").then(({ AccountScreen }) => AccountScreen),
+);
+const BenefitsScreen = dynamic(() =>
+  import("./benefits-screen").then(({ BenefitsScreen }) => BenefitsScreen),
+);
+const CompareScreen = dynamic(() =>
+  import("./compare-screen").then(({ CompareScreen }) => CompareScreen),
+);
+
+export function PlanWorkspaceContent({
+  today,
+  user,
+  plans,
+  draft,
+  route,
+  saveState,
+  result,
+  period,
+  onPeriod,
+  onDraft,
+  onNavigate,
+  onOpenTransaction,
+  canCreateExpense,
+  onLogout,
+  onDeleteAccount,
+}: {
+  today: string;
+  user: User;
+  plans: StoredPlan[];
+  draft: StoredPlan;
+  route: WorkspaceRoute;
+  saveState: SaveState;
+  result: PlanResult;
+  period: SelectedPeriod;
+  onPeriod: (period: SelectedPeriod) => void;
+  onDraft: (plan: StoredPlan) => void;
+  onNavigate: (route: WorkspaceRoute) => void;
+  onOpenTransaction: (transactionId?: string) => void;
+  canCreateExpense: boolean;
+  onLogout: () => Promise<void>;
+  onDeleteAccount: () => Promise<void>;
+}) {
+  const [hsaAllocationIntents, setHsaAllocationIntents] = useState(
+    () => new Map<string, HsaFamilyAllocation>(),
+  );
+  const preferredHsaAllocation =
+    currentHsaFamilyAllocation(draft) ?? hsaAllocationIntents.get(draft.id);
+  const navigateScreen = (screen: Screen) => {
+    if (screen === "category" || screen === "edit-budget")
+      throw new Error(`${screen} requires route context`);
+    onNavigate({ screen });
+  };
+  const rememberHsaAllocation = (allocation: HsaFamilyAllocation) => {
+    setHsaAllocationIntents((current) => {
+      const next = new Map(current);
+      next.set(draft.id, allocation);
+      return next;
+    });
+  };
+
+  switch (route.screen) {
+    case "home":
+      return (
+        <HomeSurface
+          today={today}
+          plan={draft}
+          result={result}
+          period={period}
+          compactForOffline={saveState === "offline"}
+          onPeriod={onPeriod}
+          onScreen={navigateScreen}
+          onCategory={(categoryId) =>
+            onNavigate({ screen: "category", categoryId })
+          }
+          onEditTransaction={onOpenTransaction}
+        />
+      );
+    case "budget":
+      return (
+        <BudgetSurface
+          today={today}
+          plan={draft}
+          period={period}
+          onPeriod={onPeriod}
+          onScreen={(screen) => {
+            if (screen === "edit-budget") {
+              onNavigate({ screen, returnTo: "budget" });
+              return;
+            }
+            navigateScreen(screen);
+          }}
+          onCategory={(categoryId) =>
+            onNavigate({ screen: "category", categoryId })
+          }
+        />
+      );
+    case "activity":
+      return (
+        <ActivitySurface
+          today={today}
+          plan={draft}
+          period={period}
+          onPeriod={onPeriod}
+          onEdit={onOpenTransaction}
+          onFastLog={canCreateExpense ? () => onOpenTransaction() : undefined}
+        />
+      );
+    case "category":
+      return (
+        <CategoryDetailSurface
+          today={today}
+          plan={draft}
+          categoryId={route.categoryId}
+          period={period}
+          onBack={() => onNavigate({ screen: "budget" })}
+          onEdit={onOpenTransaction}
+        />
+      );
+    case "edit-budget":
+      return (
+        <EditBudgetSurface
+          plan={draft}
+          onDraft={onDraft}
+          onBack={() => onNavigate({ screen: route.returnTo })}
+        />
+      );
+    case "manage-categories":
+      return (
+        <ManageCategoriesSurface
+          plan={draft}
+          onDraft={onDraft}
+          onBack={() => onNavigate({ screen: "budget" })}
+        />
+      );
+    case "wrap":
+      return (
+        <MonthlyWrapSurface
+          today={today}
+          plan={draft}
+          result={result}
+          period={period}
+          onBack={() => onNavigate({ screen: "home" })}
+        />
+      );
+    case "plan":
+      return (
+        <PlanHub
+          today={today}
+          plan={draft}
+          result={result}
+          onScreen={(screen) => {
+            if (screen === "edit-budget") {
+              onNavigate({ screen, returnTo: "plan" });
+              return;
+            }
+            navigateScreen(screen);
+          }}
+          onDraft={onDraft}
+        />
+      );
+    case "plan-details":
+      return (
+        <SubPage
+          title="Plan details"
+          onBack={() => onNavigate({ screen: "plan" })}
+        >
+          <PlanScreen
+            draft={draft}
+            result={result}
+            onDraft={onDraft}
+            preferredHsaAllocation={preferredHsaAllocation}
+            onHsaAllocationIntent={rememberHsaAllocation}
+          />
+        </SubPage>
+      );
+    case "benefits":
+      return (
+        <SubPage title="Benefits" onBack={() => onNavigate({ screen: "plan" })}>
+          <BenefitsScreen draft={draft} result={result} onDraft={onDraft} />
+        </SubPage>
+      );
+    case "compare":
+      return (
+        <SubPage
+          title="Compare years"
+          onBack={() => onNavigate({ screen: "plan" })}
+        >
+          <CompareScreen plans={plans} />
+        </SubPage>
+      );
+    case "account":
+      return (
+        <AccountScreen
+          user={user}
+          plans={plans}
+          onLogout={onLogout}
+          onDeleteAccount={onDeleteAccount}
+        />
+      );
+  }
+}
+
+function SubPage({
+  title,
+  onBack,
+  children,
+}: {
+  title: string;
+  onBack: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={styles.subPage}>
+      <button onClick={onBack}>
+        <ChevronLeft /> Back to Plan
+      </button>
+      <h1>{title}</h1>
+      {children}
+    </div>
+  );
+}

@@ -3,9 +3,12 @@ import "server-only";
 import type { Sql, TransactionSql } from "postgres";
 import type { BenefitEntry, ConfiguredAmount } from "../../domain/benefits";
 import {
+  type BudgetCategory,
   guidanceBucket,
+  type CategoryColorToken,
   type ExpenseEntry,
   type PlanInput,
+  type TransactionEntry,
 } from "../../domain/budget";
 import { DEFAULT_BENEFITS, DEFAULT_EXPENSES } from "../../domain/defaults";
 import {
@@ -38,6 +41,7 @@ interface PlanRow {
   spouse_hsa_catch_up_eligible: boolean;
   primary_hsa_family_allocation_ppm: number;
   spouse_hsa_family_allocation_ppm: number;
+  starting_savings_cents: string | null;
   updated_at: Date;
   field_versions: unknown;
 }
@@ -61,6 +65,19 @@ interface ExpenseRow {
   amount_cents: string;
   sort_order: number;
   guidance_bucket: "needs" | "wants" | "saving";
+  color_token: CategoryColorToken;
+  archived: boolean;
+}
+
+interface TransactionRow {
+  id: string;
+  category_id: string;
+  amount_cents: string;
+  title: string;
+  note: string | null;
+  transaction_date: string | Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 interface PlanBenefitRow extends BenefitRow {
@@ -68,6 +85,10 @@ interface PlanBenefitRow extends BenefitRow {
 }
 
 interface PlanExpenseRow extends ExpenseRow {
+  plan_id: string;
+}
+
+interface PlanTransactionRow extends TransactionRow {
   plan_id: string;
 }
 
@@ -136,18 +157,22 @@ async function insertExpenses(
     amount_cents: entry.amountCents,
     sort_order: entry.sortOrder,
     guidance_bucket: guidanceBucket(entry),
+    color_token: entry.colorToken ?? "blue",
+    archived: entry.archived ?? false,
   }));
   await transaction`
     INSERT INTO expenses (
       id, plan_id, name, category_group, cadence, amount_cents, sort_order,
-      guidance_bucket
+      guidance_bucket, color_token, archived
     )
     SELECT coalesce(entry.id, gen_random_uuid()), ${planId}, entry.name,
            entry.category_group, entry.cadence, entry.amount_cents,
-           entry.sort_order, entry.guidance_bucket
+           entry.sort_order, entry.guidance_bucket, entry.color_token,
+           entry.archived
     FROM jsonb_to_recordset(${transaction.typed(JSON.stringify(rows), 25)}::jsonb) AS entry(
       id uuid, name text, category_group text, cadence text,
-      amount_cents bigint, sort_order integer, guidance_bucket text
+      amount_cents bigint, sort_order integer, guidance_bucket text,
+      color_token text, archived boolean
     )
   `;
 }
@@ -186,7 +211,7 @@ function mapBenefit(row: BenefitRow): BenefitEntry {
   };
 }
 
-function mapExpense(row: ExpenseRow): ExpenseEntry {
+function mapExpense(row: ExpenseRow): BudgetCategory {
   return {
     id: row.id,
     name: row.name,
@@ -195,6 +220,25 @@ function mapExpense(row: ExpenseRow): ExpenseEntry {
     amountCents: Number(row.amount_cents),
     sortOrder: row.sort_order,
     guidanceBucket: row.guidance_bucket,
+    colorToken: row.color_token,
+    archived: row.archived,
+  };
+}
+
+function mapTransaction(row: TransactionRow): TransactionEntry {
+  const date =
+    row.transaction_date instanceof Date
+      ? row.transaction_date.toISOString().slice(0, 10)
+      : row.transaction_date;
+  return {
+    id: row.id,
+    categoryId: row.category_id,
+    amountCents: Number(row.amount_cents),
+    title: row.title,
+    ...(row.note === null ? {} : { note: row.note }),
+    date,
+    createdAt: row.created_at.toISOString(),
+    updatedAt: row.updated_at.toISOString(),
   };
 }
 
@@ -202,6 +246,7 @@ function materializePlan(
   row: PlanRow,
   benefits: readonly BenefitRow[],
   expenses: readonly ExpenseRow[],
+  transactions: readonly TransactionRow[],
 ): StoredPlan {
   return {
     id: row.id,
@@ -221,6 +266,10 @@ function materializePlan(
     spouseHsaFamilyAllocationPpm: row.spouse_hsa_family_allocation_ppm,
     benefits: benefits.map(mapBenefit),
     expenses: expenses.map(mapExpense),
+    transactions: transactions.map(mapTransaction),
+    ...(row.starting_savings_cents === null
+      ? {}
+      : { startingSavingsCents: Number(row.starting_savings_cents) }),
     updatedAt: row.updated_at.toISOString(),
     fieldVersions: parseFieldVersions(row.field_versions),
   };
@@ -230,7 +279,7 @@ async function hydratePlan(
   sql: Sql | TransactionSql,
   row: PlanRow,
 ): Promise<StoredPlan> {
-  const [benefits, expenses] = await Promise.all([
+  const [benefits, expenses, transactions] = await Promise.all([
     sql<BenefitRow[]>`
       SELECT id, owner, type, label, amount_kind, amount_value, discount_rate_ppm,
              custom_tax_treatment
@@ -240,13 +289,20 @@ async function hydratePlan(
     `,
     sql<ExpenseRow[]>`
       SELECT id, name, category_group, cadence, amount_cents, sort_order,
-             guidance_bucket
+             guidance_bucket, color_token, archived
       FROM expenses
       WHERE plan_id = ${row.id}
       ORDER BY sort_order, id
     `,
+    sql<TransactionRow[]>`
+      SELECT id, category_id, amount_cents, title, note, transaction_date,
+             created_at, updated_at
+      FROM transactions
+      WHERE plan_id = ${row.id}
+      ORDER BY transaction_date DESC, created_at DESC, id
+    `,
   ]);
-  return materializePlan(row, benefits, expenses);
+  return materializePlan(row, benefits, expenses, transactions);
 }
 
 async function hydratePlans(
@@ -255,7 +311,7 @@ async function hydratePlans(
 ): Promise<StoredPlan[]> {
   if (rows.length === 0) return [];
   const planIds = rows.map(({ id }) => id);
-  const [benefits, expenses] = await Promise.all([
+  const [benefits, expenses, transactions] = await Promise.all([
     sql<PlanBenefitRow[]>`
       SELECT plan_id, id, owner, type, label, amount_kind, amount_value,
              discount_rate_ppm, custom_tax_treatment
@@ -265,19 +321,28 @@ async function hydratePlans(
     `,
     sql<PlanExpenseRow[]>`
       SELECT plan_id, id, name, category_group, cadence, amount_cents,
-             sort_order, guidance_bucket
+             sort_order, guidance_bucket, color_token, archived
       FROM expenses
       WHERE plan_id = ANY(${planIds})
       ORDER BY plan_id, sort_order, id
     `,
+    sql<PlanTransactionRow[]>`
+      SELECT plan_id, id, category_id, amount_cents, title, note,
+             transaction_date, created_at, updated_at
+      FROM transactions
+      WHERE plan_id = ANY(${planIds})
+      ORDER BY plan_id, transaction_date DESC, created_at DESC, id
+    `,
   ]);
   const benefitsByPlan = groupByPlan(benefits);
   const expensesByPlan = groupByPlan(expenses);
+  const transactionsByPlan = groupByPlan(transactions);
   return rows.map((row) =>
     materializePlan(
       row,
       benefitsByPlan.get(row.id) ?? [],
       expensesByPlan.get(row.id) ?? [],
+      transactionsByPlan.get(row.id) ?? [],
     ),
   );
 }
@@ -293,7 +358,8 @@ export async function getPlanByYearInTransaction(
            other_ordinary_income_cents, hsa_coverage, primary_hsa_eligible,
            spouse_hsa_eligible, primary_hsa_catch_up_eligible,
            spouse_hsa_catch_up_eligible, primary_hsa_family_allocation_ppm,
-           spouse_hsa_family_allocation_ppm, updated_at, field_versions
+           spouse_hsa_family_allocation_ppm, starting_savings_cents, updated_at,
+           field_versions
     FROM plans
     WHERE user_id = ${userId} AND year = ${year}
   `;
@@ -320,7 +386,8 @@ async function listPlansInTransaction(
            other_ordinary_income_cents, hsa_coverage, primary_hsa_eligible,
            spouse_hsa_eligible, primary_hsa_catch_up_eligible,
            spouse_hsa_catch_up_eligible, primary_hsa_family_allocation_ppm,
-           spouse_hsa_family_allocation_ppm, updated_at, field_versions
+           spouse_hsa_family_allocation_ppm, starting_savings_cents, updated_at,
+           field_versions
     FROM plans
     WHERE user_id = ${userId}
     ORDER BY year
@@ -398,7 +465,8 @@ export async function copyPlanToYear(
              other_ordinary_income_cents, hsa_coverage, primary_hsa_eligible,
              spouse_hsa_eligible, primary_hsa_catch_up_eligible,
              spouse_hsa_catch_up_eligible, primary_hsa_family_allocation_ppm,
-             spouse_hsa_family_allocation_ppm, updated_at, field_versions
+             spouse_hsa_family_allocation_ppm, starting_savings_cents, updated_at,
+             field_versions
       FROM plans
       WHERE user_id = ${userId} AND year = ${sourceYear}
       FOR UPDATE
@@ -419,7 +487,7 @@ export async function copyPlanToYear(
         other_ordinary_income_cents, hsa_coverage, primary_hsa_eligible,
         spouse_hsa_eligible, primary_hsa_catch_up_eligible,
         spouse_hsa_catch_up_eligible, primary_hsa_family_allocation_ppm,
-        spouse_hsa_family_allocation_ppm, field_versions
+        spouse_hsa_family_allocation_ppm, starting_savings_cents, field_versions
       )
       VALUES (
         ${userId}, ${targetYear}, ${source.state_code}, ${source.filing_status},
@@ -430,7 +498,8 @@ export async function copyPlanToYear(
         ${source.primary_hsa_catch_up_eligible},
         ${source.spouse_hsa_catch_up_eligible},
         ${source.primary_hsa_family_allocation_ppm},
-        ${source.spouse_hsa_family_allocation_ppm}, '{}'::jsonb
+        ${source.spouse_hsa_family_allocation_ppm},
+        ${source.starting_savings_cents}, '{}'::jsonb
       )
       RETURNING id
     `;
@@ -449,10 +518,10 @@ export async function copyPlanToYear(
       await transaction`
       INSERT INTO expenses (
         plan_id, name, category_group, cadence, amount_cents, sort_order,
-        guidance_bucket
+        guidance_bucket, color_token, archived
       )
       SELECT ${targetId}, name, category_group, cadence, amount_cents, sort_order,
-             guidance_bucket
+             guidance_bucket, color_token, archived
       FROM expenses
       WHERE plan_id = ${source.id}
     `;
@@ -473,7 +542,7 @@ export async function copyPlanToYear(
 export async function exportAccount(sql: Sql, userId: string, email: string) {
   return {
     format: "kyle-financial-export",
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
     account: { email },
     plans: await listPlans(sql, userId),

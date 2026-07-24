@@ -19,7 +19,7 @@ describe("account export response boundary", () => {
   it("serializes a valid complete-account export as a download", async () => {
     exportAccount.mockResolvedValue({
       format: "kyle-financial-export",
-      version: 1,
+      version: 2,
       exportedAt: "2026-07-13T00:00:00.000Z",
       account: { email: "a@example.com" },
       plans: [],
@@ -29,11 +29,11 @@ describe("account export response boundary", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("content-disposition")).toContain(
-      "kyle-financial-export.json",
+      "house-by-30-export.json",
     );
     expect(await response.json()).toEqual({
       format: "kyle-financial-export",
-      version: 1,
+      version: 2,
       exportedAt: "2026-07-13T00:00:00.000Z",
       account: { email: "a@example.com" },
       plans: [],
