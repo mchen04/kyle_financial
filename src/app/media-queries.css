@@ -1,3 +1,4 @@
+@custom-media --reduced-motion (prefers-reduced-motion: reduce);
 @custom-media --viewport-xs (max-width: 350px);
 @custom-media --viewport-narrow (max-width: 360px);
 @custom-media --viewport-small (max-width: 380px);
