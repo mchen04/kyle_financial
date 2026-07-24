@@ -27,6 +27,12 @@ function request(ip: string): Request {
   });
 }
 
+function forwardedRequest(ip: string): Request {
+  return new Request("https://example.test/api/auth/login", {
+    headers: { "x-forwarded-for": `${ip}, 198.51.100.20` },
+  });
+}
+
 async function consumeAttempt(
   authRequest: Request,
   action: AuthenticationAction,
@@ -46,7 +52,7 @@ async function consumeAttempt(
 describe("distributed authentication throttling", () => {
   it("bounds account creation per IP before accepting another identity", async () => {
     const now = new Date("2026-07-13T18:00:00.000Z");
-    for (let attempt = 1; attempt <= 5; attempt += 1) {
+    for (let attempt = 1; attempt <= 10; attempt += 1) {
       await expect(
         consumeAttempt(
           request("203.0.113.10"),
@@ -70,7 +76,38 @@ describe("distributed authentication throttling", () => {
       FROM auth_rate_limits
       WHERE scope = 'signup:identity'
     `;
-    expect(blockedIdentity[0].count).toBe(5);
+    expect(blockedIdentity[0].count).toBe(10);
+  });
+
+  it("uses the forwarded client IP when the proxy omits x-real-ip", async () => {
+    const now = new Date("2026-07-13T18:10:00.000Z");
+    for (let attempt = 1; attempt <= 10; attempt += 1) {
+      await expect(
+        consumeAttempt(
+          forwardedRequest("203.0.113.20"),
+          "signup",
+          `forwarded-${attempt}@example.com`,
+          now,
+        ),
+      ).resolves.toMatchObject({ allowed: true });
+    }
+
+    await expect(
+      consumeAttempt(
+        forwardedRequest("203.0.113.20"),
+        "signup",
+        "blocked-forwarded@example.com",
+        now,
+      ),
+    ).resolves.toMatchObject({ allowed: false });
+    await expect(
+      consumeAttempt(
+        forwardedRequest("203.0.113.21"),
+        "signup",
+        "different-client@example.com",
+        now,
+      ),
+    ).resolves.toMatchObject({ allowed: true });
   });
 
   it("atomically limits one login identity across concurrent function calls", async () => {

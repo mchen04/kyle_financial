@@ -24,7 +24,7 @@ const AUTHENTICATION_POLICIES: Record<
     identity: { limit: 10, windowSeconds: 15 * 60 },
   },
   signup: {
-    ip: { limit: 5, windowSeconds: 60 * 60 },
+    ip: { limit: 10, windowSeconds: 60 * 60 },
     identity: { limit: 3, windowSeconds: 60 * 60 },
   },
 };
@@ -122,7 +122,12 @@ export async function consumeAuthenticationIpAttempt(
 ): Promise<AuthenticationRateLimit> {
   await cleanupExpiredBuckets(sql, now);
   const policy = AUTHENTICATION_POLICIES[action];
-  const ip = request.headers.get("x-real-ip")?.trim() || "unknown";
+  const forwardedIp = request.headers
+    .get("x-forwarded-for")
+    ?.split(",", 1)[0]
+    ?.trim();
+  const ip =
+    request.headers.get("x-real-ip")?.trim() || forwardedIp || "unknown";
   return consumeBucket(sql, `${action}:ip`, ip, policy.ip, now);
 }
 
