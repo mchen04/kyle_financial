@@ -16,7 +16,7 @@ export {
   periodForYear,
 } from "./cockpit-period-control";
 
-import { CalendarDays, ChevronRight, Sparkles } from "lucide-react";
+import { CalendarDays, ChevronRight } from "lucide-react";
 import { guidanceBucket } from "@/domain/budget";
 import {
   categoryRollupIsVisible,
@@ -86,7 +86,9 @@ export function HomeSurface({
         right.date.localeCompare(left.date) ||
         right.updatedAt.localeCompare(left.updatedAt),
     )
-    .slice(0, 4);
+    // Two rows, not four: Home's job is "correct it while it is fresh", and the
+    // full ledger is one tap away on the Activity tab (HIG-L1, DEN-6).
+    .slice(0, 2);
   const progress =
     rollup.spendingAllocatedCents === 0
       ? 0
@@ -98,15 +100,12 @@ export function HomeSurface({
   const unstarted = phase === "future";
   return (
     <div
-      className={`${styles.surfaceStack} ${
+      className={`${styles.surfaceStack} ${styles.homeSurface} ${
         compactForOffline ? styles.offlineHome : ""
       }`}
     >
       <header className={styles.surfaceHeader}>
         <div>
-          <p className={styles.eyebrow}>
-            {unstarted ? "Planned money cockpit" : "Today's money cockpit"}
-          </p>
           <h1>{unstarted ? "Your plan, ahead." : "Your money, right now."}</h1>
         </div>
         <PeriodControl period={period} today={today} onPeriod={onPeriod} />
@@ -128,17 +127,17 @@ export function HomeSurface({
                 : Math.abs(rollup.safeToSpendCents),
             )}
           </strong>
+          {/* The period is named by the month picker directly above, so it is
+              not restated here. */}
           <small>
             {unstarted ? (
               <>
-                {periodLabel(period)} ·{" "}
                 {money(rollup.spendingAllocatedCents, 2)} planned; actuals begin
                 when the period starts
               </>
             ) : (
               <>
-                {periodLabel(period)} · exact:{" "}
-                {money(rollup.spendingAllocatedCents, 2)} −{" "}
+                exact: {money(rollup.spendingAllocatedCents, 2)} −{" "}
                 {money(rollup.spendingActualCents, 2)} ={" "}
                 {money(rollup.safeToSpendCents, 2)}
               </>
@@ -155,19 +154,10 @@ export function HomeSurface({
         >
           <i style={{ width: `${progress}%` }} />
         </div>
+        {/* Budgeted, spent and remaining are the three terms of the exact line
+            directly above, to the cent. Only the savings impact is a fact the
+            equation does not already carry, so only it gets its own row. */}
         <dl className={styles.runwayMetrics}>
-          <Metric
-            label={unstarted ? "Spending plan" : "Budgeted"}
-            value={rollup.spendingAllocatedCents}
-          />
-          <Metric
-            label={unstarted ? "Actuals to date" : "Spent"}
-            value={rollup.spendingActualCents}
-          />
-          <Metric
-            label={unstarted ? "Planned available" : "Remaining"}
-            value={rollup.spendingRemainingCents}
-          />
           <Metric
             label={homeSavingsImpactLabel(period, today)}
             value={savingsImpactCents}
@@ -176,94 +166,55 @@ export function HomeSurface({
         </dl>
       </section>
 
-      <div className={styles.homeGrid}>
-        <section className={styles.panel}>
-          <div className={styles.sectionHeading}>
-            <div>
-              <p className={styles.eyebrow}>Needs attention</p>
-              <h2>
-                {attention.length ? "Tight categories" : "Budget is on track"}
-              </h2>
-            </div>
-            <button
-              className={styles.textButton}
-              onClick={() => onScreen("budget")}
-            >
-              View budget <ChevronRight />
-            </button>
+      <section className={styles.rowGroup}>
+        <h2 className={styles.groupLabel}>Needs attention</h2>
+        {attention.length ? (
+          <div className={styles.categoryRows}>
+            {attention.map((item) => (
+              <CategoryRow
+                key={item.category.id}
+                item={item}
+                onClick={() => onCategory(item.category.id)}
+              />
+            ))}
           </div>
-          {attention.length ? (
-            <div className={styles.categoryRows}>
-              {attention.map((item) => (
-                <CategoryRow
-                  key={item.category.id}
-                  item={item}
-                  unstarted={unstarted}
-                  onClick={() => onCategory(item.category.id)}
-                />
-              ))}
-            </div>
-          ) : (
-            <p className={styles.emptyState}>
-              Nothing is over budget in this period. Keep logging expenses to
-              protect the signal.
-            </p>
-          )}
-        </section>
+        ) : (
+          <p className={styles.groupEmpty}>
+            Nothing is over budget in this period.
+          </p>
+        )}
+      </section>
 
-        <section className={styles.panel}>
-          <div className={styles.sectionHeading}>
-            <div>
-              <p className={styles.eyebrow}>Recent activity</p>
-              <h2>Correct it while it&apos;s fresh</h2>
-            </div>
-            <button
-              className={styles.textButton}
-              onClick={() => onScreen("activity")}
-            >
-              All activity <ChevronRight />
-            </button>
-          </div>
-          {recent.length ? (
-            <TransactionRows
-              transactions={recent}
-              categories={rollup.categories.map(({ category }) => category)}
-              onEdit={onEditTransaction}
-            />
-          ) : (
-            <p className={styles.emptyState}>
-              No expenses logged for this period yet. Fast Log is ready when you
-              are.
-            </p>
-          )}
-        </section>
-      </div>
+      <section className={styles.rowGroup}>
+        <h2 className={styles.groupLabel}>Recent activity</h2>
+        {recent.length ? (
+          <TransactionRows
+            transactions={recent}
+            categories={rollup.categories.map(({ category }) => category)}
+            onEdit={onEditTransaction}
+          />
+        ) : (
+          <p className={styles.groupEmpty}>
+            No expenses logged for this period yet.
+          </p>
+        )}
+      </section>
 
-      <div className={styles.actionRail}>
+      <div className={styles.rowGroup}>
         <button
-          className={styles.actionCard}
+          className={styles.navRow}
           onClick={() => onScreen("wrap")}
           disabled={period.kind !== "month" || unstarted}
         >
           <CalendarDays />
-          <span>
-            <strong>Monthly wrap</strong>
-            <small>
-              {unstarted
-                ? "Available when this month begins"
-                : period.kind === "month"
-                  ? "See wins, overruns, and savings impact"
-                  : "Choose a month to open its wrap"}
-            </small>
-          </span>
-          <ChevronRight />
-        </button>
-        <button className={styles.actionCard} onClick={() => onScreen("plan")}>
-          <Sparkles />
-          <span>
-            <strong>Annual plan</strong>
-            <small>See the long view behind today&apos;s choices</small>
-          </span>
+          <strong>Monthly wrap</strong>
+          <em>
+            {unstarted
+              ? "Starts with the period"
+              : period.kind === "month"
+                ? periodLabel(period)
+                : "Choose a month"}
+          </em>
           <ChevronRight />
         </button>
       </div>
@@ -296,14 +247,13 @@ export function BudgetSurface({
     unstarted ? [] : observedTransactions,
     period,
   );
+  // One list in plan order. The old surface rendered every over-budget or
+  // near-limit category twice — once in a "Needs attention" block, once here —
+  // and that block appeared and disappeared with the selected period, which was
+  // this surface's largest layout shift. Over-budget rows keep their own
+  // warning colour and read "$81 over" in place of a negative remainder, so
+  // nothing about them is hidden by dropping the duplicate.
   const visibleCategories = rollup.categories.filter(categoryRollupIsVisible);
-  const attention = visibleCategories.filter(
-    ({ remainingCents, allocatedCents, category }) =>
-      remainingCents < 0 ||
-      (allocatedCents > 0 &&
-        remainingCents <= Math.ceil(allocatedCents / 10) &&
-        guidanceBucket(category) !== "saving"),
-  );
   return (
     <div className={`${styles.surfaceStack} ${styles.budgetSurface}`}>
       <header className={styles.surfaceHeader}>
@@ -319,58 +269,46 @@ export function BudgetSurface({
         </div>
         <PeriodControl period={period} today={today} onPeriod={onPeriod} />
       </header>
-      <div className={styles.toolbar}>
-        {unstarted ? (
-          <p>
-            <strong>{money(rollup.spendingAllocatedCents, 2)}</strong> is
-            planned for spending and{" "}
-            <strong>{money(rollup.savingAllocatedCents, 2)}</strong> for saving.
-            Actual spending begins when {periodLabel(period)} starts.
-          </p>
-        ) : (
-          <p>
-            <strong>{money(rollup.actualCents, 2)}</strong> spent or funded of{" "}
-            {money(rollup.allocatedCents, 2)} total. Safe to spend keeps{" "}
-            {money(rollup.savingAllocatedCents, 2)} of saving allocations
-            reserved; exact remainder{" "}
-            <strong>{money(rollup.safeToSpendCents, 2)}</strong>.
-          </p>
-        )}
+      {/* One box in both period phases: identical labels, identical row count,
+          so stepping the month changes digits and never geometry (C9). */}
+      <dl className={styles.budgetMath}>
         <div>
-          <button onClick={() => onScreen("edit-budget")}>Edit budget</button>
-          <button onClick={() => onScreen("manage-categories")}>
-            Manage categories
-          </button>
+          <dt>Spent or funded</dt>
+          <dd>{money(rollup.actualCents, 2)}</dd>
         </div>
+        <div>
+          <dt>Allocated total</dt>
+          <dd>{money(rollup.allocatedCents, 2)}</dd>
+        </div>
+        <div>
+          <dt>Saving reserved</dt>
+          <dd>{money(rollup.savingAllocatedCents, 2)}</dd>
+        </div>
+        <div>
+          <dt>Safe to spend</dt>
+          <dd data-negative={rollup.safeToSpendCents < 0}>
+            {money(rollup.safeToSpendCents, 2)}
+          </dd>
+        </div>
+      </dl>
+      <p className={styles.budgetNote}>
+        {unstarted
+          ? `Actual spending begins when ${periodLabel(period)} starts.`
+          : "Safe to spend holds saving allocations in reserve."}
+      </p>
+      <div className={styles.budgetActions}>
+        <button onClick={() => onScreen("edit-budget")}>Edit budget</button>
+        <button onClick={() => onScreen("manage-categories")}>
+          Manage categories
+        </button>
       </div>
-      {attention.length > 0 && (
-        <section className={styles.panel}>
-          <p className={styles.eyebrow}>Needs attention</p>
-          <div className={styles.categoryRows}>
-            {attention.map((item) => (
-              <CategoryRow
-                key={item.category.id}
-                item={item}
-                unstarted={unstarted}
-                onClick={() => onCategory(item.category.id)}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-      <section className={styles.panel}>
-        <div className={styles.sectionHeading}>
-          <div>
-            <p className={styles.eyebrow}>All categories</p>
-            <h2>Planned and actual</h2>
-          </div>
-        </div>
+      <section className={styles.rowGroup}>
+        <h2 className={styles.groupLabel}>All categories</h2>
         <div className={styles.categoryRows}>
           {visibleCategories.map((item) => (
             <CategoryRow
               key={item.category.id}
               item={item}
-              unstarted={unstarted}
               onClick={() => onCategory(item.category.id)}
             />
           ))}

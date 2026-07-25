@@ -505,7 +505,10 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: var(--space-3);
-    padding-bottom: calc(var(--space-20) + var(--control-lg));
+    /* C4: the scroll region only has to clear the floating Fast Log button,
+       which sits 48px above the tab bar; the tab bar itself is in flow below
+       this region and needs no reservation. */
+    padding-bottom: calc(var(--space-4) + var(--control-md));
   }
   .bottomNav {
     position: static;

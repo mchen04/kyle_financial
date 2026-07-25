@@ -158,8 +158,10 @@ export function PeriodControl({
             }
           >
             {MONTH_NAMES.map((month, index) => (
+              // Abbreviated so the picker, the period tabs, and both stepper
+              // arrows share one 44px row at 360px wide without clipping.
               <option key={month} value={index + 1}>
-                {month} {period.year}
+                {month.slice(0, 3)} {period.year}
               </option>
             ))}
           </select>

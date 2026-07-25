@@ -217,6 +217,28 @@
   color: var(--status-warning-text);
 }
 
+/* C6: every amount, percentage, count and date figure is tabular so digit
+   changes cannot re-measure a line box. */
+.surfaceHeader h1,
+.backHeader h1,
+.runwayHeadline > strong,
+.runwayHeadline > small,
+.runwayMetrics dd,
+.detailMetrics dd,
+.mathBreakdown dd,
+.activitySummary strong,
+.wrapHero > strong,
+.planOutcome > div > strong,
+.categoryRow small,
+.categoryRow em,
+.transactionRow small,
+.transactionRow em,
+.navRow em,
+.budgetNote,
+.dateHeading {
+  font-variant-numeric: tabular-nums;
+}
+
 .runwayMetrics [data-negative="true"] {
   color: var(--color-amber-200);
 }
@@ -275,10 +297,116 @@
   height: var(--icon-sm);
 }
 
+/* C4: rows inside a group sit at 0px with a hairline between them; the 8px
+   gap that used to separate them bought no information and cost 8px per row. */
 .categoryRows,
-.transactionRows,
+.transactionRows {
+  display: grid;
+  gap: var(--space-0);
+}
+
+.categoryRows > * + *,
+.transactionRows > * + * {
+  border-top: var(--border-hairline) solid var(--border-subtle);
+}
+
 .activityGroups {
   display: grid;
+  gap: var(--space-2);
+}
+
+/* C2: a group label costs one 13px line plus 4px, never a subtitle. */
+.rowGroup {
+  display: grid;
+  gap: var(--space-0);
+}
+
+.groupLabel {
+  margin: 0 0 var(--space-1);
+  color: var(--text-secondary);
+  font: var(--weight-bold) var(--text-sm) / 1.38 var(--font-data);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+.groupEmpty {
+  min-height: var(--control-md);
+  display: flex;
+  align-items: center;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+/* C5: two facts and one destination is a row, not an 80px card. */
+.navRow {
+  width: 100%;
+  min-height: var(--control-md);
+  display: grid;
+  grid-template-columns: var(--icon-lg) auto minmax(0, 1fr) var(--icon-sm);
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-0) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-transparent);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.navRow > svg:first-child {
+  width: var(--icon-lg);
+  color: var(--text-action);
+}
+
+.navRow > svg:last-child {
+  width: var(--icon-sm);
+  color: var(--text-tertiary);
+}
+
+.navRow em {
+  color: var(--text-secondary);
+  font-style: normal;
+  font-size: var(--text-sm);
+  text-align: right;
+}
+
+.navRow:disabled {
+  color: var(--text-disabled);
+  cursor: default;
+}
+
+.budgetMath {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-3);
+  border: var(--border-hairline) solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface-panel);
+}
+
+.budgetMath dt {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.budgetMath dd {
+  margin: var(--space-1) 0 0;
+  font: var(--weight-bold) var(--text-md) / 1.25 var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
+
+.budgetNote {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.budgetActions {
+  display: flex;
   gap: var(--space-2);
 }
 
@@ -341,6 +469,17 @@
   min-width: 0;
   display: grid;
   gap: var(--space-1);
+}
+
+.rowFigures {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.categoryRow > .rowFigures {
+  justify-items: end;
+  gap: var(--space-0);
 }
 
 .categoryRow small,
@@ -441,6 +580,7 @@
 }
 
 .toolbar button,
+.budgetActions button,
 .emptyHero button,
 .loadMore {
   min-height: var(--control-sm);

@@ -2,20 +2,39 @@
   .surfaceHeader {
     align-items: start;
     flex-direction: column;
+    gap: var(--space-2);
   }
 
+  /* One 44px row instead of two stacked ones: the kind tabs and the month
+     stepper are the same control and cost 106px stacked (C4, C1). */
   .periodControl {
     width: 100%;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
     justify-items: stretch;
+    gap: var(--space-2);
   }
 
   .periodTabs {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(var(--control-sm), auto));
+    padding: var(--space-0);
+    border: 0;
+    background: var(--color-transparent);
+  }
+
+  .periodTabs button {
+    padding-inline: var(--space-1);
   }
 
   .monthStepper {
+    grid-template-columns: var(--control-sm) minmax(0, 1fr) var(--control-sm);
     justify-content: center;
+  }
+
+  .monthStepper select {
+    min-width: 0;
+    padding-inline: var(--space-1);
   }
 
   .planGrid {
@@ -29,19 +48,33 @@
   }
 
   .surfaceHeader h1 {
+    max-width: none;
     font-size: clamp(var(--text-2xl), var(--fluid-12), var(--text-4xl));
   }
 
+  /* C2: "Your money, right now." restates the Home tab and carries no figure,
+     so it is a label, not a display headline. */
+  .homeSurface .surfaceHeader h1 {
+    margin: 0;
+    font-size: var(--text-lg);
+  }
+
+  /* The Budget answer stays the largest thing on its surface but at a size
+     where both phase strings ("… safe to spend" / "… planned spending") set on
+     one line at 360-430px, so stepping the period cannot reflow it (C9). */
+  .budgetSurface .surfaceHeader h1 {
+    font-size: var(--text-xl);
+  }
+
   .runwayCard {
-    gap: var(--space-4);
-    padding: var(--space-6);
+    gap: var(--space-3);
+    padding: var(--space-4);
   }
 
   .runwayHeadline > strong {
-    font-size: clamp(var(--text-4xl), var(--fluid-18), var(--text-6xl));
+    font-size: var(--text-4xl);
   }
 
-  .runwayMetrics,
   .detailMetrics,
   .homeGrid,
   .actionRail,
@@ -50,20 +83,28 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  /* Label and value on one line (C1, C4) instead of a stacked metric block. */
   .runwayMetrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
   }
 
-  .runwayCard {
-    margin-bottom: calc(var(--control-md) + var(--space-4));
-  }
-
-  .mathBreakdown {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .runwayMetrics dd {
+    margin: 0;
+    font-size: var(--text-md);
   }
 
   .runwayMetrics div {
-    display: block;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding-top: var(--space-2);
+  }
+
+  .mathBreakdown,
+  .budgetMath {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .panel,
@@ -77,10 +118,12 @@
     flex-direction: column;
   }
 
+  /* The 60px right gutter was decorative — the chevron it reserved is hidden
+     at this width — and it was what forced every row onto two lines. */
   .categoryRow,
   .transactionRow {
     grid-template-columns: var(--space-3) minmax(0, 1fr) auto;
-    padding-right: calc(var(--control-md) + var(--space-3));
+    padding-right: var(--space-2);
   }
 
   .categoryRow > svg,
@@ -88,8 +131,15 @@
     display: none;
   }
 
+  /* C1 + C6: a 48px row — name on the left, both figures stacked in a fixed
+     120px tabular column on the right, so digit count never re-flows the name
+     and the row height is identical in every period phase (C9). */
+  .categoryRow {
+    min-height: var(--control-md);
+    grid-template-columns: var(--space-3) minmax(0, 1fr) var(--layout-xs);
+  }
+
   .categoryRow em {
-    max-width: var(--layout-2xs);
     font-size: var(--text-sm);
   }
 
@@ -163,14 +213,6 @@
     font-size: var(--text-2xl);
   }
 
-  .runwayMetrics {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .runwayMetrics div {
-    display: block;
-  }
-
   .runwayMetrics dd {
     font-size: var(--text-lg);
   }
@@ -187,20 +229,7 @@
 
   .runwayCard {
     gap: var(--space-3);
-    margin-bottom: calc(var(--control-lg) + var(--space-3));
-    padding: var(--space-4);
-  }
-
-  .runwayMetrics {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .runwayMetrics div {
-    display: block;
-  }
-
-  .runwayMetrics dd {
-    font-size: var(--text-md);
+    padding: var(--space-3);
   }
 
   .surfaceStack:has(.emptyHero) .surfaceHeader > div:first-child {
@@ -216,6 +245,12 @@
     gap: var(--space-2);
     padding: var(--space-3) var(--space-3)
       calc(var(--control-md) + var(--space-3));
+  }
+
+  /* 740pt-tall phones give the answer one step less display size so the whole
+     Home surface still lands inside one screen. */
+  .homeSurface .runwayHeadline > strong {
+    font-size: var(--text-3xl);
   }
 
   .offlineHome .runwayCard {

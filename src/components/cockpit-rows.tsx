@@ -27,32 +27,35 @@ export function Metric({
 export function CategoryRow({
   item,
   onClick,
-  unstarted = false,
 }: {
   item: CategoryRollup;
   onClick?: () => void;
-  unstarted?: boolean;
 }) {
+  // One phrasing for both period phases. A future period simply reads
+  // "$0 spent of $240" / "$240 remaining", which is what the rollup says, and
+  // keeps the row's line box identical when the selected month steps forward.
+  // Every figure lives in one fixed-width column so a change in digit count
+  // cannot re-flow the category name, and the row keeps the same height in
+  // every period phase. "spent"/"funded" is dropped from the ratio because
+  // "remaining"/"left to fund" beside it already carries that distinction.
   const content = (
     <>
       <i data-color={item.category.colorToken} aria-hidden="true" />
       <span>
         <strong>{item.category.name}</strong>
-        <small>
-          {unstarted ? (
-            <>{money(item.allocatedCents)} planned for this period</>
-          ) : (
-            <>
-              {money(item.actualCents)} {item.actualLabel} of{" "}
-              {money(item.allocatedCents)}
-            </>
-          )}
-        </small>
       </span>
-      <em data-negative={!unstarted && item.remainingCents < 0}>
-        {money(unstarted ? item.allocatedCents : item.remainingCents)}{" "}
-        {unstarted ? "allocated" : item.remainingLabel}
-      </em>
+      <span className={styles.rowFigures}>
+        <small>
+          {money(item.actualCents)} of {money(item.allocatedCents)}
+        </small>
+        <em data-negative={item.remainingCents < 0}>
+          {item.remainingCents < 0
+            ? // Over budget is the attention signal the surface must not bury,
+              // so the row says "over" instead of a negative "remaining".
+              `${money(Math.abs(item.remainingCents))} over`
+            : `${money(item.remainingCents)} ${item.remainingLabel}`}
+        </em>
+      </span>
       {onClick && <ChevronRight />}
     </>
   );

@@ -19,6 +19,43 @@
   composes: backHeader from "./daily-cockpit.module.css";
 }
 
+.budgetActions {
+  composes: budgetActions from "./daily-cockpit.module.css";
+}
+
+.budgetMath {
+  composes: budgetMath from "./daily-cockpit.module.css";
+  composes: budgetMath from "./daily-cockpit-responsive.module.css";
+}
+
+.budgetNote {
+  composes: budgetNote from "./daily-cockpit.module.css";
+}
+
+.groupEmpty {
+  composes: groupEmpty from "./daily-cockpit.module.css";
+}
+
+.groupLabel {
+  composes: groupLabel from "./daily-cockpit.module.css";
+}
+
+.homeSurface {
+  composes: homeSurface from "./daily-cockpit-responsive.module.css";
+}
+
+.navRow {
+  composes: navRow from "./daily-cockpit.module.css";
+}
+
+.rowFigures {
+  composes: rowFigures from "./daily-cockpit.module.css";
+}
+
+.rowGroup {
+  composes: rowGroup from "./daily-cockpit.module.css";
+}
+
 .budgetSurface {
   composes: budgetSurface from "./daily-cockpit.module.css";
   composes: budgetSurface from "./daily-cockpit-responsive.module.css";

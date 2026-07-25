@@ -17,6 +17,7 @@
 // page. Run `--mode capture` to record without gating, `--mode gate` (default)
 // to exit non-zero when a frozen bar is violated.
 import { execFile, spawn } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
@@ -26,6 +27,42 @@ import { fileURLToPath } from "node:url";
 const run = promisify(execFile);
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const probeScript = resolve(repositoryRoot, "scripts/density-probe.js");
+
+/**
+ * Load `.env.local` into `process.env` so the harness runs in a clean shell.
+ * The seeder, the build, and `next start` are all spawned with `process.env`,
+ * so they inherit whatever is loaded here. Variables already present in the
+ * environment win: an explicit `DATABASE_URL=… pnpm ui:density:measure` must
+ * not be silently overridden by the file.
+ */
+function loadLocalEnvironment() {
+  let contents;
+  try {
+    contents = readFileSync(resolve(repositoryRoot, ".env.local"), "utf8");
+  } catch {
+    return; // No file: rely on the ambient environment.
+  }
+  for (const line of contents.split("\n")) {
+    const match = /^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/.exec(
+      line,
+    );
+    if (!match) continue;
+    const [, name, rawValue] = match;
+    if (name in process.env) continue;
+    let value = rawValue.trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"') && value.length > 1) ||
+      (value.startsWith("'") && value.endsWith("'") && value.length > 1)
+    ) {
+      value = value.slice(1, -1);
+    } else {
+      value = value.replace(/\s+#.*$/, "").trim();
+    }
+    process.env[name] = value;
+  }
+}
+
+loadLocalEnvironment();
 
 // ---------------------------------------------------------------------------
 // Frozen bars. These come from the mission and are deliberately not tunable
