@@ -27,6 +27,18 @@
   text-transform: uppercase;
 }
 
+/* The grey section label. `.eyebrow` above is blue and names the SCREEN;
+   this names a section INSIDE a screen. Two judges found the two roles
+   sharing one blue treatment across six surfaces, so the colour no longer
+   sorted them. Same geometry as the cockpit's own `.groupLabel`. */
+.groupLabel {
+  margin: 0 0 var(--space-1);
+  color: var(--ink-soft);
+  font: 700 var(--text-sm)/1.38 var(--data);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
 .muted {
   color: var(--ink-soft);
 }
@@ -92,18 +104,33 @@
   box-shadow: var(--shadow-card);
 }
 
-.wideCard h1,
-.wideCard h2 {
+.wideCard h1 {
   margin: 0 0 var(--space-6);
   font: 650 clamp(var(--text-xl), var(--fluid-3), var(--text-3xl))/1.05
     var(--display);
   letter-spacing: var(--tracking-tight);
 }
 
+/* D7, applied to the one card family the L9 pass missed. An <h2> inside a card
+   is a section within a page, not the page, and this rule was still setting it
+   to the same 24px the page title uses — which is why Account's "Install on
+   iPhone" announced itself a rank above the section beside it. One rung down,
+   matching every other section heading in the product. */
+.wideCard h2 {
+  margin: 0 0 var(--space-5);
+  font: 650 var(--text-lg) / 1.2 var(--display);
+  letter-spacing: var(--tracking-tight);
+}
+
 /* A note that sits under the figures it explains rather than above them, so it
-   is separated from what comes next, not pulled up into what came before. */
+   is separated from what comes next, not pulled up into what came before.
+   The bottom margin is the "not pulled up into what came before" half, from the
+   next block's point of view: on Benefits this paragraph had ~35px of clearance
+   above it and ~7px below, so its descenders read as touching the top edge of
+   the amber HSA/FSA callout and the note looked like it was falling into the
+   warning. Symmetric clearance, so the two blocks read as two blocks. */
 .wideCard > .muted {
-  margin: var(--space-3) 0 0;
+  margin: var(--space-3) 0 var(--space-5);
 }
 
 .sectionHeading {

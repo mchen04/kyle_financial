@@ -58,7 +58,7 @@ export function MonthlyWrapSurface({
         onBack={onBack}
       >
         <section className={styles.panel}>
-          <p className={styles.eyebrow}>Forecast not started</p>
+          <p className={styles.groupLabel}>Forecast not started</p>
           <h2>This month has not begun.</h2>
           <p className={styles.emptyState}>
             Return when the month begins to see live spending variance and
@@ -182,7 +182,7 @@ function WrapList({
 }) {
   return (
     <section className={styles.panel}>
-      <p className={styles.eyebrow}>{title}</p>
+      <p className={styles.groupLabel}>{title}</p>
       {items.length ? (
         <div className={styles.categoryRows}>
           {items.map((item) => (
@@ -296,7 +296,7 @@ export function PlanHub({
           </span>
         </label>
         <div>
-          <p className={styles.eyebrow}>
+          <p className={styles.groupLabel}>
             {futurePlan
               ? annualProjection.projectedEndingSavingsCents === undefined
                 ? "Planned savings change"

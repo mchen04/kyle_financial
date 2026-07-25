@@ -510,12 +510,26 @@
     background: var(--surface-glass-strong);
     backdrop-filter: blur(var(--space-4));
   }
+  /* The selected tab was a full-bar-height tinted slab with 12px corners, which
+     is a Material navigation-bar active indicator, not an iOS selection. The
+     tint is kept — it is the only thing marking the current tab on a bar whose
+     labels are always visible — but it is inset so it reads as a capsule
+     floating in the bar with clearance on all four sides.
+
+     The inset is bought with `background-clip`, not with margin. Margin was
+     tried first and the density gate caught it in one run: 4px of block margin
+     on four buttons grew the bar 8px, which came straight out of `<main>`, and
+     Home — which fits with 2.9px of slack — went 5.1px over its own scroll
+     region. Clipping the tint to the content box insets the capsule by the
+     padding that was already there and changes no box by a single pixel. */
   .bottomNav button {
     min-height: var(--bottom-nav-height);
     justify-content: center;
     flex-direction: column;
     gap: var(--space-1);
     padding: var(--space-1);
+    border-radius: var(--radius-pill);
+    background-clip: content-box;
     font-size: var(--text-xs);
   }
 

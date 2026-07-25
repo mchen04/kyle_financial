@@ -2,6 +2,10 @@
   composes: eyebrow from "./surface-primitives.module.css";
 }
 
+.groupLabel {
+  composes: groupLabel from "./surface-primitives.module.css";
+}
+
 .muted {
   composes: muted from "./surface-primitives.module.css";
 }

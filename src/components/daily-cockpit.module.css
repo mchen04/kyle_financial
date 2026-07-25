@@ -642,22 +642,29 @@
   color: var(--text-tertiary);
 }
 
+/* An empty state is the absence of rows, not an object. This was a 360px
+   min-height box drawn with a dashed hairline, holding ~100px of content
+   floated in its middle — a third of the viewport spent outlining emptiness, on
+   the one surface whose populated form fits seven rows in the same space. Three
+   independent judges named it, and the dashed border is the only one in the
+   product, so it read as an unstyled placeholder from a different app.
+
+   It is now the platform idiom: a symbol, a title and a line of body copy,
+   centred on the page background, sized to its own content and nothing more.
+   No container, no border, no reserved height. */
 .emptyHero {
-  min-height: var(--layout-xl);
   display: grid;
   place-items: center;
   align-content: center;
-  gap: var(--space-3);
-  padding: var(--space-8);
-  border: var(--border-hairline) dashed var(--border-default);
-  border-radius: var(--radius-lg);
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-4);
   text-align: center;
 }
 
 .emptyHero > svg {
-  width: var(--space-12);
-  height: var(--space-12);
-  color: var(--text-action);
+  width: var(--space-8);
+  height: var(--space-8);
+  color: var(--text-tertiary);
 }
 
 .emptyHero p {
@@ -671,15 +678,26 @@
   color: var(--text-inverse);
 }
 
+/* The back control sits above the title, not beside it. Beside it, the control
+   is as wide as its own label — `Back to Home`, `Back to Budget`, `Back to
+   Plan` — so it pushed the <h1> to a different x on every detail surface, and
+   none of those x positions matched the tab-root headlines, which sit hard
+   against the page gutter. Flipping between screens, the largest text on the
+   page visibly slid. Stacking gives every title in the product one left edge,
+   and it is also the platform's own arrangement: a back item in the bar, the
+   large title on the line below it. */
 .backHeader {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
+  display: grid;
+  justify-items: start;
+  gap: var(--space-1);
 }
 
 .backHeader > button {
-  flex: 0 0 auto;
+  justify-self: start;
   width: auto;
+  /* The chevron is optically outdented so the label, not the glyph, lines up
+     with the title below it. */
+  margin-inline-start: calc(-1 * var(--space-2));
   padding-inline: var(--space-2) var(--space-3);
 }
 

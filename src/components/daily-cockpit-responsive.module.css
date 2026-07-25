@@ -150,13 +150,37 @@
      that is compared down a column looks like as a row. The three-metric block
      goes 144px -> 104px and the six-metric one 224px -> 160px, and no cell on
      either is empty. */
+  /* One baseline per cell only works while the label and the figure both fit on
+     it. Measured on Plan at 390x844, they do not: every one of the four labels
+     wrapped to two lines (32px) AND the figure still overflowed its own cell —
+     `Spending variance` by 18.5px, `Starting balance` by 8.9px, `Planned total`
+     by 9.6px, `Funding variance` by 0. `justify-content: space-between` cannot
+     right-align content already wider than its box, so the four figures ended
+     at four different x positions and the column a reader scans down did not
+     exist.
+
+     Stacking the label over the figure gives the figure the cell's full width.
+     The labels stop wrapping, so the cell is 44px instead of the 48px the
+     one-baseline version needed, and the figures align on a single left edge
+     per column — which is the alignment that matters, because they are set in
+     tabular numerals. */
   .mathBreakdown div {
-    min-height: var(--control-md);
+    min-height: var(--control-sm);
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-2);
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--micro-2);
     padding: var(--space-2) var(--space-3);
+  }
+
+  /* The label wraps if it must. `white-space: nowrap` was tried, to hold every
+     cell at 44px, and the gate refused it in one run: Monthly wrap's
+     `Saving funding variance` needs 145px in a 134px box, and an ellipsis is
+     not a fit. A label that needs two lines takes two lines — the figure below
+     it still gets the cell's whole width, which is the alignment this change
+     exists to buy. */
+  .mathBreakdown dt {
+    line-height: 1.25;
   }
 
   .mathBreakdown dd {

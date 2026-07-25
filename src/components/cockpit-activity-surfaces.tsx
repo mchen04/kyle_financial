@@ -17,6 +17,11 @@ import { Metric, MonthlyWrapRow, TransactionRows } from "./cockpit-rows";
 import { money, type StoredPlan } from "./plan-types";
 import styles from "./cockpit-shared.module.css";
 
+/** Upper-case the first letter only, so "left to fund" stays a phrase. */
+function sentenceCase(label: string): string {
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 export function ActivitySurface({
   today,
   plan,
@@ -108,7 +113,7 @@ export function ActivitySurface({
         >
           <div className={styles.sectionHeading}>
             <div>
-              <p className={styles.eyebrow}>Needs correction</p>
+              <p className={styles.groupLabel}>Needs correction</p>
               <h2 id="future-actuals-title">Future-dated expenses</h2>
             </div>
           </div>
@@ -232,12 +237,24 @@ export function CategoryDetailSurface({
   return (
     <BackPage title={item.category.name} onBack={onBack}>
       <div className={styles.detailMetrics}>
+        {/* The domain names these "spent" / "funded" / "remaining" / "left to
+            fund" in lower case because they also read inside sentences. As a
+            row of three peer labels they have to match each other, and two
+            judges read "Allocated spent remaining" as a heading followed by two
+            fragments. Sentence case is applied here, at the one place they are
+            set as labels, rather than by changing what the domain calls them. */}
         <Metric label="Allocated" value={item.allocatedCents} />
-        <Metric label={item.actualLabel} value={item.actualCents} />
-        <Metric label={item.remainingLabel} value={item.remainingCents} />
+        <Metric
+          label={sentenceCase(item.actualLabel)}
+          value={item.actualCents}
+        />
+        <Metric
+          label={sentenceCase(item.remainingLabel)}
+          value={item.remainingCents}
+        />
       </div>
       <section className={styles.panel}>
-        <p className={styles.eyebrow}>{periodLabel(period)}</p>
+        <p className={styles.groupLabel}>{periodLabel(period)}</p>
         {transactions.length ? (
           <TransactionRows
             transactions={transactions}

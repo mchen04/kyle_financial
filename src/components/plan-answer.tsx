@@ -46,7 +46,7 @@ export function PlanAnswer({
       aria-labelledby="answer-heading"
     >
       <div>
-        <p className={styles.eyebrow} id="answer-heading">
+        <p className={styles.groupLabel} id="answer-heading">
           {hasPlannedExpenses ? "Savings / month" : "Unallocated / month"}
         </p>
         <p className={styles.answerNumber}>

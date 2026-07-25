@@ -16,9 +16,7 @@
   --color-sky-50: #cbd9e7;
   --color-blue-700: #0f4f82;
   --color-blue-600: #1769aa;
-  --color-blue-300: #88c6ef;
   --color-teal-700: #087e73;
-  --color-teal-300: #7dd8ca;
   --color-amber-800: #71360f;
   --color-amber-700: #803c0e;
   --color-amber-600: #934310;
@@ -43,7 +41,6 @@
   --alpha-white-90: rgb(255 255 255 / 90%);
   --alpha-white-13: rgb(255 255 255 / 13%);
   --alpha-white-12: rgb(255 255 255 / 12%);
-  --alpha-white-02: rgb(255 255 255 / 2%);
   --alpha-sky-38: rgb(220 235 248 / 38%);
   --alpha-focus: rgb(23 105 170 / 35%);
   --alpha-action-shadow: rgb(23 105 170 / 20%);
@@ -187,9 +184,7 @@
   --layout-xl: 360px;
   --layout-panel: 400px;
   --layout-2xl: 440px;
-  --layout-3xl: 520px;
   --layout-4xl: 560px;
-  --layout-5xl: 620px;
   --layout-6xl: 680px;
   --layout-7xl: 720px;
   --layout-8xl: 760px;
@@ -201,7 +196,6 @@
   --viewport-height: 100dvh;
   --canvas-wash-depth: 22rem;
   --viewport-sheet-height: 90dvh;
-  --viewport-auth-panel-height: 34dvh;
   --fluid-2: 2vw;
   --fluid-2-1: 2.1vw;
   --fluid-2-5: 2.5vw;
@@ -209,15 +203,10 @@
   --fluid-3-5: 3.5vw;
   --fluid-5: 5vw;
   --fluid-6: 6vw;
-  --fluid-6-5: 6.5vw;
   --fluid-7: 7vw;
   --fluid-9: 9vw;
   --fluid-10: 10vw;
   --fluid-12: 12vw;
-  --fluid-18: 18vw;
-  --fluid-45: 45vw;
-  --fluid-negative-15: -15vw;
-  --fluid-negative-20: -20vw;
 
   /* Compatibility aliases consumed by the existing planner surfaces. */
   --ink: var(--text-primary);
@@ -346,24 +335,35 @@ select {
   appearance: none;
   min-height: var(--control-sm);
   padding-inline-end: var(--space-5);
+  /* The glyph is a chevron, not a solid triangle. The two-gradient triangle
+     this replaced was drawn by us, but it is the shape the UA paints on a
+     desktop select, so a judge reading the screen could not tell it from a
+     browser default — the exact thing `appearance: none` was applied to escape.
+     A chevron in the secondary ink is what the platform draws beside a control
+     that opens a list. Two 1px-wide bars rotated into a caret, sized in tokens
+     so the reserved `padding-inline-end` above still covers it. */
   background-image:
     linear-gradient(
       45deg,
-      var(--color-transparent) 50%,
-      var(--text-primary) 50%
+      var(--color-transparent) 45%,
+      var(--text-secondary) 45%,
+      var(--text-secondary) 62%,
+      var(--color-transparent) 62%
     ),
     linear-gradient(
       135deg,
-      var(--text-primary) 50%,
-      var(--color-transparent) 50%
+      var(--color-transparent) 38%,
+      var(--text-secondary) 38%,
+      var(--text-secondary) 55%,
+      var(--color-transparent) 55%
     );
   background-repeat: no-repeat;
   background-position:
-    right var(--space-2) top 50%,
-    right var(--space-1) top 50%;
+    right var(--space-3) top 50%,
+    right var(--space-2) top 50%;
   background-size:
-    var(--space-1) var(--space-1),
-    var(--space-1) var(--space-1);
+    var(--space-2) var(--space-2),
+    var(--space-2) var(--space-2);
 }
 
 /* Same rule, same reason: a <summary> is the only way to reach what its

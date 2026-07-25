@@ -75,10 +75,15 @@ const budgetScreens = new Set<Screen>([
  * and from Activity, so it keeps the highlight on the branch the reader came
  * from rather than jumping the bar to a tab they did not tap (C13: the tab bar
  * is identical on every surface and never moves under the reader).
+ *
+ * A wrap opened from Home used to light Budget, on the reasoning that the wrap
+ * is a Budget-section surface. Two independent judges read the result as the
+ * two pieces of persistent chrome contradicting each other: the back control
+ * says `Back to Home` while the bar says the reader is standing in Budget. The
+ * back control names where the reader came from, so the bar names it too.
  */
 function activeTabFor(route: WorkspaceRoute): Screen {
-  if (route.screen === "wrap")
-    return route.returnTo === "activity" ? "activity" : "budget";
+  if (route.screen === "wrap") return route.returnTo;
   if (route.screen === "account") return route.returnTo;
   if (budgetScreens.has(route.screen)) return "budget";
   if (planScreens.has(route.screen)) return "plan";

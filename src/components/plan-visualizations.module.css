@@ -45,6 +45,10 @@
 .eyebrow {
   composes: eyebrow from "./surface-primitives.module.css";
 }
+.groupLabel {
+  composes: groupLabel from "./surface-primitives.module.css";
+}
+
 .guidance {
   margin-top: var(--space-6);
   padding-top: var(--space-5);

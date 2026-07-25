@@ -2223,3 +2223,82 @@ gate, and the run says so in its own output.
 - **Only 390x844 was measured under `menulist-real`.** The count at 360x740 and
   430x932 is unmeasured; the fix is viewport-independent, but the number 49 is
   specific to the primary viewport.
+
+---
+
+## L5 cycle 4 — the judge panel, and the cycle 5 wave it drove
+
+The panel's own record, including every rejected finding and the reason, is in
+[`l5-judge-cycle4/scores.md`](./l5-judge-cycle4/scores.md). Four independent
+fresh-context reviewers, one axis each, images only, no source access, judged
+against `7d1312b`.
+
+| Axis                     |    Score |   Bar | Verdict  |
+| ------------------------ | -------: | ----: | -------- |
+| Visual coherence         |  **7.2** | > 8.0 | FAIL     |
+| Typographic hierarchy    |  **7.6** | > 8.0 | FAIL     |
+| Density without crowding |  **7.4** | > 8.0 | FAIL     |
+| iOS nativeness           |  **5.5** | > 8.0 | FAIL     |
+| **Panel average**        | **6.93** | > 8.5 | **FAIL** |
+
+Cycle 4 of a hard cap of 8. The bar was not moved; the product was.
+
+### What the panel agreed on, and what it did not
+
+A finding raised by more than one judge who could not see the others' work is
+weighted above a single opinion. Nine findings had two or more judges; all nine
+are fixed. Six single-judge findings are rejected in `scores.md` with reasons —
+three of them because the reviewer was reading a **Chromium capture artifact**
+as a product defect (the home-indicator inset, which `.bottomNav` reserves with
+`max(var(--space-1), env(safe-area-inset-bottom))` and which emulation resolves
+to 0; and the `<input type="date">` segment spinner, which iOS Safari renders as
+a native wheel).
+
+### The one finding that was measured rather than judged
+
+Three judges said Plan's four-up stat block did not form a column. Measured in
+the live DOM, it is worse than that — the figures **overflow their own cells**:
+
+| Cell              |     Label height | Value right edge | Cell content ends | Verdict                 |
+| ----------------- | ---------------: | ---------------: | ----------------: | ----------------------- |
+| Starting balance  | **32** (2 lines) |            183.9 |               175 | overflows by **8.9px**  |
+| Spending variance | **32** (2 lines) |            193.5 |               175 | overflows by **18.5px** |
+| Planned total     | **32** (2 lines) |            375.6 |               366 | overflows by **9.6px**  |
+| Funding variance  | **32** (2 lines) |              366 |               366 | flush, 0px              |
+
+`justify-content: space-between` cannot right-align content that is already
+wider than its box, so every label wrapped to two lines _and_ three of the four
+figures still ran past the cell edge — four figures ending at four different x
+positions. Stacking the label over the figure gives the figure the cell's whole
+width; the labels stop wrapping, the cell drops from 48px to 44px, and the
+figures align on one edge per column.
+
+### The wave
+
+|   # | Judges | Surface(s)            | Change                                                                                             |
+| --: | -----: | --------------------- | -------------------------------------------------------------------------------------------------- |
+|   1 |  **3** | Activity empty search | The dashed 360px `min-height` container is gone. A symbol, a title and one line, sized to content. |
+|   2 |  **3** | Plan, Monthly wrap    | `mathBreakdown` cells stack label over figure at phone width (see the table above)                 |
+|   3 |  **3** | Fast Log              | One footer shape for both states: a two-column row, secondary leading, primary trailing            |
+|   4 |  **2** | six surfaces          | Blue eyebrow = the screen; grey `groupLabel` = a section inside it. Seven labels moved to grey     |
+|   5 |  **2** | Category detail       | `Allocated / Spent / Remaining` — one casing for three peer labels                                 |
+|   6 |  **2** | Account               | `Delete account and data` matches its peer heading; adjacent 44px targets go 8px -> 12px apart     |
+|   7 |  **2** | Monthly wrap          | A wrap opened from Home lights **Home**, not Budget — the bar now agrees with the back control     |
+|   8 |  **2** | Fast Log              | `Note` and `Optional` share one line instead of two label rows                                     |
+|   9 |      1 | Benefits              | The note above the amber callout gets the same clearance below it as above (7px -> 20px)           |
+|  10 |      1 | every `<select>`      | The disclosure glyph is a chevron, not the solid triangle a UA paints                              |
+|  11 |      1 | the tab bar           | The selection is an inset capsule, not a full-height slab with 12px corners                        |
+|  12 |      1 | 7 detail surfaces     | The back control sits **above** the title, so every title in the product shares one left edge      |
+
+Change 7 reverses an L5 decision, deliberately. L5 chose to light Budget for a
+wrap opened from Home, reasoning that the wrap is a Budget-section surface. Two
+judges independently read the result as the two pieces of persistent chrome
+contradicting each other — `Back to Home` under a lit Budget tab. The back
+control names where the reader came from, so the bar names it too.
+
+Change 12 is the same class of fix as change 4: a thing that should be constant
+was varying. The back control is as wide as its own label, so `Back to Home`,
+`Back to Budget` and `Back to Plan` pushed the `<h1>` to three different x
+positions, none of which matched the tab-root headlines sitting at the page
+gutter. Stacking costs ~44px on seven surfaces whose bars have 0.9-3.0 VH of
+headroom, and it is the platform's own arrangement.
