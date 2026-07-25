@@ -657,6 +657,94 @@ describe("offline mutation reconciliation", () => {
     },
   );
 
+  it("refuses a stale edit alone rather than condemning its plan year", async () => {
+    // Two devices: one leaves married-filing-jointly, the other has an older
+    // spouse-owner edit still queued. The stale edit cannot be applied — a
+    // single filer cannot own a spouse benefit — but refusing the whole year
+    // would leave it in the outbox forever, taking every later edit with it.
+    const user = await createUser(
+      sql,
+      "sync-stale-owner@example.com",
+      "sync stale owner password",
+    );
+    const created = await createPlanWithDefaults(sql, user.id, {
+      year: 2026,
+      stateCode: "TX",
+      filingStatus: "mfj",
+      grossSalaryCents: 10_000_000,
+      additionalWageIncomeCents: 0,
+      spouseWageIncomeCents: 4_000_000,
+      otherOrdinaryIncomeCents: 0,
+      hsaCoverage: "self",
+    });
+    const benefit = created.benefits[0];
+    const expense = created.expenses[0];
+
+    await applySyncMutations(sql, user.id, [
+      {
+        mutationId: "00000000-0000-4000-8000-0000000015a0",
+        planYear: 2026,
+        field: "filingStatus",
+        value: "single",
+        updatedAt: "2026-07-24T12:00:00.000Z",
+      },
+      {
+        mutationId: "00000000-0000-4000-8000-0000000015a1",
+        planYear: 2026,
+        field: "spouseWageIncomeCents",
+        value: 0,
+        updatedAt: "2026-07-24T12:00:00.000Z",
+      },
+    ]);
+
+    const staleId = "00000000-0000-4000-8000-0000000015a2";
+    const staleResponse = await applySyncMutations(sql, user.id, [
+      {
+        mutationId: staleId,
+        planYear: 2026,
+        field: `benefit:${benefit.id}:owner`,
+        value: "spouse",
+        updatedAt: "2026-07-24T13:00:00.000Z",
+      },
+    ]);
+    expect(staleResponse.acknowledgements).toEqual([
+      { mutationId: staleId, applied: false },
+    ]);
+    expect(
+      (
+        await sql`
+        SELECT mutation_id FROM applied_mutations
+        WHERE user_id = ${user.id} AND mutation_id = ${staleId}
+      `
+      ).length,
+    ).toBe(1);
+
+    // The plan year must still accept ordinary work afterwards.
+    const laterId = "00000000-0000-4000-8000-0000000015a3";
+    expect(
+      (
+        await applySyncMutations(sql, user.id, [
+          {
+            mutationId: laterId,
+            planYear: 2026,
+            field: `expense:${expense.id}:name`,
+            value: "Still editable",
+            updatedAt: "2026-07-24T14:00:00.000Z",
+          },
+        ])
+      ).acknowledgements,
+    ).toEqual([{ mutationId: laterId, applied: true }]);
+
+    const plan = await getPlanByYear(sql, user.id, 2026);
+    expect(plan?.filingStatus).toBe("single");
+    expect(plan?.benefits.find(({ id }) => id === benefit.id)?.owner).toBe(
+      "primary",
+    );
+    expect(plan?.expenses.find(({ id }) => id === expense.id)?.name).toBe(
+      "Still editable",
+    );
+  });
+
   it("merges disjoint expense edits instead of replacing the collection", async () => {
     const user = await createUser(
       sql,

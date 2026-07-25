@@ -141,6 +141,16 @@ async function reconcilePlanYear(
   planYear: number,
   yearMutations: DecodedSyncMutation[],
   receivedAt: Date,
+  /**
+   * Second attempt. The batch is judged as a whole first, because one save
+   * legitimately passes through invalid intermediate states — leaving
+   * married-filing-jointly changes the filing status, the spouse's wages and a
+   * benefit's owner together, in no guaranteed order. Only once that has failed
+   * is each entity mutation judged on its own, so the batch can name the edits
+   * it cannot accept instead of refusing the whole year and leaving the client
+   * nothing to drop.
+   */
+  attributeIndividually = false,
 ): Promise<PlanYearSyncResult> {
   try {
     const acknowledgements = await sql.begin(async (transaction) => {
@@ -281,7 +291,19 @@ async function reconcilePlanYear(
           // with no ordering guarantee, so whichever arrives second sees a plan
           // that is briefly self-contradictory. Checking there rejected valid
           // edits depending on delivery order.
-          if (mutation.kind !== "scalar") {
+          // Only entity edits are attributed individually. A scalar that is
+          // inadmissible alone is almost always half of a coupled pair the
+          // client emits together, so refusing it on its own would discard one
+          // side of a legitimate change; those stay a whole-year rejection.
+          if (
+            attributeIndividually &&
+            mutation.kind !== "scalar" &&
+            !isAdmissibleProjection(
+              applyDecodedSyncMutation(projectedPlan, mutation),
+            )
+          ) {
+            applied = false;
+          } else if (mutation.kind !== "scalar") {
             try {
               // A savepoint bounds the blast radius of a constraint the client
               // payload violates: the failing statement rolls back alone and
@@ -355,6 +377,20 @@ async function reconcilePlanYear(
       !isForeignKeyConstraintViolation(error)
     )
       throw error;
+    if (!attributeIndividually) {
+      // The batch as a whole is inadmissible. Retry attributing the failure to
+      // the individual edits responsible, so the rest commit and every mutation
+      // earns a receipt. A year rejected without receipts can never leave the
+      // client's outbox, and takes every later edit to that year down with it.
+      return reconcilePlanYear(
+        sql,
+        userId,
+        planYear,
+        yearMutations,
+        receivedAt,
+        true,
+      );
+    }
     return {
       kind: "rejected",
       acknowledgements: yearMutations.map(({ mutationId }) => ({
