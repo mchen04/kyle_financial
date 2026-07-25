@@ -2389,3 +2389,95 @@ rebuild of an interaction or an asset system, and the mission's non-goals name
 
 **The bar is not lowered. It is reported unmet: 7.23 against 8.5, all four axes
 under 8.0.**
+
+---
+
+## Final ledger — what is met, and what is not
+
+Two consecutive clean rounds on `947b3a1`, both **126 measurements across
+chromium + webkit, 0 violating rows, exit 0**, and **identical to three decimals
+on all 126 rows**. Evidence: [`final-round1.json`](./final-round1.json) /
+[`final-round2.json`](./final-round2.json).
+
+| Signal                        | Result                  |
+| ----------------------------- | ----------------------- |
+| absolute VH bar misses        | **0 of 63**             |
+| max CLS                       | **0.0039** (bar 0.02)   |
+| headline label/value swaps    | **0**                   |
+| targets < 44px, both engines  | **0**                   |
+| smallest computed font-size   | **11.00px** (floor 11)  |
+| boxes clipping their own text | **0**                   |
+| horizontal overflow           | **0**                   |
+| console errors                | **0**                   |
+| native layout-shift API live  | **63/63** Chromium rows |
+
+### Not met: four percentage-cut requirements
+
+Every one of these still meets its **absolute** VH bar, with margin.
+
+| Surface      | Viewport | Baseline | After | Bar | Required cut |    Actual |
+| ------------ | -------- | -------: | ----: | --: | -----------: | --------: |
+| Activity     | 390x844  |    7.873 | 4.682 | 3.0 |        ≥ 60% | **40.5%** |
+| Activity     | 360x740  |    8.782 | 5.341 | 3.0 |        ≥ 60% | **39.2%** |
+| Activity     | 430x932  |    7.050 | 4.240 | 3.0 |        ≥ 60% | **39.9%** |
+| Benefits     | 360x740  |    5.746 | 3.051 | 4.0 |        ≥ 60% | **46.9%** |
+| Monthly wrap | 360x740  |    3.230 | 2.474 | 3.0 |        ≥ 35% | **23.4%** |
+| Plan details | 360x740  |    3.392 | 3.186 | 4.0 |        ≥ 35% |  **6.1%** |
+
+**Activity is an artifact of measuring an exempt region.** Its vertical cost is
+61 transaction rows, which the mission exempts by name; the sub-bar that
+actually gates it — chrome above the first row — passes at **0.279 / 0.309 /
+0.352 VH against 0.60** at the three viewports. The percentage rule is computed
+on a figure the mission has already declared informational for this surface.
+
+**The other three are genuine misses at the narrow viewport only**, and the
+reason they are being reported rather than closed is recorded here rather than
+left implicit. Measured at 360x740, what remains is:
+
+| Surface      | Content | Target for the cut | Must remove |
+| ------------ | ------: | -----------------: | ----------: |
+| Monthly wrap |  1831px |             1554px |   **277px** |
+| Benefits     |  2258px |             1700px |   **558px** |
+| Plan details |  2358px |             1632px |   **726px** |
+
+The recoverable non-information was measured, block by block, and it is not
+enough. Monthly wrap's largest reserves are its hero's 48px of vertical padding
+and three panels at 24px each; Benefits' rows are already 44px with 16px gaps;
+Plan details' fifteen ledger rows are the 73px rung **L8 derived on purpose**,
+and 24px of their height is the padding around a 48px control that rule 4
+protects. Tightening every one of them yields roughly a tenth of what these
+targets need.
+
+Closing the remaining 20-30% would therefore require one of two things:
+
+1. **Undoing L8's derived row rung** — a height that was measured, argued and
+   judged, not guessed; or
+2. **Collapsing information** these waves deliberately made visible — the
+   savings-impact explanation, the tax ledger, the benefit editors.
+
+Rule 2 permits a labelled, exception-escaping collapse, so option 2 is legal.
+It is refused anyway: it would trade a reader's access to the numbers for a
+percentage at one of three viewports, on surfaces whose **absolute** bars pass
+with 0.8-0.9 VH of headroom. The north star asks every pixel to carry
+information or enable an action. These do.
+
+**No bar in the mission file was lowered, and none of these is reported as
+met.** They stand as the true remaining ledger.
+
+### Not met: the judge panel
+
+**7.23 average against 8.5, all four axes below 8.0**, stopped at cycle 6 of a
+cap of 8. Per-cycle scores and every accepted and rejected finding are in
+[`l5-judge-cycle4/scores.md`](./l5-judge-cycle4/scores.md) and
+[`l5-judge-cycle5/scores.md`](./l5-judge-cycle5/scores.md).
+
+### Residual risk
+
+- **The real-iPhone-Safari pass has not been run** and is an owner-device check.
+  Playwright WebKit reproduced the styled-menulist divergence exactly, which is
+  the strongest available local substitute, but it is not the shipping browser
+  on the shipping hardware.
+- **Safe-area insets are verified in CSS, not in capture.** Headless Chromium
+  resolves `env(safe-area-inset-*)` to 0, so no screenshot in this repository can
+  show the notch or home-indicator reservation working. Two judge findings were
+  rejected on exactly this basis.
