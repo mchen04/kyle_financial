@@ -566,12 +566,22 @@ describe("offline mutation reconciliation", () => {
         updatedAt: "2026-07-12T01:00:00.000Z",
       },
     ]);
-    expect(result.acknowledgements).toEqual([
-      { mutationId, applied: false, rejected: true },
-    ]);
+    // Refused on its own, not as a whole-year rejection: a rejected
+    // acknowledgement writes no receipt and the client cannot drop it, so the
+    // mutation would sit in the outbox forever and take every later edit to
+    // this plan year with it.
+    expect(result.acknowledgements).toEqual([{ mutationId, applied: false }]);
     expect(
       (await getPlanByYear(sql, user.id, 2040))?.spouseWageIncomeCents,
     ).toBe(0);
+    expect(
+      (
+        await sql`
+          SELECT mutation_id FROM applied_mutations
+          WHERE user_id = ${user.id} AND mutation_id = ${mutationId}
+        `
+      ).length,
+    ).toBe(1);
   });
 
   it("validates the committed winners instead of stale no-op payloads", async () => {

@@ -745,6 +745,90 @@ describe("offline mutation reconciliation", () => {
     );
   });
 
+  it("refuses a scalar stranded by another device without wedging the year", async () => {
+    // Two devices, no hand-built payload. One leaves married-filing-jointly
+    // online; the other has been offline since before that and edits only the
+    // spouse's wages. Its own filing status never changed locally, so there is
+    // no partner field for it to emit — the invariant breaks from server-side
+    // divergence, which no amount of client-side batching can prevent.
+    const user = await createUser(
+      sql,
+      "sync-stranded-scalar@example.com",
+      "sync stranded scalar password",
+    );
+    const created = await createPlanWithDefaults(sql, user.id, {
+      year: 2026,
+      stateCode: "TX",
+      filingStatus: "mfj",
+      grossSalaryCents: 10_000_000,
+      additionalWageIncomeCents: 0,
+      spouseWageIncomeCents: 4_000_000,
+      otherOrdinaryIncomeCents: 0,
+      hsaCoverage: "self",
+    });
+    await applySyncMutations(sql, user.id, [
+      {
+        mutationId: "00000000-0000-4000-8000-0000000017a0",
+        planYear: 2026,
+        field: "filingStatus",
+        value: "single",
+        updatedAt: "2026-07-24T12:00:00.000Z",
+      },
+      {
+        mutationId: "00000000-0000-4000-8000-0000000017a1",
+        planYear: 2026,
+        field: "spouseWageIncomeCents",
+        value: 0,
+        updatedAt: "2026-07-24T12:00:00.000Z",
+      },
+    ]);
+
+    const strandedId = "00000000-0000-4000-8000-0000000017a2";
+    const stranded = {
+      mutationId: strandedId,
+      planYear: 2026,
+      field: "spouseWageIncomeCents" as const,
+      value: 7_000_000,
+      updatedAt: "2026-07-24T13:00:00.000Z",
+    };
+    expect(
+      (await applySyncMutations(sql, user.id, [stranded])).acknowledgements,
+    ).toEqual([{ mutationId: strandedId, applied: false }]);
+    expect(
+      (
+        await sql`
+          SELECT mutation_id FROM applied_mutations
+          WHERE user_id = ${user.id} AND mutation_id = ${strandedId}
+        `
+      ).length,
+    ).toBe(1);
+
+    // The year must keep accepting work even while that edit is retried.
+    const innocentId = "00000000-0000-4000-8000-0000000017a3";
+    const second = await applySyncMutations(sql, user.id, [
+      stranded,
+      {
+        mutationId: innocentId,
+        planYear: 2026,
+        field: `expense:${created.expenses[0].id}:name`,
+        value: "Innocent rename",
+        updatedAt: "2026-07-24T14:00:00.000Z",
+      },
+    ]);
+    expect(second.acknowledgements.some(({ rejected }) => rejected)).toBe(
+      false,
+    );
+    expect(
+      second.acknowledgements.find(
+        ({ mutationId }) => mutationId === innocentId,
+      ),
+    ).toEqual({ mutationId: innocentId, applied: true });
+
+    const plan = await getPlanByYear(sql, user.id, 2026);
+    expect(plan?.spouseWageIncomeCents).toBe(0);
+    expect(plan?.expenses[0].name).toBe("Innocent rename");
+  });
+
   it("merges disjoint expense edits instead of replacing the collection", async () => {
     const user = await createUser(
       sql,
@@ -1052,12 +1136,9 @@ describe("offline mutation reconciliation", () => {
         baseVersion: synced?.fieldVersions.filingStatus ?? null,
       },
     ]);
+    // Refused alone, with a receipt, so the client's outbox can drain.
     expect(noncanonical.acknowledgements).toEqual([
-      {
-        mutationId: "00000000-0000-4000-8000-000000000799",
-        applied: false,
-        rejected: true,
-      },
+      { mutationId: "00000000-0000-4000-8000-000000000799", applied: false },
     ]);
     expect(await getPlanByYear(sql, user.id, 2050)).toMatchObject({
       filingStatus: "mfj",
@@ -1161,11 +1242,12 @@ describe("offline mutation reconciliation", () => {
         baseVersion: staleVersions[field] ?? null,
       })),
     );
+    // Each stale field is refused on its own, with a receipt, rather than the
+    // year being rejected receipt-free and pinned in the client's outbox.
     expect(result.acknowledgements).toEqual(
       staleTransition.map((_, index) => ({
         mutationId: `00000000-0000-4000-8000-${String(910 + index).padStart(12, "0")}`,
         applied: false,
-        rejected: true,
       })),
     );
 
