@@ -21,15 +21,19 @@ beforeEach(async () => {
   await sql`DELETE FROM auth_rate_limits`;
 });
 
+// One trusted proxy in front of the app, so the address it observed is the
+// rightmost `x-forwarded-for` entry — the first one the caller cannot choose.
 function request(ip: string): Request {
   return new Request("https://example.test/api/auth/login", {
-    headers: { "x-real-ip": ip },
+    headers: { "x-forwarded-for": ip },
   });
 }
 
-function forwardedRequest(ip: string): Request {
+// A caller prepending their own entries, as an attacker rotating a spoofed
+// address would. Only the proxy-observed tail may decide the bucket.
+function spoofedRequest(claimed: string, observed: string): Request {
   return new Request("https://example.test/api/auth/login", {
-    headers: { "x-forwarded-for": `${ip}, 198.51.100.20` },
+    headers: { "x-forwarded-for": `${claimed}, ${observed}` },
   });
 }
 
@@ -79,12 +83,12 @@ describe("distributed authentication throttling", () => {
     expect(blockedIdentity[0].count).toBe(10);
   });
 
-  it("uses the forwarded client IP when the proxy omits x-real-ip", async () => {
+  it("keys the bucket on the proxy-observed address, not a claimed one", async () => {
     const now = new Date("2026-07-13T18:10:00.000Z");
     for (let attempt = 1; attempt <= 10; attempt += 1) {
       await expect(
         consumeAttempt(
-          forwardedRequest("203.0.113.20"),
+          spoofedRequest(`203.0.113.${attempt}`, "198.51.100.20"),
           "signup",
           `forwarded-${attempt}@example.com`,
           now,
@@ -94,20 +98,21 @@ describe("distributed authentication throttling", () => {
 
     await expect(
       consumeAttempt(
-        forwardedRequest("203.0.113.20"),
+        spoofedRequest("203.0.113.20", "198.51.100.20"),
         "signup",
         "blocked-forwarded@example.com",
         now,
       ),
     ).resolves.toMatchObject({ allowed: false });
+    // Rotating the claimed address must not mint a fresh bucket.
     await expect(
       consumeAttempt(
-        forwardedRequest("203.0.113.21"),
+        spoofedRequest("203.0.113.21", "198.51.100.20"),
         "signup",
         "different-client@example.com",
         now,
       ),
-    ).resolves.toMatchObject({ allowed: true });
+    ).resolves.toMatchObject({ allowed: false });
   });
 
   it("atomically limits one login identity across concurrent function calls", async () => {

@@ -7,6 +7,7 @@ import {
 } from "@/server/auth/rate-limit";
 import { database } from "@/server/database";
 import {
+  crossSiteWriteResponse,
   errorResponse,
   parseJsonRequest,
   validatedJsonResponse,
@@ -14,6 +15,8 @@ import {
 import { signupCredentialsSchema } from "@/server/request-contracts";
 
 export async function POST(request: Request): Promise<Response> {
+  const crossSite = crossSiteWriteResponse(request);
+  if (crossSite) return crossSite;
   try {
     const ipRateLimit = await consumeAuthenticationIpAttempt(
       database(),

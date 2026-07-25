@@ -112,6 +112,27 @@ async function consumeBucket(
   };
 }
 
+/**
+ * The address the outermost trusted proxy actually observed.
+ *
+ * `x-forwarded-for` and `x-real-ip` are both writable by the caller, so reading
+ * either from the left lets anyone mint a fresh bucket per request and walk
+ * straight through the limit. Each proxy appends the peer it saw, so counting
+ * back from the right by the number of proxies in front of this app yields the
+ * first value the caller could not choose. With no proxy configured, nothing
+ * about the request is trustworthy and every caller shares one bucket, which
+ * fails closed rather than open.
+ */
+export function clientAddress(request: Request): string {
+  const hops = Number.parseInt(process.env.TRUSTED_PROXY_HOPS ?? "1", 10);
+  if (!Number.isInteger(hops) || hops < 1) return "untrusted";
+  const forwarded = (request.headers.get("x-forwarded-for") ?? "")
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  return forwarded.at(-hops) ?? "unknown";
+}
+
 export async function consumeAuthenticationIpAttempt(
   sql: Sql,
   request: Request,
@@ -120,13 +141,13 @@ export async function consumeAuthenticationIpAttempt(
 ): Promise<AuthenticationRateLimit> {
   await cleanupExpiredBuckets(sql, now);
   const policy = AUTHENTICATION_POLICIES[action];
-  const forwardedIp = request.headers
-    .get("x-forwarded-for")
-    ?.split(",", 1)[0]
-    ?.trim();
-  const ip =
-    request.headers.get("x-real-ip")?.trim() || forwardedIp || "unknown";
-  return consumeBucket(sql, `${action}:ip`, ip, policy.ip, now);
+  return consumeBucket(
+    sql,
+    `${action}:ip`,
+    clientAddress(request),
+    policy.ip,
+    now,
+  );
 }
 
 export function consumeAuthenticationIdentityAttempt(
