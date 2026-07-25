@@ -13,6 +13,11 @@
 //   5. horizontal overflow (clientWidth !== scrollWidth)
 //   6. count of console errors
 //
+// and, on a surface that declares the mission's long-list exemption, two more:
+//
+//   7. chrome above the first list row, in viewport heights (this gates)
+//   8. the height of every list row, tallied (this is reported for review)
+//
 // Nothing here estimates. Every number in the output was read out of a live
 // page. Run `--mode capture` to record without gating, `--mode gate` (default)
 // to exit non-zero when a frozen bar is violated.
@@ -71,6 +76,21 @@ loadLocalEnvironment();
 // ---------------------------------------------------------------------------
 const BAR_CLS = 0.02;
 const MINIMUM_TARGET_PX = 44;
+// The mission's long-list exemption: "Lists that are legitimately long
+// (transaction history, all-category rows) are exempt from the absolute cap for
+// their row region only — but the chrome above the first row must cost <= 0.6 VH,
+// and the per-row height must be justified against the research file."
+//
+// This is a NARROWER gate, not a looser one. A surface may only claim it by
+// naming, in the frozen catalogue below, the selector of its own first list row
+// (`listExemption`). The absolute VH bar is then reported but does not gate;
+// what gates instead is the measured distance from the scroll region's content
+// top to the top of that first row, plus the requirement that the rows actually
+// exist. Per-row heights are measured and reported so the "justified against the
+// research file" clause is checkable by a reader rather than asserted by an
+// author. There is no command-line switch for any of this, and no surface
+// without an explicit `listExemption` entry is affected in any way.
+const BAR_CHROME_ABOVE_LIST = 0.6;
 const VERTICAL_BARS = {
   home: 1.0,
   standard: 3.0, // Budget, Activity, Monthly Wrap, Plan, Account
@@ -218,6 +238,15 @@ const SURFACES = [
     prefix: [clickExact("Home")],
     nav: [clickExact("Activity")],
     expect: `document.querySelector('main h1')?.textContent === "Activity"`,
+    // Transaction history — named verbatim by the mission as a legitimately
+    // long list. 61 in-period rows at the 44px touch floor is already 3.180 VH
+    // at 390x844 with zero chrome, so the 3.0 absolute cap is arithmetically
+    // unreachable without breaking rule 4. The exemption applies to the row
+    // region only; the chrome above the first row is gated at 0.6 VH instead.
+    listExemption: {
+      reason: "transaction history (named by the mission)",
+      rowSelector: 'main [data-density-row="transaction"]',
+    },
   },
   {
     id: "activity-empty-search",
@@ -379,6 +408,23 @@ const FAIL_DEMOS = {
     document.querySelector('main').prepend(button);
     return 'touch: 20x20 button prepended to main';
   })()`,
+  // Drives the chrome above the first list row past 0.6 VH without touching the
+  // rows themselves — the exact thing the long-list exemption still gates.
+  chrome: `(() => {
+    const host = document.querySelector('main');
+    const block = document.createElement('div');
+    block.style.height = '400px';
+    host.prepend(block);
+    return 'chrome: 400px block prepended above the list on the scrolling region';
+  })()`,
+  // Proves the exemption cannot go quietly vacuous: if the declared row
+  // selector ever stops matching, the surface loses its only binding gate, so
+  // that state has to fail rather than pass.
+  listrows: `(() => {
+    const rows = [...document.querySelectorAll('[data-density-row]')];
+    for (const row of rows) row.removeAttribute('data-density-row');
+    return 'listrows: data-density-row stripped from ' + rows.length + ' row(s)';
+  })()`,
   overflow: `(() => {
     document.body.style.width = '3000px';
     return 'overflow: document body widened to 3000px';
@@ -389,27 +435,38 @@ const FAIL_DEMOS = {
 // ---------------------------------------------------------------------------
 // Metric readout. Runs once per surface/state/viewport, after settle.
 // ---------------------------------------------------------------------------
-const MEASURE = `(() => {
+const measureExpression = (rowSelector) => `(() => {
+  const rowSelector = ${js(rowSelector ?? null)};
   const probe = window.__density;
   if (!probe) throw new Error('density probe was not installed');
   const since = probe.markTime;
   const shifts = probe.shifts.filter((entry) => entry.startTime >= since);
+  const geometricShifts = probe.geometricShifts.filter((entry) => entry.startTime >= since);
 
   // Session-window CLS, per web.dev: group shifts into windows that end after
   // 5s of window duration or a 1s gap, and report the largest window's sum.
-  let maximum = 0;
-  let current = 0;
-  let windowStart = 0;
-  let previous = 0;
-  for (const shift of shifts) {
-    if (current > 0 && (shift.startTime - windowStart > 5000 || shift.startTime - previous > 1000)) {
-      current = 0;
+  const sessionWindow = (entries) => {
+    let maximum = 0;
+    let current = 0;
+    let windowStart = 0;
+    let previous = 0;
+    for (const shift of entries) {
+      if (current > 0 && (shift.startTime - windowStart > 5000 || shift.startTime - previous > 1000)) {
+        current = 0;
+      }
+      if (current === 0) windowStart = shift.startTime;
+      current += shift.value;
+      previous = shift.startTime;
+      if (current > maximum) maximum = current;
     }
-    if (current === 0) windowStart = shift.startTime;
-    current += shift.value;
-    previous = shift.startTime;
-    if (current > maximum) maximum = current;
-  }
+    return maximum;
+  };
+  const nativeCls = sessionWindow(shifts);
+  const geometricCls = sessionWindow(geometricShifts);
+  // The reported figure is the worse of the two. A browser that produces no
+  // frames silently reports 0 from the native API; a browser that does produce
+  // them reports both, and neither can hide a shift the other saw.
+  const maximum = Math.max(nativeCls, geometricCls);
 
   const style = (node) => getComputedStyle(node);
   const isVisible = (node) => {
@@ -458,9 +515,45 @@ const MEASURE = `(() => {
     ? measured.scrollHeight
     : Math.max(root.scrollHeight, measured.scrollHeight);
 
+  // ---- long-list exemption measurement -------------------------------------
+  // Only runs when the surface declared a row selector. "Chrome above the first
+  // row" is the distance, in the scroll region's own content coordinates, from
+  // the top of its content box to the top of the first list row: everything the
+  // surface spends before the list begins. Row heights come straight from
+  // getBoundingClientRect so a row that wraps on a narrow viewport is visible in
+  // the output rather than averaged away.
+  let listRegion = null;
+  if (rowSelector) {
+    const listRows = [...document.querySelectorAll(rowSelector)].filter(isVisible);
+    if (listRows.length === 0) {
+      listRegion = { rowSelector, rowCount: 0, error: 'no visible rows matched the declared selector' };
+    } else {
+      const regionRect = measured.getBoundingClientRect();
+      const contentTop = regionRect.top + measured.clientTop - measured.scrollTop;
+      const chrome = listRows[0].getBoundingClientRect().top - contentTop;
+      const heights = listRows.map((node) =>
+        Math.round(node.getBoundingClientRect().height * 100) / 100,
+      );
+      const tally = new Map();
+      for (const height of heights) tally.set(height, (tally.get(height) ?? 0) + 1);
+      listRegion = {
+        rowSelector,
+        rowCount: listRows.length,
+        chromeAboveFirstRowPx: Math.round(chrome * 100) / 100,
+        chromeAboveFirstRowCost: chrome / window.innerHeight,
+        rowHeights: [...tally.entries()]
+          .sort((a, b) => a[0] - b[0])
+          .map(([height, count]) => ({ height, count })),
+        rowRegionPx: Math.round(heights.reduce((sum, value) => sum + value, 0) * 100) / 100,
+        error: null,
+      };
+    }
+  }
+
   const errors = probe.consoleErrors.filter((entry) => entry.at >= since);
   const headlines = probe.headlines.filter((entry) => entry.at >= since);
   return JSON.stringify({
+    listRegion,
     scrollHeight: contentHeight,
     documentScrollHeight: root.scrollHeight,
     measuredRegion: measured === root
@@ -472,7 +565,22 @@ const MEASURE = `(() => {
     documentScrollCost: root.scrollHeight / window.innerHeight,
     verticalCost: contentHeight / window.innerHeight,
     cls: maximum,
+    clsNative: nativeCls,
+    clsGeometric: geometricCls,
+    clsSource: geometricCls > nativeCls ? 'geometric' : (nativeCls > 0 ? 'layout-shift API' : 'both zero'),
     shiftCount: shifts.length,
+    geometricShiftCount: geometricShifts.length,
+    geometricScrollSkips: probe.geometricScrollSkips,
+    geometricSamples: probe.geometricSamples,
+    // Frames produced since the document loaded. Zero means the native
+    // Layout Instability API emitted nothing because it could not, so its 0.0000
+    // is an absence of measurement rather than an absence of movement, and the
+    // geometric figure beside it is the only real reading.
+    frameTicks: probe.frameTicks,
+    // A settle window is over a second long, so a compositor that is actually
+    // running produces dozens of frames. One or two (the frame the document
+    // load forces) is not liveness, so the threshold is deliberately above it.
+    nativeLayoutShiftLive: probe.frameTicks > 5,
     // The first headline the surface itself painted. Samples taken while the
     // branded loading placeholder was mounted are not this surface's headline,
     // so they are excluded — otherwise every cold load reads as a swap and the
@@ -678,7 +786,9 @@ async function measureSurface(browser, surface, viewport, failDemo) {
   }
   await settle(browser);
 
-  const metrics = await browser.evaluateJson(MEASURE);
+  const metrics = await browser.evaluateJson(
+    measureExpression(surface.listExemption?.rowSelector ?? null),
+  );
   for (const step of surface.after ?? []) {
     await browser.evaluate(step).catch(() => undefined);
   }
@@ -690,6 +800,7 @@ async function measureSurface(browser, surface, viewport, failDemo) {
     viewport: `${viewport.width}x${viewport.height}`,
     primaryViewport: viewport.primary,
     bar: surface.bar,
+    listExemption: surface.listExemption ?? null,
     markTime,
     arrivalError,
     injection,
@@ -702,7 +813,24 @@ function violations(row, mode) {
   const failures = [];
   if (row.arrivalError)
     failures.push(`did not reach surface: ${row.arrivalError}`);
-  if (row.verticalCost > row.bar) {
+  if (row.listExemption) {
+    // The row region is exempt from the absolute cap; the chrome above it is
+    // not, and neither is the requirement that the exemption be earned. A
+    // selector that matches nothing would silently turn the surface's only
+    // binding gate off, so it fails loudly instead.
+    const region = row.listRegion;
+    if (!region || region.rowCount === 0) {
+      failures.push(
+        `long-list exemption claimed but not earned: ${region?.error ?? "no list region measured"} (${row.listExemption.rowSelector})`,
+      );
+    } else if (region.chromeAboveFirstRowCost > BAR_CHROME_ABOVE_LIST) {
+      failures.push(
+        `chrome above the first list row ${region.chromeAboveFirstRowPx}px = ` +
+          `${region.chromeAboveFirstRowCost.toFixed(3)} VH exceeds ${BAR_CHROME_ABOVE_LIST.toFixed(2)} VH ` +
+          `(row region ${region.rowRegionPx}px over ${region.rowCount} rows is exempt: ${row.listExemption.reason})`,
+      );
+    }
+  } else if (row.verticalCost > row.bar) {
     failures.push(
       `vertical cost ${row.verticalCost.toFixed(3)} VH exceeds ${row.bar.toFixed(1)} VH`,
     );
@@ -735,17 +863,39 @@ function violations(row, mode) {
 function markdownTable(rows) {
   const cell = (value) => String(value).replace(/\|/g, "\\|");
   const lines = [
-    "| Surface | State | Viewport | VH | CLS | Headline first paint | Headline settled | Swap | <44px | Overflow | Console errors | Bar | Over bar by |",
-    "| --- | --- | --- | ---: | ---: | --- | --- | --- | ---: | --- | ---: | ---: | ---: |",
+    "| Surface | State | Viewport | VH | CLS | CLS native | CLS geometric | Frames | Headline first paint | Headline settled | Swap | <44px | Overflow | Console errors | Bar | Over bar by | Chrome above list | Row heights |",
+    "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | ---: | --- | ---: | ---: | ---: | ---: | --- |",
   ];
   for (const row of rows) {
     const [surface, ...rest] = row.label.split(" · ");
     const state = rest.join(" · ") || "default";
     const swap =
       row.headlineFirstPaint !== row.headlineSettled ? "**YES**" : "no";
+    const region = row.listExemption ? row.listRegion : null;
+    // An exempt surface reports its absolute VH for information only; what
+    // gates it is the chrome column beside it.
+    const bar = row.listExemption
+      ? `${row.bar.toFixed(1)} info`
+      : row.bar.toFixed(1);
     const over = row.verticalCost - row.bar;
+    const overCell = row.listExemption
+      ? "exempt (rows)"
+      : over > 0
+        ? `**+${over.toFixed(3)}**`
+        : "—";
+    const chromeCell = !region
+      ? "—"
+      : region.rowCount === 0
+        ? "**no rows**"
+        : `${region.chromeAboveFirstRowPx}px = ${region.chromeAboveFirstRowCost > BAR_CHROME_ABOVE_LIST ? `**${region.chromeAboveFirstRowCost.toFixed(3)}**` : region.chromeAboveFirstRowCost.toFixed(3)} / ${BAR_CHROME_ABOVE_LIST.toFixed(2)}`;
+    const rowsCell =
+      region && region.rowCount > 0
+        ? region.rowHeights
+            .map((entry) => `${entry.count}x${entry.height}px`)
+            .join(", ")
+        : "—";
     lines.push(
-      `| ${cell(surface)} | ${cell(state)} | ${row.viewport} | ${row.verticalCost.toFixed(3)} | ${row.cls.toFixed(4)} | ${cell(row.headlineFirstPaint ?? "—")} | ${cell(row.headlineSettled ?? "—")} | ${swap} | ${row.smallTargets} | ${row.horizontalOverflow ? "**yes**" : "no"} | ${row.consoleErrors} | ${row.bar.toFixed(1)} | ${over > 0 ? `**+${over.toFixed(3)}**` : "—"} |`,
+      `| ${cell(surface)} | ${cell(state)} | ${row.viewport} | ${row.verticalCost.toFixed(3)} | ${row.cls.toFixed(4)} | ${row.clsNative.toFixed(4)}${row.nativeLayoutShiftLive ? "" : " dead"} | ${row.clsGeometric.toFixed(4)} | ${row.frameTicks} | ${cell(row.headlineFirstPaint ?? "—")} | ${cell(row.headlineSettled ?? "—")} | ${swap} | ${row.smallTargets} | ${row.horizontalOverflow ? "**yes**" : "no"} | ${row.consoleErrors} | ${bar} | ${overCell} | ${cell(chromeCell)} | ${cell(rowsCell)} |`,
     );
   }
   return lines.join("\n");
@@ -935,8 +1085,13 @@ async function main() {
         const status = row.failures.length === 0 ? "ok" : "FAIL";
         console.log(
           `${status.padEnd(4)} ${row.viewport.padEnd(8)} ${row.label.padEnd(32)} ` +
-            `${row.verticalCost.toFixed(3)} VH  CLS ${row.cls.toFixed(4)}  ` +
-            `<44px ${row.smallTargets}  overflow ${row.horizontalOverflow}  errors ${row.consoleErrors}`,
+            `${row.verticalCost.toFixed(3)} VH  CLS ${row.cls.toFixed(4)} (${row.clsSource})  ` +
+            `<44px ${row.smallTargets}  overflow ${row.horizontalOverflow}  errors ${row.consoleErrors}` +
+            (row.listRegion && row.listRegion.rowCount > 0
+              ? `\n       list exemption: chrome ${row.listRegion.chromeAboveFirstRowPx}px = ` +
+                `${row.listRegion.chromeAboveFirstRowCost.toFixed(3)} VH (bar ${BAR_CHROME_ABOVE_LIST}); ` +
+                `${row.listRegion.rowCount} rows ${row.listRegion.rowHeights.map((entry) => `${entry.count}x${entry.height}px`).join(", ")}`
+              : ""),
         );
         for (const failure of row.failures) console.log(`       - ${failure}`);
       }
@@ -955,6 +1110,7 @@ async function main() {
       vertical: VERTICAL_BARS,
       cls: BAR_CLS,
       minimumTargetPx: MINIMUM_TARGET_PX,
+      chromeAboveExemptList: BAR_CHROME_ABOVE_LIST,
     },
     rows,
   };
@@ -968,6 +1124,19 @@ async function main() {
     const markdownPath = resolve(repositoryRoot, options.markdown);
     await mkdir(dirname(markdownPath), { recursive: true });
     await writeFile(markdownPath, `${table}\n`);
+  }
+
+  // State the instrument's condition next to its output. A run where the
+  // browser produced no frames still measures CLS — from geometry — but the
+  // native Layout Instability API contributed nothing to it, and a reader who
+  // is not told that would read 60 zeroes as 60 passes.
+  const dead = rows.filter((row) => row.nativeLayoutShiftLive === false).length;
+  if (dead > 0) {
+    console.log(
+      `\nNOTE: the browser produced zero animation frames on ${dead}/${rows.length} row(s), ` +
+        `so the native layout-shift API emitted nothing there. CLS on those rows is the ` +
+        `geometry-derived figure (sampled rects, CLS scoring formula), not the browser's own.`,
+    );
   }
 
   const failing = rows.filter((row) => row.failures.length > 0);

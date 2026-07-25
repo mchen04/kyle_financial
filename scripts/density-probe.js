@@ -11,8 +11,26 @@
     consoleErrors: [],
     observerError: null,
     inflight: 0,
+    // Geometry-derived layout shifts (see the block below) and the evidence
+    // that says whether the native Layout Instability API can be trusted here.
+    geometricShifts: [],
+    geometricScrollSkips: 0,
+    geometricSamples: 0,
+    frameTicks: 0,
   };
   window.__density = state;
+
+  // Frame liveness. The Layout Instability API only emits entries when the
+  // compositor actually produces frames; a headless or fully occluded window
+  // produces none, and then `layout-shift` is silent no matter how far the page
+  // jumps. That failure mode reads as CLS 0.0000 on every row — a dead
+  // instrument that looks like a perfect score. Counting animation frames is
+  // how the harness tells "nothing shifted" from "nothing was measured".
+  const tick = () => {
+    state.frameTicks += 1;
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
 
   // The measurement window is "network idle plus one second". In a single-route
   // client app the interesting requests are the app's own fetches, so count
@@ -44,6 +62,113 @@
   } catch (error) {
     state.observerError = String(error);
   }
+
+  // ---------------------------------------------------------------------------
+  // Geometry-derived layout shift.
+  //
+  // Layout still runs when frames do not, so getBoundingClientRect() is truthful
+  // even in a browser where `layout-shift` never fires. This samples every
+  // rendered element on a timer (setInterval runs without frames) and applies
+  // the same CLS scoring formula the spec defines: for the elements that moved
+  // between two samples, score = impact fraction x max distance fraction.
+  //
+  // Two deliberate differences from the native metric, both stated rather than
+  // hidden:
+  //   * The impact region is the bounding box of every moved element's union of
+  //     old and new rects, not their exact union. A bounding box is >= the true
+  //     union, so this over-reports rather than under-reports — the safe
+  //     direction for a gate.
+  //   * Movement is sampled at 100ms, not per frame, so two shifts inside one
+  //     sampling interval are scored as their net movement. A page that jumps
+  //     down and back within 100ms scores lower here than natively.
+  // ---------------------------------------------------------------------------
+  const previousRects = new WeakMap();
+  let lastInputAt = -Infinity;
+  for (const type of ["pointerdown", "keydown", "click", "input", "wheel"]) {
+    addEventListener(
+      type,
+      () => {
+        lastInputAt = performance.now();
+      },
+      true,
+    );
+  }
+
+  let lastScrollTop = null;
+  const sampleLayout = () => {
+    const now = performance.now();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const scroller = document.querySelector("main");
+    const scrollTop = scroller ? scroller.scrollTop : 0;
+    // Scrolling moves every rect without shifting anything. The native metric
+    // excludes it; so does this, by discarding the sample pair that straddles a
+    // scroll and counting how often that happened.
+    const scrolled = lastScrollTop !== null && scrollTop !== lastScrollTop;
+    lastScrollTop = scrollTop;
+    state.geometricSamples += 1;
+
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    let maxMove = 0;
+    let moved = 0;
+    const inViewport = (box) =>
+      box.bottom > 0 &&
+      box.top < viewportHeight &&
+      box.right > 0 &&
+      box.left < viewportWidth;
+
+    for (const node of document.querySelectorAll("body *")) {
+      const rect = node.getBoundingClientRect();
+      const previous = previousRects.get(node);
+      previousRects.set(node, rect);
+      if (!previous || scrolled) continue;
+      if (rect.width === 0 || rect.height === 0) continue;
+      if (previous.width === 0 || previous.height === 0) continue;
+      const dx = rect.left - previous.left;
+      const dy = rect.top - previous.top;
+      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) continue;
+      if (!inViewport(rect) && !inViewport(previous)) continue;
+      moved += 1;
+      maxMove = Math.max(maxMove, Math.abs(dx), Math.abs(dy));
+      minX = Math.min(minX, rect.left, previous.left);
+      minY = Math.min(minY, rect.top, previous.top);
+      maxX = Math.max(maxX, rect.right, previous.right);
+      maxY = Math.max(maxY, rect.bottom, previous.bottom);
+    }
+
+    if (scrolled) {
+      state.geometricScrollSkips += 1;
+      return;
+    }
+    if (moved === 0) return;
+    // CLS-4: shifts within 500ms of a user interaction are excluded.
+    if (now - lastInputAt < 500) return;
+
+    const width = Math.max(
+      0,
+      Math.min(maxX, viewportWidth) - Math.max(minX, 0),
+    );
+    const height = Math.max(
+      0,
+      Math.min(maxY, viewportHeight) - Math.max(minY, 0),
+    );
+    const impact = (width * height) / (viewportWidth * viewportHeight);
+    const distance = maxMove / Math.max(viewportWidth, viewportHeight);
+    const value = impact * distance;
+    if (value > 0) {
+      state.geometricShifts.push({
+        value,
+        startTime: now,
+        moved,
+        maxMove: Math.round(maxMove * 10) / 10,
+      });
+    }
+  };
+  setInterval(sampleLayout, 100);
+  sampleLayout();
 
   const clean = (node) =>
     node ? node.textContent.replace(/\s+/g, " ").trim() : "";

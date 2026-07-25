@@ -760,3 +760,365 @@ exiting non-zero.
   not the other will re-open the C9 defect that this loop closed.
 - Everything the harness cannot see is unchanged and still listed in
   [`mobile-density-baseline.md`](./mobile-density-baseline.md#what-this-harness-cannot-see).
+
+---
+
+## L4 — stability, verifier fidelity, and the long-list exemption made measurable
+
+Every number below was read out of the same live production build.
+Evidence: [`l4-full-after.json`](./l4-full-after.json) (60 rows, gate mode,
+exit 0) and [`l4-full-after.md`](./l4-full-after.md); the red proofs are
+`l4-faildemo-{chrome,listrows,cls,vh,headline,touch,overflow,console}.json`.
+
+```
+pnpm ui:density:measure -- --mode gate --viewports 390x844,360x740,430x932
+# 60 measurement(s); 0 violating row(s); mode=gate   EXIT=0
+```
+
+### 1. The long-list exemption is now a measured gate, not an author's claim
+
+L3b's chrome-above-the-first-row figure existed only in an uncommitted ad-hoc
+probe. The one bar that actually binds Activity was therefore unverifiable by
+anyone but its author. That was the real defect, and it is closed:
+
+- The Activity entry in the harness's frozen surface catalogue now carries a
+  `listExemption` naming the selector of its first list row
+  (`main [data-density-row="transaction"]`). No other surface has one, and there
+  is no command-line flag that can grant one. The mission names transaction
+  history and all-category rows; Budget's category list already passes the
+  absolute 3.0 bar at 1.238-1.565 VH, so it was not given an exemption it does
+  not need.
+- The harness measures **chrome above the first row** itself, in the scroll
+  region's own content coordinates (content-box top to first row top), and gates
+  it at **<= 0.6 VH**.
+- It measures and reports **every row's height**, tallied, so the "justified
+  against the research file" clause is checkable by a reader.
+- Activity's 3.0 VH figure is still reported, in a column marked `info`. It no
+  longer gates.
+- A `data-density-row="transaction"` attribute was added to the transaction row
+  so the selector cannot be renamed by the CSS-module hasher. It costs 0px.
+
+Measured, identical at every viewport because chrome is a fixed cost:
+
+| Viewport | Chrome above the first row |     as VH | Sub-bar | Margin |
+| -------- | -------------------------: | --------: | ------: | -----: |
+| 390x844  |                   188.89px | **0.224** | <= 0.60 |   2.7x |
+| 360x740  |                   188.89px | **0.255** | <= 0.60 |   2.4x |
+| 430x932  |                   188.89px | **0.203** | <= 0.60 |   3.0x |
+
+**Red proof** (`--fail-demo chrome`, browser-side injection only, no application
+source touched): a 400px block prepended above the list drives the chrome to
+588.89px = **0.698 / 0.796 / 0.632 VH**, and the run exits non-zero on all three
+viewports with the row region still exempt. **Green proof**: the table above,
+0 violating rows.
+
+**Second red proof** (`--fail-demo listrows`): stripping `data-density-row` from
+every row makes the harness report _long-list exemption claimed but not earned_
+and exit non-zero. An exemption whose selector stops matching cannot silently
+turn Activity's only binding gate off.
+
+### 2. The 74px row: resolved by deriving the rung, option (a)
+
+Activity rendered 46 rows at 64px (C1's two-line rung, justified) and 15 rows at
+**74px** because those transactions carry a note. C1 defined no three-line rung,
+so 74px was a height nobody had justified — the exemption's second condition was
+unmet.
+
+`docs/research/mobile-density-2026-07.md` now carries **C1b**, appended with its
+derivation and citations. The short version: the binding constraint on a
+three-line block is not Carbon's ladder (which stops at 64px and publishes no
+three-line rung) but **HIG-T2** — "if you need to display three or more lines of
+text, avoid tight leading even in areas where height is limited" — which **C3**
+already turns into 1.5 leading. At 1.5, the three line boxes measure
+24 + 19.5 + 19.5 = 63px; with the row's 8px top and bottom padding that is 79px,
+which rounds to **80px** on C4's 8px rhythm. The gap goes to **0px** because a
+24px line box for 16px text already carries the 8px of separation a gap would
+duplicate.
+
+The 74px the surface was shipping was `normal` leading (~1.18) on a three-line
+block — tight leading at three lines, exactly what HIG-T2 forbids. Setting the
+note at 11px to reach 74px legitimately was rejected: 24 + 19.5 + 16.5 + 16 =
+76px lands on the same 80px rung after rounding, so it would buy less legible
+text for zero pixels.
+
+Measured after the change, identical at 390, 360 and 430 (rows do not re-wrap on
+width): **46 x 64px, 15 x 80px**. Both figures are now printed by the harness on
+every Activity row.
+
+**This costs density and the cost is stated, not absorbed:** +6px per noted row,
+90px over the 15 noted rows, and Activity moves **5.103 -> 5.210 VH** at 390x844
+(5.820 -> 5.942 at 360x740, 4.621 -> 4.718 at 430x932). Activity's absolute VH
+was already a documented miss on a bar that is arithmetically unreachable under
+rule 4; the chrome sub-bar that actually gates it is unaffected, and the trade
+buys compliance with HIG-T2/C3 on 15 rows. L3b's refusal to fold the note into
+the meta line stands and was not revisited.
+
+### 3. The CLS instrument was dead, and that is why it now reports its own liveness
+
+This is the finding that matters most for verifier fidelity.
+
+Partway through this loop the harness reported **CLS 0.0000 on all 60 rows** —
+and the `cls` fail-demo, which prepends a 220px block, **also reported 0.0000 and
+passed**. The check had stopped being able to fail.
+
+Root cause, established directly rather than guessed: the browser was producing
+**zero animation frames**. A `requestAnimationFrame` loop never ticked; a
+control experiment that moved an element 390px down produced **zero**
+`layout-shift` entries with `PerformanceObserver.supportedEntryTypes` still
+listing `layout-shift` and `observerError` still null. The Layout Instability
+API only emits when the compositor presents frames, so an occluded or
+non-compositing window reports a perfect score for a page that is jumping. This
+reproduced headless and headed, so it was not fixable from inside the repo.
+
+Two changes, both of which stay in place now that frames are being produced
+again:
+
+1. **The probe counts frames.** Every row now reports `frameTicks` and
+   `nativeLayoutShiftLive` (frames > 5 — one frame is what document load forces,
+   and is not liveness). A run whose native CLS is zero because nothing was
+   measured is now distinguishable from one where nothing moved, and the harness
+   prints a NOTE naming the affected row count.
+2. **A second, compositor-independent CLS measurement.** Layout still runs when
+   frames do not, so `getBoundingClientRect()` stays truthful. The probe samples
+   every rendered element on a 100ms timer (`setInterval` runs without frames)
+   and applies the spec's own scoring formula — impact fraction x max distance
+   fraction — to whatever moved between two samples, grouped into web.dev
+   session windows, excluding shifts within 500ms of an input (CLS-4) and
+   discarding sample pairs that straddle a scroll. The gate uses
+   **`max(native, geometric)`**, so neither instrument can hide what the other
+   saw.
+
+Its two deliberate differences from the native metric are stated in the code and
+both make it conservative or coarse, never permissive: the impact region is the
+**bounding box** of the moved elements' rects, which is >= their true union, so
+it over-reports rather than under-reports; and 100ms sampling scores two shifts
+inside one interval as their net movement, so a jump-and-return within 100ms
+scores lower than natively.
+
+**It is cross-validated.** On the 220px `cls` injection it reads **0.2203**;
+L3d/e measured **0.2097** natively for the same 220px injection on Manage
+categories. On the `chrome` injection the native API — live again by then — read
+0.3399-0.4038 and the run failed on both counts.
+
+In the final 60-row run **both instruments are live** (92-3263 frames per row),
+and the native figures reproduce the earlier waves' numbers to four decimals:
+Budget 0.0075 / 0.0106 / 0.0056, Budget future-month 0.0042 / 0.0038 / 0.0039,
+Home 0.0005 / 0.0007 / 0.0005, signed-out sign-in 0.0005 / 0.0007 / 0.0004.
+That agreement is the evidence that the instrument is healthy, and it is why
+this run's table can be trusted where the earlier all-zeroes run could not.
+
+### 4. Full-matrix stability sweep — 20 surface states x 3 viewports
+
+`CLS` is `max(native, geometric)`; both columns are shown. `Frames` is the
+liveness evidence for the native column. Every row's headline is identical at
+first paint and settled.
+
+| Surface           | State                      | Viewport |    VH |      Bar | CLS native | CLS geometric | Frames | Headline swap | <44px | Overflow | Console errors | Chrome above list | Row heights      |
+| ----------------- | -------------------------- | -------- | ----: | -------: | ---------: | ------------: | -----: | ------------- | ----: | -------- | -------------: | ----------------: | ---------------- |
+| Signed out        | create account (cold load) | 390x844  | 1.000 |      1.5 |     0.0000 |        0.0000 |     92 | no            |     0 | no       |              0 |                 — | —                |
+| Signed out        | sign in                    | 390x844  | 1.000 |      1.5 |     0.0005 |        0.0000 |    195 | no            |     0 | no       |              0 |                 — | —                |
+| Onboarding        | cold load                  | 390x844  | 1.000 |      1.5 |     0.0000 |        0.0000 |     94 | no            |     0 | no       |              0 |                 — | —                |
+| Home              | default                    | 390x844  | 1.000 |      1.0 |     0.0005 |        0.0000 |    383 | no            |     0 | no       |              0 |                 — | —                |
+| Home              | cold load                  | 390x844  | 1.000 |      1.0 |     0.0000 |        0.0000 |     94 | no            |     0 | no       |              0 |                 — | —                |
+| Budget            | default                    | 390x844  | 1.367 |      3.0 |     0.0075 |        0.0000 |    297 | no            |     0 | no       |              0 |                 — | —                |
+| Budget            | future month               | 390x844  | 1.367 |      3.0 |     0.0042 |        0.0000 |    511 | no            |     0 | no       |              0 |                 — | —                |
+| Activity          | default                    | 390x844  | 5.210 | 3.0 info |     0.0075 |        0.0000 |    714 | no            |     0 | no       |              0 |  188.89px = 0.224 | 46x64px, 15x80px |
+| Activity          | empty search               | 390x844  | 1.000 |      3.0 |     0.0000 |        0.0000 |    928 | no            |     0 | no       |              0 |                 — | —                |
+| Category detail   | Dining out                 | 390x844  | 1.424 |      4.0 |     0.0000 |        0.0000 |   1144 | no            |     0 | no       |              0 |                 — | —                |
+| Edit budget       | default                    | 390x844  | 1.608 |      4.0 |     0.0000 |        0.0000 |   1359 | no            |     0 | no       |              0 |                 — | —                |
+| Manage categories | default                    | 390x844  | 2.364 |      4.0 |     0.0000 |        0.0000 |   1573 | no            |     0 | no       |              0 |                 — | —                |
+| Monthly wrap      | default                    | 390x844  | 2.098 |      3.0 |     0.0000 |        0.0000 |   1788 | no            |     0 | no       |              0 |                 — | —                |
+| Plan              | default                    | 390x844  | 2.359 |      3.0 |     0.0005 |        0.0000 |   1991 | no            |     0 | no       |              0 |                 — | —                |
+| Plan details      | default                    | 390x844  | 2.845 |      4.0 |     0.0000 |        0.0000 |   2207 | no            |     0 | no       |              0 |                 — | —                |
+| Benefits          | default                    | 390x844  | 2.757 |      4.0 |     0.0000 |        0.0000 |   2421 | no            |     0 | no       |              0 |                 — | —                |
+| Compare years     | default                    | 390x844  | 1.634 |      4.0 |     0.0000 |        0.0000 |   2636 | no            |     0 | no       |              0 |                 — | —                |
+| Account           | default                    | 390x844  | 1.000 |      3.0 |     0.0000 |        0.0000 |   2838 | no            |     0 | no       |              0 |                 — | —                |
+| Fast Log          | new expense                | 390x844  | 0.848 |      4.0 |     0.0000 |        0.0000 |   3041 | no            |     0 | no       |              0 |                 — | —                |
+| Fast Log          | edit expense               | 390x844  | 0.782 |      4.0 |     0.0000 |        0.0000 |   3256 | no            |     0 | no       |              0 |                 — | —                |
+| Signed out        | create account (cold load) | 360x740  | 1.000 |      1.5 |     0.0000 |        0.0000 |     94 | no            |     0 | no       |              0 |                 — | —                |
+| Signed out        | sign in                    | 360x740  | 1.000 |      1.5 |     0.0007 |        0.0000 |    197 | no            |     0 | no       |              0 |                 — | —                |
+| Onboarding        | cold load                  | 360x740  | 1.000 |      1.5 |     0.0000 |        0.0000 |     94 | no            |     0 | no       |              0 |                 — | —                |
+| Home              | default                    | 360x740  | 1.000 |      1.0 |     0.0007 |        0.0000 |    382 | no            |     0 | no       |              0 |                 — | —                |
+| Home              | cold load                  | 360x740  | 1.000 |      1.0 |     0.0000 |        0.0000 |     94 | no            |     0 | no       |              0 |                 — | —                |
+| Budget            | default                    | 360x740  | 1.565 |      3.0 |     0.0106 |        0.0000 |    298 | no            |     0 | no       |              0 |                 — | —                |
+| Budget            | future month               | 360x740  | 1.565 |      3.0 |     0.0038 |        0.0000 |    513 | no            |     0 | no       |              0 |                 — | —                |
+| Activity          | default                    | 360x740  | 5.942 | 3.0 info |     0.0106 |        0.0000 |    717 | no            |     0 | no       |              0 |  188.89px = 0.255 | 46x64px, 15x80px |
+| Activity          | empty search               | 360x740  | 1.000 |      3.0 |     0.0000 |        0.0000 |    932 | no            |     0 | no       |              0 |                 — | —                |
+| Category detail   | Dining out                 | 360x740  | 1.614 |      4.0 |     0.0000 |        0.0000 |   1148 | no            |     0 | no       |              0 |                 — | —                |
+| Edit budget       | default                    | 360x740  | 1.847 |      4.0 |     0.0000 |        0.0000 |   1363 | no            |     0 | no       |              0 |                 — | —                |
+| Manage categories | default                    | 360x740  | 2.645 |      4.0 |     0.0000 |        0.0000 |   1578 | no            |     0 | no       |              0 |                 — | —                |
+| Monthly wrap      | default                    | 360x740  | 2.750 |      3.0 |     0.0000 |        0.0000 |   1793 | no            |     0 | no       |              0 |                 — | —                |
+| Plan              | default                    | 360x740  | 2.399 |      3.0 |     0.0007 |        0.0000 |   1996 | no            |     0 | no       |              0 |                 — | —                |
+| Plan details      | default                    | 360x740  | 3.265 |      4.0 |     0.0000 |        0.0000 |   2212 | no            |     0 | no       |              0 |                 — | —                |
+| Benefits          | default                    | 360x740  | 3.166 |      4.0 |     0.0000 |        0.0000 |   2427 | no            |     0 | no       |              0 |                 — | —                |
+| Compare years     | default                    | 360x740  | 1.888 |      4.0 |     0.0000 |        0.0000 |   2642 | no            |     0 | no       |              0 |                 — | —                |
+| Account           | default                    | 360x740  | 1.208 |      3.0 |     0.0000 |        0.0000 |   2845 | no            |     0 | no       |              0 |                 — | —                |
+| Fast Log          | new expense                | 360x740  | 0.968 |      4.0 |     0.0000 |        0.0000 |   3048 | no            |     0 | no       |              0 |                 — | —                |
+| Fast Log          | edit expense               | 360x740  | 0.892 |      4.0 |     0.0000 |        0.0000 |   3263 | no            |     0 | no       |              0 |                 — | —                |
+| Signed out        | create account (cold load) | 430x932  | 1.000 |      1.5 |     0.0000 |        0.0000 |     94 | no            |     0 | no       |              0 |                 — | —                |
+| Signed out        | sign in                    | 430x932  | 1.000 |      1.5 |     0.0004 |        0.0000 |    197 | no            |     0 | no       |              0 |                 — | —                |
+| Onboarding        | cold load                  | 430x932  | 1.000 |      1.5 |     0.0000 |        0.0000 |     94 | no            |     0 | no       |              0 |                 — | —                |
+| Home              | default                    | 430x932  | 1.000 |      1.0 |     0.0005 |        0.0000 |    383 | no            |     0 | no       |              0 |                 — | —                |
+| Home              | cold load                  | 430x932  | 1.000 |      1.0 |     0.0000 |        0.0000 |     94 | no            |     0 | no       |              0 |                 — | —                |
+| Budget            | default                    | 430x932  | 1.238 |      3.0 |     0.0056 |        0.0000 |    298 | no            |     0 | no       |              0 |                 — | —                |
+| Budget            | future month               | 430x932  | 1.238 |      3.0 |     0.0039 |        0.0000 |    513 | no            |     0 | no       |              0 |                 — | —                |
+| Activity          | default                    | 430x932  | 4.718 | 3.0 info |     0.0056 |        0.0000 |    716 | no            |     0 | no       |              0 |  188.89px = 0.203 | 46x64px, 15x80px |
+| Activity          | empty search               | 430x932  | 1.000 |      3.0 |     0.0000 |        0.0000 |    930 | no            |     0 | no       |              0 |                 — | —                |
+| Category detail   | Dining out                 | 430x932  | 1.290 |      4.0 |     0.0000 |        0.0000 |   1147 | no            |     0 | no       |              0 |                 — | —                |
+| Edit budget       | default                    | 430x932  | 1.411 |      4.0 |     0.0000 |        0.0000 |   1362 | no            |     0 | no       |              0 |                 — | —                |
+| Manage categories | default                    | 430x932  | 2.105 |      4.0 |     0.0000 |        0.0000 |   1577 | no            |     0 | no       |              0 |                 — | —                |
+| Monthly wrap      | default                    | 430x932  | 1.823 |      3.0 |     0.0000 |        0.0000 |   1792 | no            |     0 | no       |              0 |                 — | —                |
+| Plan              | default                    | 430x932  | 2.100 |      3.0 |     0.0005 |        0.0000 |   1995 | no            |     0 | no       |              0 |                 — | —                |
+| Plan details      | default                    | 430x932  | 2.488 |      4.0 |     0.0000 |        0.0000 |   2210 | no            |     0 | no       |              0 |                 — | —                |
+| Benefits          | default                    | 430x932  | 2.461 |      4.0 |     0.0000 |        0.0000 |   2424 | no            |     0 | no       |              0 |                 — | —                |
+| Compare years     | default                    | 430x932  | 1.480 |      4.0 |     0.0000 |        0.0000 |   2639 | no            |     0 | no       |              0 |                 — | —                |
+| Account           | default                    | 430x932  | 1.000 |      3.0 |     0.0000 |        0.0000 |   2842 | no            |     0 | no       |              0 |                 — | —                |
+| Fast Log          | new expense                | 430x932  | 0.708 |      4.0 |     0.0000 |        0.0000 |   3045 | no            |     0 | no       |              0 |                 — | —                |
+| Fast Log          | edit expense               | 430x932  | 0.708 |      4.0 |     0.0000 |        0.0000 |   3260 | no            |     0 | no       |              0 |                 — | —                |
+
+**Totals across all 60 rows: max CLS 0.0106 against a 0.02 bar; 0 headline
+label/value differences between first paint and settled; 0 interactive targets
+under 44px; 0 horizontal overflow; 0 console errors; 0 surfaces failing to
+arrive.**
+
+The three busts earlier waves fixed are all confirmed still fixed, at every
+viewport: Budget future-month **0.4113 / 0.6632 / 0.3793 -> 0.0042 / 0.0038 /
+0.0039**; Activity empty-search **0.0804 -> 0.0000**; the signed-out auth panel
+L3d/e introduced and closed **0.0277 / 0.0361 / 0.0214 -> 0.0005 / 0.0007 /
+0.0004**. Nothing regressed: no row moved in the wrong direction on CLS, and the
+only VH movement in the whole matrix is Activity's +0.107 from C1b above.
+
+### 5. D2 — REPRODUCED, through cache state only
+
+Earlier waves recorded D2 as not reproducible: the harness found the Budget
+headline identical at first paint and settled on all 60 rows, and concluded the
+two strings were two different _period_ states rather than one state mutating.
+That conclusion was correct **about the seeded fixture's happy path** and wrong
+as a verdict on the defect. Following the code path the supervisor identified
+during recon, D2 reproduces.
+
+**The path.** `initialPeriod` (`cockpit-period-control.tsx:36-41`) returns
+month 1 when `draft.year` is not today's year and the current month when it is.
+`plan-workspace.tsx:78-89` seeds `periodSelection` from `initialPeriod(draft.year,
+today)`. `daily-cockpit.tsx:240` branches the Budget `<h1>` — and
+`HomeSurface` its answer label — on `selectedPeriodPhase(period, today)`. So the
+period, and every number derived from it, changes the moment `draft.year`
+changes. `financial-app.tsx:55-58` computes `activeDraft` from `plans`, `draft`
+and `today`, and `use-account-lifecycle.ts:190-216` sets `draft` from
+`restorableCachedPlans` — the IndexedDB copy — whenever the session request fails
+for any reason other than 401, flagging it `requireAuthoritativePlanRefresh`;
+`use-plan-sync.ts:158-161` later replaces it with the server's answer.
+
+**The reproduction.** Signed in as the density fixture at 390x844, so the
+IndexedDB `plans` store held both seeded years (2025 and 2026, distinct ids).
+Then, through cache state and a simulated network condition only — no
+application source, sync, offline or auth behaviour was changed:
+
+1. deleted the **2026** row from the IndexedDB `plans` store, leaving 2025;
+2. aborted `**/api/auth/session*` and `**/api/bootstrap*` at the browser's
+   network layer, so the session request fails the way a real flaky network
+   makes it fail;
+3. reloaded, sampling the DOM every 20ms.
+
+Observed:
+
+```
+t =   8ms   (nothing painted)
+t =  29ms   loading placeholder, "House by 30"
+t =  50ms   Home painted.  month picker = 1   (January)      <- provisional
+t =  70ms   Home re-painted. month picker = 7  (July)        <- settled
+t = 730ms   offline indicator appears
+```
+
+and in the same experiment, the recorded headline samples, neither of them taken
+while the loading placeholder was mounted:
+
+```
+t = 43ms   "Home | Left to spend $474"     <- January 2025, from the stale cache
+t = 68ms   "Home | Left to spend $123"     <- July 2026, from the server
+```
+
+A number rendered in a provisional state and then changed meaning: **$474 is
+January 2025's figure and $123 is July 2026's**, under an unchanged label, 25ms
+apart. On a real network that gap is however long the failed session request and
+the subsequent plan load take, not 25ms.
+
+**The verbatim label flip follows analytically and was not observed directly.**
+It needs the cached year to be a _future_ year: `initialPeriod` would seed
+January of it, `selectedPeriodPhase` would return `"future"`, and the Budget
+`<h1>` would read `"$X planned spending"` before the authoritative current-year
+draft made it `"$X safe to spend"` — D2's reported strings exactly. An attempt to
+stage that by writing a fabricated 2027 plan row into the cache and removing the
+seeded years did not get there: the app fell back to the signed-out screen
+instead, so the fabricated row was not restorable. This is stated as reasoning
+from `selectedPeriodPhase` and `initialMonth`, **not** as something measured.
+
+**Latent verdict: LATENT for real users.** Nothing about the reproduction is
+synthetic except the timing. A user whose device cache holds a plan year other
+than the current one — which the fixture's own two-year seed produces, and which
+any user who rolled over a year has — and whose `/api/auth/session` call fails
+for any reason other than 401 will render one plan year's figures and then have
+them replaced by another's. "Could not trigger it under the seeded happy path"
+and "cannot happen" are different claims, and the earlier write-up conflated
+them.
+
+**What was fixed, and what was refused.**
+
+- **The geometry half of D2 as reported — "everything below jumps" — is already
+  fixed and is now measured at every viewport.** L3a set the Budget `h1` to 24px
+  at <=720px specifically so both phase strings set on one line, and replaced the
+  phase-varying toolbar with a `dl` carrying the same four cells in both phases.
+  The evidence is that Budget and Budget-future-month measure the **same VH to
+  three decimals** at all three viewports (1.367 / 1.565 / 1.238) with CLS
+  0.0042 / 0.0038 / 0.0039. Adding C9-1's 96px reservation on top of that would
+  add height to a block whose geometry is already invariant across the exact
+  transition D2 names, so it was not added.
+- **Suppressing the provisional number was refused as out of scope.** The only
+  root fix is in the offline restore path: either stop painting a draft the app
+  has already flagged `requireAuthoritativePlanRefresh`, or reserve the box until
+  that refresh resolves. Both change what an offline device shows and for how
+  long, and **never-cross rule 5 forbids changing offline behaviour**. Rule 5 is
+  not reinterpretable by this loop, and it outranks a deliverable instruction the
+  same way rule 2 outranked 0.18 VH when L3b refused the note-line merge. The
+  exact call sites are named above so the decision can be taken by whoever owns
+  that boundary.
+- **The reproduction was not added as a gated harness state.** It would be a row
+  that is red by construction and that this loop is forbidden to fix, which would
+  leave every future run exiting non-zero for a reason unrelated to what it is
+  measuring. The recipe above is reproducible by hand in under two minutes.
+
+### What was refused
+
+- **No bar was widened.** Home 1.0, standard 3.0, deep 4.0, entry 1.5, CLS 0.02,
+  44px, no overflow, no console errors, no headline swap are byte-identical in
+  `scripts/measure-density.mjs`. The one bar that changed for one surface became
+  **narrower and better measured**: Activity's absolute cap became informational
+  and a 0.6 VH chrome sub-bar plus a row-height report took over, per the
+  mission's own BARS section and the supervisor's adjudication.
+- **No general escape hatch was added.** `listExemption` is a property of an
+  entry in the frozen surface catalogue, not a flag; a surface that claims it and
+  matches no rows **fails**, which is proven red.
+- **No touch target, input size or token was touched.** `pnpm ui:tokens:check`
+  passes with 217 canonical tokens; the 80px rung uses the existing `--space-20`
+  and `--leading-body`, and no raw px literal was authored.
+- **No test was deleted, weakened, or changed.** All 498 tests in 61 files pass
+  unmodified.
+
+### Residual risk
+
+- **The geometric CLS measurement is coarser than the native one.** It reads
+  0.0000 on rows where the native API reads 0.0038-0.0106, because those shifts
+  are smaller than what a 100ms sampler resolves. It is a safety net for a dead
+  compositor, not a replacement: when both are live the native figure is the one
+  that binds, and the gate takes the larger of the two.
+- **The 0.6 VH chrome sub-bar is a ratio over a fixed cost.** 188.89px busts it
+  only below a 315px-tall viewport. No such phone exists.
+- **C1b's 80px rung is derived, not published.** Carbon publishes no three-line
+  rung; the number comes from C3's 1.5 leading applied to the row's actual type
+  sizes and rounded to C4's rhythm. A reviewer who disagrees with 1.5 leading in
+  a list row is disagreeing with HIG-T2, and the derivation is written out so
+  that disagreement has something to attach to.
+- **D2 is reproduced and unfixed**, by refusal, with its call sites named. It is
+  latent for any user with a multi-year cache and a failing session request.
+- Everything the harness cannot see is unchanged and still listed in
+  [`mobile-density-baseline.md`](./mobile-density-baseline.md#what-this-harness-cannot-see).

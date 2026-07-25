@@ -456,6 +456,23 @@
   gap: var(--space-1);
 }
 
+/* C1 three-line rung. A transaction that carries a note is a three-line block,
+   and C3 puts any block of three or more lines at 1.5 leading (HIG-T2: tight
+   leading is legitimate in a list row, but not past two lines). At 1.5 the
+   three line boxes measure 24 + 19.5 + 19.5 = 63px, which with the row's 8px
+   top and bottom padding is 79px — so the rung is 80px and the row height is
+   the rung rather than whatever the text happened to reflow to. The 1.5 leading
+   already contributes 8px of internal separation, so the 4px inter-line gap
+   would double-count it and goes to 0 (C4). */
+.transactionRow[data-lines="3"] {
+  min-height: var(--space-20);
+}
+
+.transactionRow[data-lines="3"] > span {
+  gap: var(--space-0);
+  line-height: var(--leading-body);
+}
+
 .rowFigures {
   text-align: right;
   white-space: nowrap;

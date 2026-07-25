@@ -101,6 +101,15 @@ export function TransactionRows({
         return (
           <button
             key={transaction.id}
+            // Stable hook for the density harness's long-list exemption: CSS
+            // module class names are hashed, so the chrome-above-the-first-row
+            // measurement needs a selector the build cannot rename. Costs 0px.
+            data-density-row="transaction"
+            // A noted transaction is a three-line block, which C3 sets at 1.5
+            // leading and C1 (three-line rung) sizes at 80px. Declaring the
+            // line count on the row is what lets the stylesheet pick the rung
+            // instead of letting the height fall out of whatever the text did.
+            data-lines={transaction.note ? "3" : "2"}
             className={styles.transactionRow}
             onClick={() => onEdit(transaction.id)}
           >

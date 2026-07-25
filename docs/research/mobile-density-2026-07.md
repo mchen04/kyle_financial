@@ -890,6 +890,56 @@ that carries an interactive control expands the control's hit area to **44px
 minimum** without growing the row. No row may be shorter than **44px** under any
 condition. _(DEN-2 ADOPT Large=48/XL=64, REJECT 24/32/40; HIG-A1; HIG-B1)_
 
+**C1b — Three-line row height (added 2026-07-25, L4).** A list row carrying a
+genuine third line is **80px** tall (`min-height: var(--space-20)`), sets
+**1.5** leading on its text block, and uses a **0px** gap between its lines.
+
+_Why this rung exists._ C1 as first written stopped at the two-line row because
+DEN-2's published ladder stops at Extra large = 64px, and Carbon states that rung
+is "only recommended if your data is expected to have two lines of content in a
+single row." Carbon publishes no three-line rung, so a three-line row cannot be
+adopted from it and must be **derived**. Leaving it underived is not neutral: an
+undefined row height is a height nobody has justified, and Activity was shipping
+one (74px) on the 15 fixture transactions that carry a note.
+
+_The derivation, and why it is not simply "64 + something"._ The binding
+constraint on a three-line block is not the ladder, it is **HIG-T2**, which
+licenses tight leading in a list row and then fences it: "If you need to display
+three or more lines of text, avoid tight leading even in areas where height is
+limited." **C3** already turns that fence into a number — any block of three or
+more lines sets 1.5 leading. So the height of a three-line row is not a free
+choice; it is what 1.5 leading costs:
+
+| Line                            | Size | Leading | Line box |
+| ------------------------------- | ---: | ------: | -------: |
+| title (`--text-md`)             | 16px |     1.5 |     24px |
+| meta, `category · Fri, Jul 24`  | 13px |     1.5 |   19.5px |
+| note (`--text-sm`)              | 13px |     1.5 |   19.5px |
+| **text block**                  |      |         | **63px** |
+| row padding (`--space-2` twice) |      |         |     16px |
+| **total**                       |      |         | **79px** |
+
+79px rounds up to **80px** on the 8px rhythm C4 keeps (`--space-20`), so the rung
+is 80px and the row is sized by the rung rather than by whatever the text
+reflowed to. The **gap is 0px**, not the 4px a two-line row uses: at 1.5 leading
+a 16px line box already carries 8px of internal leading, so an added gap would
+double-count the separation C4 asks for once.
+
+_What this rejects._ It rejects the 74px the surface was rendering, which was
+`normal` leading (≈1.18) on a three-line block — that is tight leading at three
+lines, exactly what HIG-T2 forbids. It also rejects reaching 74px legitimately by
+dropping the note to `--text-xs` (11px): 24 + 19.5 + 16.5 + 16 = 76px still lands
+on the same 80px rung after rounding, so shrinking the note would buy less
+legible text for zero pixels. The 80px rung costs **+6px per noted row** against
+what shipped — 90px across the 15 noted rows in the fixture, 0.107 VH at
+390x844. That is a density cost paid deliberately to stop violating HIG-T2/C3,
+and it is recorded rather than absorbed.
+
+_(HIG-T2 as the binding fence; C3 for the 1.5 figure; DEN-2 for the ladder this
+rung extends and for why it cannot simply be read off it; C4 for the 8px rhythm
+and for not double-counting separation; HIG-A1/HIG-B1 unaffected — 80px clears
+the 44px floor.)_
+
 **C2 — Section header vertical budget.** A section header costs at most **32px
 total**: a 13px/18px label (`--text-sm`, `--leading` 1.38) plus **8px** above and
 **6px** below, and it never carries a subtitle, a description, or a divider of
