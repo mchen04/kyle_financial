@@ -47,11 +47,13 @@ one raw literal, the PWA background that `--color-paper-50` must mirror.
 5. **Budget:** selected-period total, attention/near-limit categories, all
    allocated/actual/remaining rows, then dedicated Category Detail, Edit
    Budget, and Manage Categories pages.
-6. **Activity:** selected period, search/category filters, local-date groups,
-   and the correction path.
-7. **Monthly Wrap:** total budget versus actual, wins, overruns, projected
-   savings change or configured ending balance, and a component-by-component
-   explanation that prevents double counting.
+6. **Activity:** selected period, a labeled Monthly Wrap row, search/category
+   filters, local-date groups, and the correction path.
+7. **Monthly Wrap:** total budget versus actual, under-budget and over-budget
+   categories, projected savings change or configured ending balance, and a
+   component-by-component explanation that prevents double counting. Reachable
+   from both Home and Activity; its single back control names the surface it
+   returns to.
 8. **Plan:** annual and explicit monthly outcomes, optional starting savings,
    projected change/ending result, accessible allocation chart, annual
    money-flow rail, and links to Plan Details, Benefits, Compare, and budget

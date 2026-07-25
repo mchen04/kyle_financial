@@ -1122,3 +1122,564 @@ them.
   latent for any user with a multi-year cache and a failing session request.
 - Everything the harness cannot see is unchanged and still listed in
   [`mobile-density-baseline.md`](./mobile-density-baseline.md#what-this-harness-cannot-see).
+
+---
+
+## L5 — D2 fixed at the root, and the navigation IA
+
+Every number below was read out of a live production build.
+AFTER is [`l5-full-after.json`](./l5-full-after.json) (63 rows: 21 surface
+states x 3 viewports, gate mode, exit 0) and
+[`l5-full-after.md`](./l5-full-after.md). The two BEFORE artefacts are
+[`l5-d2-before.json`](./l5-d2-before.json) (the defect, reproduced on a build
+with the fix removed) and [`l5-d2-cls-before.json`](./l5-d2-cls-before.json)
+(the residual layout shift the fix's first half left behind, with the moved
+elements named). The red proofs are `l5-faildemo-{answer,cls,headline,chrome,listrows,touch}.json`.
+
+```
+pnpm ui:density:measure -- --mode gate --viewports 390x844,360x740,430x932 --session final
+# 63 measurement(s); 0 violating row(s); mode=gate   EXIT=0
+```
+
+---
+
+### 1. The instrument was still dead, and this time it was fixable from inside the repo
+
+L4 found the Layout Instability API emitting nothing because the browser was
+producing no animation frames, concluded it "reproduced headless and headed, so
+it was not fixable from inside the repo", and shipped `frameTicks` so a future
+run could at least _detect_ the condition. The detector fired immediately on
+this loop's first full run: **zero frames on 63 of 63 rows**, which under the
+mission's rule makes that run invalid. It was thrown away.
+
+The cause is narrower than "occlusion". Headless Chrome has no display sink, so
+its **frame-rate limiter** never schedules a `BeginFrame` and the compositor
+presents nothing; the Layout Instability API only emits on presented frames.
+Measured directly, a `requestAnimationFrame` loop over two seconds:
+
+| Launch flag                                | Frames in 2s |
+| ------------------------------------------ | -----------: |
+| (none — the default)                       |        **1** |
+| `--disable-backgrounding-occluded-windows` |            1 |
+| `--disable-renderer-backgrounding`         |            1 |
+| `--disable-background-timer-throttling`    |            1 |
+| **`--disable-frame-rate-limit`**           |      **115** |
+
+The harness now passes `--disable-frame-rate-limit` at launch. It changes
+nothing about layout or about the scores the API reports; it only makes the API
+able to report. `frameTicks` stays on every row, because a flag that stops
+working has to remain visible: **the minimum across all 63 rows of the accepted
+run is 102 and the maximum is 6171, and `nativeLayoutShiftLive` is true on
+63/63**. Every native CLS figure in the L4 table reproduces exactly, which is
+the cross-check that the flag did not change what is being measured.
+
+A second instrument change, for the same reason L4 gave: a red CLS row now
+prints **which elements the browser saw move**, with their before/after rects.
+That is what turned this loop's residual shift from a guess into a two-minute
+diagnosis, twice.
+
+---
+
+### 2. D2 — fixed
+
+**The defect, reproduced on a build with the fix removed** (`l5-d2-before.json`,
+gate mode, 390x844):
+
+```
+FAIL  Home · cache restore awaiting the server
+  - headline changed between first paint and settled:
+      "Home | Left to spend $474" -> "Home | Left to spend $123"
+  - the primary answer was painted 2 times with different values:
+      ["Left to spend $474", "Left to spend $123"]
+```
+
+`$474` is January 2025's figure and `$123` is July 2026's, under the identical
+label `Left to spend`. It reproduces L4's hand-run numbers exactly.
+
+#### What the fix is
+
+One new piece of session state, `planAwaitingAuthority`, and two elements that
+render a reserved box instead of a number while it is set.
+
+- **Set** in `use-account-lifecycle.ts`, on the line after the restore already
+  flags `requireAuthoritativePlanRefresh` and calls `setUser` (which is what
+  starts the authoritative refresh), and **only when `navigator.onLine`**.
+- **Cleared** by the reducer alone, so no sync code decides it: the next
+  `plans` action clears it (the authoritative answer arrived, or the user
+  edited), and any `save` action other than `"saving"` clears it (the reconciler
+  resolved — including by failing, in which case the cached plan _is_ the
+  settled value). It cannot strand a surface in a skeleton: every exit from the
+  reconciler passes through one of those two actions, and a device that cannot
+  reach the server never enters the state at all.
+
+Nothing was suppressed, delayed, or re-ordered in the restore. The same plans
+are read from the same cache at the same moment; the outbox, the service worker,
+the IndexedDB schema and the auth boundary are untouched; `use-plan-sync`'s sync
+logic is not edited at all. The only added statement in that file is one guarded
+call to a UI state setter.
+
+#### The reservation, and why it is zero-shift by construction
+
+**C9-2** allows exactly two states. The reserved state is the _same elements_,
+with the _same classes, fonts, leading, margins and grid gaps_, each holding a
+single non-breaking space:
+
+| Element                    |      Settled |     Reserved | Why they are equal            |
+| -------------------------- | -----------: | -----------: | ----------------------------- |
+| Home label `<span>`        |         18px |         18px | one line box, 16px / `normal` |
+| Home amount `<strong>`     |     53.188px |     53.188px | one line box, 56px / 0.95     |
+| Home qualifier `<small>`   |         16px |         16px | one line box, 13.33px         |
+| 2 x grid gap (`--space-1`) |          8px |          8px | same grid                     |
+| **Home headline block**    | **95.188px** | **95.188px** | 390x844 and 430x932           |
+| **Home headline block**    |     **80px** |     **80px** | 360x740 (40px amount)         |
+| Budget `<h1>`              |     25.188px |     25.188px | one line box, 24px            |
+
+No height is hard-coded anywhere. C9-1 names **96px** for this block as
+18 + 44 + 18 + 2x8; the block this build actually ships is 95.188px at 390 and
+430 and 80px at 360x740, because L3a set the amount at 56px/40px display type
+rather than 44px and the gap at 4px. C9-1's requirement is "an explicit
+`min-height` **equal to the settled line box**", and a literal 96px would be
+_wrong here by 0.8px at two viewports and 16px at the third_ — which is a
+layout shift, not a reservation. Matching the settled line box by construction
+is what the rule asks for and what a fixed number cannot guarantee across three
+viewports and two type scales.
+
+C9-3 (the label may never change identity) is satisfied by putting the label
+_inside_ the reservation. Home's label is `Left to spend` / `Over budget` /
+`Planned spending` depending on the very numbers that are provisional, and
+Budget's `<h1>` is one string carrying both the figure and the phrase that gives
+it meaning. Neither can be painted early. Budget's `Budget` eyebrow is a fixed
+section name and stays.
+
+#### The two things the reservation alone did not fix, found by the shift report
+
+Reserving the headline left **CLS 0.0633 / 0.0700 / 0.0585** against a 0.02 bar
+(`l5-d2-cls-before.json`). The shift report named the culprit in one line:
+`main` moving from y=137 to y=72 while growing 626 -> 691px — a 65px block
+_above_ the scroll region disappearing. Two blocks, both the same C9-1 defect
+(a box that exists in one state and not the other), both driven by the
+provisional draft:
+
+1. **The offline notice.** The restore sets `saveState` to `"offline"` before
+   the reconciler has said anything, so a 65px banner reading _"Showing the
+   latest copy saved on this device"_ asserted the device was offline while it
+   was in fact fetching, then removed itself.
+2. **The fallback tax-table notice.** The cached draft was **2025**, for which
+   this build has no tax table, so _"Tax data isn't available for 2025"_
+   rendered and then vanished when the authoritative **2026** plan landed.
+
+Both are now gated on `!planAwaitingAuthority`, and so is the compact-offline
+Home layout, which is a different box at <=740px tall. **This is the edge of
+never-cross rule 5 and it is worth being explicit about where the line was
+drawn.** `planAwaitingAuthority` is only ever set when `navigator.onLine` is
+true, so:
+
+- a genuinely offline device never reaches any of these branches;
+- what an offline device holds, how long it holds it, its queued edits, its
+  offline notice and its `Retry sync` control are byte-for-byte what they were;
+- nothing is suppressed indefinitely — each of the three renders the instant the
+  plan settles, which is the first moment its statement is true.
+
+This is asserted in tests rather than claimed: one test drives the online
+restore and requires the offline notice to be **absent**, another drives the
+offline restore and requires it and its `Retry sync` button to be **present**.
+
+#### After
+
+| Viewport | Before CLS |  After CLS | Before answer paints                       | After answer paints  | Frames |
+| -------- | ---------: | ---------: | ------------------------------------------ | -------------------- | -----: |
+| 390x844  | **0.0633** | **0.0000** | `Left to spend $474`, `Left to spend $123` | `Left to spend $123` |    778 |
+| 360x740  | **0.0700** | **0.0001** | (same)                                     | `Left to spend $123` |    823 |
+| 430x932  | **0.0585** | **0.0000** | (same)                                     | `Left to spend $123` |    812 |
+
+(After, to full precision: 4.07e-5 / 5.73e-5 / 3.03e-5 — the sync-status chip
+changing from `Saving` to `Saved`, which is 0.2% of the bar.)
+
+The recorded samples show the two legal states and nothing between them:
+
+```
+"House by 30"                 hero ""                    busy
+"Home"                        hero ""                    busy   <- the reserved box
+"Home | Left to spend $123"   hero "Left to spend $123"          <- settled
+```
+
+Budget and Budget-future-month are byte-identical to L4 at every viewport
+(1.367 / 1.565 / 1.238 VH, CLS 0.0075 / 0.0106 / 0.0056 and 0.0042 / 0.0038 /
+0.0039), so the reservation added no height to the block whose invariance L3a
+established.
+
+#### The gated harness state — deterministic, and it is deterministic
+
+`home-provisional-restore` is a real row in the frozen surface catalogue, gated
+in every run. It stages the defect from the browser only:
+
+1. `sessionStorage.__density_block` is set to `/api/bootstrap`; the probe's
+   existing `fetch` wrapper rejects any matching request with a `TypeError`,
+   which is how a flaky network fails.
+2. The **newest** cached plan year is deleted from the account's IndexedDB
+   `plans` store, so the restore has a year the server will disagree with.
+3. The document reloads and is measured cold.
+
+It is deterministic because the density fixture always seeds exactly two plan
+years (2025 and 2026) and the app always caches both, so step 2 always leaves
+one stale year behind. Arrival asserts all four of: the surface is Home, the
+sabotage actually fired (`blockedRequests > 0`), the cache really did lose a
+year, and nothing is left reserved — so the row cannot pass by failing to stage
+itself. Its `after` step clears the flag, and the authoritative refresh
+re-caches the deleted year on the way back, so the device ends the row holding
+exactly what it held before.
+
+The one thing it does not cover: **Budget's reservation is not separately
+gated**, because the provisional window closes in tens of milliseconds and no
+deterministic tap can reach Budget inside it. It is covered by a test that
+navigates to Budget while the flag is held and asserts the `<h1>` is reserved
+and carries no figure.
+
+#### A new gate, narrower than the one it sits beside
+
+The generic headline check compares first paint with settled, so it cannot see a
+figure that appears and is replaced _before_ the settled value. On a surface
+that declares `singleAnswerPaint`, the harness now also requires the **primary
+answer to be painted exactly once**, across every sample, busy or not. Proven
+red on demand by `--fail-demo answer`, which repaints the answer with a second
+value and puts it back — and which the generic check reports as green on the
+same row, which is the point.
+
+---
+
+### 3. Navigation IA
+
+#### The tab set is unchanged: `Home -> Budget -> Activity -> Plan`
+
+A blind fresh-eyes reviewer placed **9 of 10** named tasks correctly against
+these four labels plus the floating `+` and the profile avatar, which clears the
+
+> = 9/10 bar. Nothing was renamed or reordered, because doing so would have
+> invalidated that placement evidence for a 1/10 gain. Against **C13**, ordered
+> left to right by expected open frequency for a two-person private budget app:
+
+| Tab          | Opened                                         | Why it sits here                                                                                                                           |
+| ------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Home**     | every session, first                           | It is the one question the app exists to answer — what is safe to spend today. Nothing is opened more often than the reason for opening.   |
+| **Budget**   | several times a week                           | The follow-up to Home's answer: _which_ category is tight. Second because it is where the reader goes when the first number is not enough. |
+| **Activity** | a few times a week, and after every correction | The ledger. Read less often than the rollup that summarises it, but it is the only place an individual expense can be found and fixed.     |
+| **Plan**     | a few times a year                             | Salary, taxes, benefits, allocations. Deliberately last: it is set up once and revisited at raises, open enrolment, and the year rollover. |
+
+C13's other clauses hold and were measured, not asserted. Walked across
+**13 screens** at 390x844 — Home, Budget, Category detail, Edit budget, Manage
+categories, Activity, Wrap from Activity, Wrap from Home, Plan, Plan details,
+Benefits, Compare years, Account — the bar is byte-identical on every one of
+them: the same four labels in the same order, **72px each**, none disabled,
+none hidden, none badged, labels always visible, and **exactly one**
+`aria-current="page"` at a time. Account is the sole screen with no highlighted
+tab, which is correct: it is a toolbar control, not a destination. **Tabs are
+destinations, never actions**: Fast Log stays a `position: fixed` floating
+button (125x48, on screen at all times) and Account stays the top-right profile
+control, because neither is a place.
+
+#### The one miss, and what was added
+
+The miss was _"See what you overspent on last month."_ — the reviewer tapped
+**Activity**, and Monthly Wrap was reachable only from Home. A retrospective
+question reads as a history question. **Monthly Wrap is now reachable from
+Activity as well, and is still reachable from Home.** No path was removed, so
+never-cross rule 1 is untouched; one was added.
+
+Per **C12**, it is a **labeled 48px row carrying its own summary value** —
+`Monthly wrap` with `July 2026` on the right — never a bare chevron. Measured
+live at 390x844: **48.00px**, enabled, identical to Home's row.
+
+Its cost, measured against the gate that actually binds Activity:
+
+| Viewport | Chrome above the first row |     as VH | This row's share | Sub-bar | Margin |
+| -------- | -------------------------: | --------: | ---------------: | ------: | -----: |
+| 390x844  |     188.89 -> **252.89px** | **0.300** |   +64px = +0.076 | <= 0.60 |   2.0x |
+| 360x740  |     188.89 -> **252.89px** | **0.342** |   +64px = +0.086 | <= 0.60 |   1.8x |
+| 430x932  |     188.89 -> **252.89px** | **0.271** |   +64px = +0.069 | <= 0.60 |   2.2x |
+
+64px is the 48px row plus one 16px group gap. Against the mission's <= 0.6 VH
+allowance for this addition the actual spend is **0.076 VH**, and Activity's
+total chrome remains under the 0.6 VH gate with a 1.8x margin at its tightest
+viewport. Activity's informational absolute figure moves 5.210 -> 5.286,
+5.942 -> 6.028 and 4.718 -> 4.786 VH. **It is the only row in the 63-row matrix
+that moved at all**; the other 60 are identical to L4 on both VH and CLS.
+
+Two smaller things came with it, both walked in a live browser:
+
+- The wrap route now carries its origin, so its single back control **names the
+  surface it returns to**. It previously read `Back to Budget` and navigated to
+  **Home** — a control that lied about its own destination. It now reads
+  `Back to Home` from Home and `Back to Activity` from Activity, and goes there.
+  The page's `Budget` eyebrow is unchanged: that is the wrap's section identity,
+  not its return path.
+- The tab highlight follows the origin, so opening the wrap from Activity does
+  not move the bar to a tab the reader did not tap. From Home it still
+  highlights Budget, exactly as before.
+
+Walked live at 390x844:
+
+```
+Home      -> tab Home      | Monthly wrap row, 48px, "July 2026"
+Activity  -> tab Activity  | Monthly wrap row, 48px, "July 2026"
+  tap it  -> "July 2026 wrap", eyebrow Budget, back "Back to Activity", tab Activity
+  back    -> Activity
+Home
+  tap it  -> "July 2026 wrap", eyebrow Budget, back "Back to Home",     tab Budget
+  back    -> Home
+```
+
+The reviewer's other two comments are recorded and **not** acted on, with
+reasons: _"Plan told me the least"_ — Plan is the annual-inputs destination and
+its own hub names Plan Details, Benefits and Compare on arrival; renaming it
+would cost the placement evidence. _"Activity was ambiguous between history and
+notifications"_ — the app has no notifications surface at all, so the ambiguity
+resolves on first arrival and never recurs.
+
+#### Every capability in `docs/surface-map.md`, in taps from Home
+
+Home is the first authenticated screen and is tap 0. Every path below was walked,
+not assumed; the ones marked (H) are held by the harness, which asserts arrival
+on that surface in every run.
+
+|   # | Capability (`surface-map.md`)                      | Path from Home                                                          | Taps |
+| --: | -------------------------------------------------- | ----------------------------------------------------------------------- | ---: |
+|   1 | Create an account                                  | signed out; `Create account` is the default panel                       |    1 |
+|   1 | Sign in                                            | signed out; `Already have an account? Sign in` -> `Sign in`             |    2 |
+|   1 | Validation / bootstrap states                      | rendered in place on the same panel                                     |    0 |
+|   2 | Onboarding: year, wages, state, filing status      | shown automatically when the account has no plan                        |    0 |
+|   3 | Selected period (Month / YTD / Year + stepper)     | Home header, one 44px row, five controls                                |    1 |
+|   3 | Left to spend / Over budget (the answer)           | Home, above the fold                                                    |    0 |
+|   3 | Budgeted, spent, remaining (to the cent)           | Home, the `exact:` line under the answer                                |    0 |
+|   3 | Savings impact                                     | Home, the runway metric row                                             |    0 |
+|   3 | Attention (over-budget categories)                 | Home, `Needs attention`, top 3 above the fold                           |    0 |
+|   3 | Recent correction                                  | Home, `Recent activity`, 2 rows                                         |    0 |
+|   3 | Monthly Wrap                                       | Home -> `Monthly wrap` row **or** Activity -> `Monthly wrap` row        |  1–2 |
+|   3 | Plan                                               | `Plan` tab                                                              |    1 |
+|   4 | Fast Log a new expense                             | floating `+`, `position: fixed`, on screen at all times                 |    1 |
+|   4 | Amount, category, title, note, date                | inside that sheet                                                       |    1 |
+|   4 | Inline category creation                           | Fast Log -> `Create category`                                           |    2 |
+|   4 | Save / Save and add another                        | inside that sheet                                                       |    1 |
+|   4 | Edit an existing expense                           | Home recent row **or** `Activity` -> the row                            |  1–2 |
+|   4 | Delete an expense                                  | that same sheet -> `Delete`                                             |  2–3 |
+|   5 | Selected-period total                              | `Budget`                                                                |    1 |
+|   5 | Attention / near-limit categories                  | `Budget`; over-budget rows escape in warning colour reading `$81 over`  |    1 |
+|   5 | All allocated / actual / remaining rows            | `Budget`                                                                |    1 |
+|   5 | Category Detail                                    | `Budget` -> the row (**or** Home `Needs attention` row, 1 tap)          |  1–2 |
+|   5 | Edit Budget                                        | `Budget` -> `Edit budget`                                               |    2 |
+|   5 | Manage Categories                                  | `Budget` -> `Manage categories`                                         |    2 |
+|   5 | Create / rename / archive / reorder / recolour     | `Budget` -> `Manage categories` -> the control                          |    3 |
+|   6 | Activity list                                      | `Activity`                                                              |    1 |
+|   6 | Search expenses                                    | `Activity` -> the search field                                          |    2 |
+|   6 | Filter by category                                 | `Activity` -> the category select                                       |    2 |
+|   6 | Local-date grouping                                | `Activity`; the day rides on every row as `Groceries · Fri, Jul 24`     |    1 |
+|   6 | Correction path (future-dated expenses)            | `Activity` -> the `Needs correction` row                                |    2 |
+|   6 | Beyond the first 100 rows                          | `Activity` -> `Load 100 more · N remaining`                             |    2 |
+|   7 | Monthly Wrap: budget vs actual, under/over, impact | Home **or** Activity -> `Monthly wrap`                                  |  1–2 |
+|   7 | Component-by-component explanation                 | on that page                                                            |  1–2 |
+|   8 | Annual and monthly outcomes                        | `Plan`                                                                  |    1 |
+|   8 | Optional starting savings                          | `Plan` -> the field                                                     |    2 |
+|   8 | Projected change / ending result                   | `Plan`                                                                  |    1 |
+|   8 | Accessible allocation chart                        | `Plan`                                                                  |    1 |
+|   8 | Annual money-flow rail                             | `Plan`                                                                  |    1 |
+|   8 | Budget editing from Plan                           | `Plan` -> `Edit budget`                                                 |    2 |
+|   9 | Plan Details                                       | `Plan` -> `Plan details`                                                |    2 |
+|   9 | Benefits (add, edit, rename, delete, ESPP, HSA)    | `Plan` -> `Benefits` -> the control                                     |    3 |
+|   9 | Compare years                                      | `Plan` -> `Compare years`                                               |    2 |
+|   9 | Start next year's plan                             | `Plan` -> `Start 2027` (top bar, Plan screens only)                     |    2 |
+|  10 | Account, privacy and sync context                  | profile avatar (top right, every screen)                                |    1 |
+|  10 | Export all years / this device                     | avatar -> the two export buttons                                        |    2 |
+|  10 | Add to Home Screen instructions                    | avatar -> the three numbered steps                                      |    1 |
+|  10 | Log out                                            | avatar -> `Log out`                                                     |    2 |
+|  10 | Delete the account permanently                     | avatar -> `Delete account`                                              |    2 |
+|  10 | Switch plan year                                   | year select, top bar, every screen                                      |    1 |
+|  11 | Loading, offline, pending, sync failure, retry     | rendered in place, above the content region, on whatever screen is open |    0 |
+|  11 | Update ready / export and deletion errors          | rendered in place                                                       |    0 |
+|  12 | Over budget, zero allocations, saving categories   | rendered in place on Home, Budget and Category Detail                   |    0 |
+|  12 | Infeasible payroll, tax limits, table fallback     | rendered in place on Benefits, Plan and the content region              |  0–3 |
+
+**Maximum: 3 taps. Nothing in the surface map exceeds it, and nothing became
+unreachable.** The only path that changed length changed downward: Monthly Wrap
+is now 1 tap from two different tabs instead of one.
+
+#### In-tab section order
+
+The mission's required order is **the answer, then the primary action, then
+exceptions, then context, then configuration.**
+
+| Surface          | Order as built                                                                                                                                                 | Against the required order                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Home**         | header (`Home` + period control) -> runway card (label, figure, `exact:` line, savings impact) -> `Needs attention` -> `Recent activity` -> `Monthly wrap` row | Answer, exceptions, context, context. The **primary action is the floating Fast Log button**, which is `position: fixed` and therefore above everything at all times without spending a row — the strongest possible reading of "then the primary action". **Configuration is deliberately first, not last:** the period control scopes every number below it, and a reader who changes it after reading has read figures computed for a different period. |
+| **Budget**       | header (`$123 safe to spend` + period control) -> four-cell math `dl` -> one note line -> `Edit budget` / `Manage categories` -> all categories                | Answer, answer's audit trail, primary actions, context. **Exceptions are inside the context block, not above it**, by L3a's deliberate choice: a separate `Needs attention` block rendered every over-budget row a second time and appeared and disappeared with the period. Over-budget rows escape in warning colour reading `$81 over` in the one list, so rule 2 holds without the duplicate.                                                          |
+| **Activity**     | header (`$5,255.44 · 61 expenses` + period control) -> **`Monthly wrap` row** -> `Needs correction` -> search + category filter -> the list                    | Answer, answer, exceptions, configuration, context. Two deviations, both stated: the wrap row is **part of the answer region** — it is the same period's answer in retrospective form, which is exactly why the reviewer looked for it here — and **configuration precedes context** because a filter placed after a 61-row list cannot be reached by the reader who needs it.                                                                             |
+| **Plan**         | header + outcome figures -> starting savings -> allocation chart -> money-flow rail -> `Plan details` / `Benefits` / `Compare years` / `Edit budget`           | Answer, configuration, context, then the four sub-page rows. Starting savings sits second because the projected ending result directly above it is the number it changes.                                                                                                                                                                                                                                                                                  |
+| **Monthly Wrap** | back control + `July 2026 wrap` -> budget vs actual -> under budget / over budget -> savings impact -> how the impact is built                                 | Answer, exceptions, context. It has no primary action: it is a read-only retrospective.                                                                                                                                                                                                                                                                                                                                                                    |
+| **Account**      | header -> exports -> install steps -> `Log out` -> `Delete account`                                                                                            | Configuration surface throughout, ordered by reversibility: the destructive action is last and the routine one first.                                                                                                                                                                                                                                                                                                                                      |
+
+---
+
+### FAIL-DEMO
+
+Each check was proven red on this build, by browser-side injection only — no
+application source touched — except the first row, which was proven red by
+building the application **with the fix removed**, because no injection can
+recreate a stale plan year.
+
+| Check                      | How it was proven red                                | Result                                                             | Evidence                    |
+| -------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------ | --------------------------- |
+| **D2 itself**              | build with `markPlanAwaitingAuthority` disabled      | `Left to spend $474` -> `$123`; headline swap + 2 answer paints ✗  | `l5-d2-before.json`         |
+| **single answer paint**    | `--fail-demo answer` (repaint the answer, then undo) | 2 answer paints ✗ **while the generic headline check reads green** | `l5-faildemo-answer.json`   |
+| CLS                        | `--fail-demo cls` (220px block at +900ms)            | 0.2203 ✗ on Home and Activity                                      | `l5-faildemo-cls.json`      |
+| headline swap              | `--fail-demo headline`                               | swapped ✗ on Home and Activity                                     | `l5-faildemo-headline.json` |
+| Activity chrome sub-bar    | `--fail-demo chrome` (400px block above the list)    | ✗ on Activity, row region still exempt                             | `l5-faildemo-chrome.json`   |
+| long-list exemption earned | `--fail-demo listrows` (strip `data-density-row`)    | _exemption claimed but not earned_ ✗                               | `l5-faildemo-listrows.json` |
+| touch target               | `--fail-demo touch` (20x20 button)                   | 1 and 2 targets under 44px ✗                                       | `l5-faildemo-touch.json`    |
+
+The residual CLS shift was also proven red by the real build before the second
+half of the fix landed: **0.0633 / 0.0700** with the moved elements named
+(`l5-d2-cls-before.json`).
+
+---
+
+### Full matrix — 21 surface states x 3 viewports
+
+`CLS native` is the browser's Layout Instability API; `CLS geometric` is the
+compositor-independent sampler; the gate takes the larger. `Frames` is the
+liveness evidence for the native column.
+
+| Surface state                            | Viewport |    VH |      Bar | CLS native | CLS geometric | Frames | Headline swap | <44px | Overflow | Console errors | Chrome above list |
+| ---------------------------------------- | -------- | ----: | -------: | ---------: | ------------: | -----: | ------------- | ----: | -------- | -------------: | ----------------: |
+| Signed out · create account (cold load)  | 390x844  | 1.000 |      1.5 |     0.0000 |        0.0000 |    133 | no            |     0 | no       |              0 |                 — |
+| Signed out · sign in                     | 390x844  | 1.000 |      1.5 |     0.0005 |        0.0000 |    228 | no            |     0 | no       |              0 |                 — |
+| Onboarding · cold load                   | 390x844  | 1.000 |      1.5 |     0.0000 |        0.0000 |    473 | no            |     0 | no       |              0 |                 — |
+| Home                                     | 390x844  | 1.000 |      1.0 |     0.0005 |        0.0000 |   6171 | no            |     0 | no       |              0 |                 — |
+| Home · cold load                         | 390x844  | 1.000 |      1.0 |     0.0000 |        0.0000 |    853 | no            |     0 | no       |              0 |                 — |
+| Budget                                   | 390x844  | 1.367 |      3.0 |     0.0075 |        0.0000 |   1042 | no            |     0 | no       |              0 |                 — |
+| Budget · future month                    | 390x844  | 1.367 |      3.0 |     0.0042 |        0.0000 |   1244 | no            |     0 | no       |              0 |                 — |
+| Activity                                 | 390x844  | 5.286 | 3.0 info |     0.0075 |        0.0000 |   1435 | no            |     0 | no       |              0 |  252.89px = 0.300 |
+| Activity · empty search                  | 390x844  | 1.000 |      3.0 |     0.0000 |        0.0000 |   1638 | no            |     0 | no       |              0 |                 — |
+| Category detail · Dining out             | 390x844  | 1.424 |      4.0 |     0.0000 |        0.0000 |   1841 | no            |     0 | no       |              0 |                 — |
+| Edit budget                              | 390x844  | 1.608 |      4.0 |     0.0000 |        0.0000 |   2043 | no            |     0 | no       |              0 |                 — |
+| Manage categories                        | 390x844  | 2.364 |      4.0 |     0.0000 |        0.0000 |   2245 | no            |     0 | no       |              0 |                 — |
+| Monthly wrap                             | 390x844  | 2.098 |      3.0 |     0.0000 |        0.0000 |   2446 | no            |     0 | no       |              0 |                 — |
+| Plan                                     | 390x844  | 2.359 |      3.0 |     0.0005 |        0.0000 |   2636 | no            |     0 | no       |              0 |                 — |
+| Plan details                             | 390x844  | 2.845 |      4.0 |     0.0000 |        0.0000 |   2838 | no            |     0 | no       |              0 |                 — |
+| Benefits                                 | 390x844  | 2.757 |      4.0 |     0.0000 |        0.0000 |   3038 | no            |     0 | no       |              0 |                 — |
+| Compare years                            | 390x844  | 1.634 |      4.0 |     0.0000 |        0.0000 |   3240 | no            |     0 | no       |              0 |                 — |
+| Account                                  | 390x844  | 1.000 |      3.0 |     0.0000 |        0.0000 |   3431 | no            |     0 | no       |              0 |                 — |
+| Fast Log · new expense                   | 390x844  | 0.848 |      4.0 |     0.0000 |        0.0000 |   3624 | no            |     0 | no       |              0 |                 — |
+| Fast Log · edit expense                  | 390x844  | 0.782 |      4.0 |     0.0000 |        0.0000 |   3830 | no            |     0 | no       |              0 |                 — |
+| Home · cache restore awaiting the server | 390x844  | 1.000 |      1.0 |     0.0000 |        0.0000 |    778 | no            |     0 | no       |              0 |                 — |
+| Signed out · create account (cold load)  | 360x740  | 1.000 |      1.5 |     0.0000 |        0.0000 |    102 | no            |     0 | no       |              0 |                 — |
+| Signed out · sign in                     | 360x740  | 1.000 |      1.5 |     0.0007 |        0.0000 |    198 | no            |     0 | no       |              0 |                 — |
+| Onboarding · cold load                   | 360x740  | 1.000 |      1.5 |     0.0000 |        0.0000 |    286 | no            |     0 | no       |              0 |                 — |
+| Home                                     | 360x740  | 1.000 |      1.0 |     0.0007 |        0.0000 |   5276 | no            |     0 | no       |              0 |                 — |
+| Home · cold load                         | 360x740  | 1.000 |      1.0 |     0.0001 |        0.0000 |    764 | no            |     0 | no       |              0 |                 — |
+| Budget                                   | 360x740  | 1.565 |      3.0 |     0.0106 |        0.0000 |    954 | no            |     0 | no       |              0 |                 — |
+| Budget · future month                    | 360x740  | 1.565 |      3.0 |     0.0038 |        0.0000 |   1156 | no            |     0 | no       |              0 |                 — |
+| Activity                                 | 360x740  | 6.028 | 3.0 info |     0.0106 |        0.0000 |   1349 | no            |     0 | no       |              0 |  252.89px = 0.342 |
+| Activity · empty search                  | 360x740  | 1.000 |      3.0 |     0.0000 |        0.0000 |   1551 | no            |     0 | no       |              0 |                 — |
+| Category detail · Dining out             | 360x740  | 1.614 |      4.0 |     0.0000 |        0.0000 |   1754 | no            |     0 | no       |              0 |                 — |
+| Edit budget                              | 360x740  | 1.847 |      4.0 |     0.0000 |        0.0000 |   1954 | no            |     0 | no       |              0 |                 — |
+| Manage categories                        | 360x740  | 2.645 |      4.0 |     0.0000 |        0.0000 |   2155 | no            |     0 | no       |              0 |                 — |
+| Monthly wrap                             | 360x740  | 2.750 |      3.0 |     0.0000 |        0.0000 |   2357 | no            |     0 | no       |              0 |                 — |
+| Plan                                     | 360x740  | 2.399 |      3.0 |     0.0007 |        0.0000 |   2547 | no            |     0 | no       |              0 |                 — |
+| Plan details                             | 360x740  | 3.265 |      4.0 |     0.0000 |        0.0000 |   2749 | no            |     0 | no       |              0 |                 — |
+| Benefits                                 | 360x740  | 3.166 |      4.0 |     0.0000 |        0.0000 |   2951 | no            |     0 | no       |              0 |                 — |
+| Compare years                            | 360x740  | 1.888 |      4.0 |     0.0000 |        0.0000 |   3153 | no            |     0 | no       |              0 |                 — |
+| Account                                  | 360x740  | 1.208 |      3.0 |     0.0000 |        0.0000 |   3343 | no            |     0 | no       |              0 |                 — |
+| Fast Log · new expense                   | 360x740  | 0.968 |      4.0 |     0.0000 |        0.0000 |   3536 | no            |     0 | no       |              0 |                 — |
+| Fast Log · edit expense                  | 360x740  | 0.892 |      4.0 |     0.0000 |        0.0000 |   3741 | no            |     0 | no       |              0 |                 — |
+| Home · cache restore awaiting the server | 360x740  | 1.000 |      1.0 |     0.0001 |        0.0000 |    823 | no            |     0 | no       |              0 |                 — |
+| Signed out · create account (cold load)  | 430x932  | 1.000 |      1.5 |     0.0000 |        0.0000 |    102 | no            |     0 | no       |              0 |                 — |
+| Signed out · sign in                     | 430x932  | 1.000 |      1.5 |     0.0004 |        0.0000 |    198 | no            |     0 | no       |              0 |                 — |
+| Onboarding · cold load                   | 430x932  | 1.000 |      1.5 |     0.0000 |        0.0000 |    311 | no            |     0 | no       |              0 |                 — |
+| Home                                     | 430x932  | 1.000 |      1.0 |     0.0005 |        0.0000 |   5727 | no            |     0 | no       |              0 |                 — |
+| Home · cold load                         | 430x932  | 1.000 |      1.0 |     0.0000 |        0.0000 |   1580 | no            |     0 | no       |              0 |                 — |
+| Budget                                   | 430x932  | 1.238 |      3.0 |     0.0056 |        0.0000 |   1769 | no            |     0 | no       |              0 |                 — |
+| Budget · future month                    | 430x932  | 1.238 |      3.0 |     0.0039 |        0.0000 |   1971 | no            |     0 | no       |              0 |                 — |
+| Activity                                 | 430x932  | 4.786 | 3.0 info |     0.0056 |        0.0000 |   2161 | no            |     0 | no       |              0 |  252.89px = 0.271 |
+| Activity · empty search                  | 430x932  | 1.000 |      3.0 |     0.0000 |        0.0000 |   2363 | no            |     0 | no       |              0 |                 — |
+| Category detail · Dining out             | 430x932  | 1.290 |      4.0 |     0.0000 |        0.0000 |   2567 | no            |     0 | no       |              0 |                 — |
+| Edit budget                              | 430x932  | 1.411 |      4.0 |     0.0000 |        0.0000 |   2767 | no            |     0 | no       |              0 |                 — |
+| Manage categories                        | 430x932  | 2.105 |      4.0 |     0.0000 |        0.0000 |   2969 | no            |     0 | no       |              0 |                 — |
+| Monthly wrap                             | 430x932  | 1.823 |      3.0 |     0.0000 |        0.0000 |   3171 | no            |     0 | no       |              0 |                 — |
+| Plan                                     | 430x932  | 2.100 |      3.0 |     0.0005 |        0.0000 |   3360 | no            |     0 | no       |              0 |                 — |
+| Plan details                             | 430x932  | 2.488 |      4.0 |     0.0000 |        0.0000 |   3560 | no            |     0 | no       |              0 |                 — |
+| Benefits                                 | 430x932  | 2.461 |      4.0 |     0.0000 |        0.0000 |   3761 | no            |     0 | no       |              0 |                 — |
+| Compare years                            | 430x932  | 1.480 |      4.0 |     0.0000 |        0.0000 |   3964 | no            |     0 | no       |              0 |                 — |
+| Account                                  | 430x932  | 1.000 |      3.0 |     0.0000 |        0.0000 |   4154 | no            |     0 | no       |              0 |                 — |
+| Fast Log · new expense                   | 430x932  | 0.708 |      4.0 |     0.0000 |        0.0000 |   4348 | no            |     0 | no       |              0 |                 — |
+| Fast Log · edit expense                  | 430x932  | 0.708 |      4.0 |     0.0000 |        0.0000 |   4552 | no            |     0 | no       |              0 |                 — |
+| Home · cache restore awaiting the server | 430x932  | 1.000 |      1.0 |     0.0000 |        0.0000 |    812 | no            |     0 | no       |              0 |                 — |
+
+**Totals across all 63 rows: max CLS 0.0106 against a 0.02 bar; minimum
+`frameTicks` 102, so the native instrument was live on 63/63 rows and no figure
+above is an artefact of a dead compositor; 0 headline swaps; 0 interactive
+targets under 44px; 0 horizontal overflow; 0 console errors; 0 surfaces failing
+to arrive; 0 violating rows; exit 0.**
+
+---
+
+### Tests
+
+Two tests were added and one existing assertion was updated. No test was
+deleted or weakened. **500 tests in 61 files pass** (498 before this loop).
+
+| Test                                                                                                                                       | Change      | Why                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------------------------------------------------------------------------------------ | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `core-flow.integration.test.tsx` — _"reserves the headline while a cache restore waits for the server, and never paints the stale figure"_ | **added**   | Drives the real lifecycle through an online cache restore where the cached plan says `$750` and the server says `$1,750`. Asserts the reserved box is painted, `$750` and `Left to spend` never appear, the offline notice never appears, Budget's `<h1>` is reserved too, and the swap to the settled value happens in one step. Proven able to fail: with the one-line fix removed it fails on the first assertion. |
+| `core-flow.integration.test.tsx` — _"keeps a genuinely offline cached plan rendering its own value"_                                       | **added**   | The rule-5 boundary, asserted rather than claimed: a device that cannot reach the server renders `Left to spend $750` normally, with no reservation, no `aria-busy`, and its offline notice and `Retry sync` control intact.                                                                                                                                                                                          |
+| `core-flow.integration.test.tsx` — the Monthly Wrap walk                                                                                   | **updated** | It clicked `Back to Budget` on a control that navigated to **Home**. That assertion encoded a control lying about its destination; it now clicks `Back to Home` and asserts it lands on Home. This is behaviour this loop intentionally changed.                                                                                                                                                                      |
+
+---
+
+### What was refused
+
+- **No bar was widened.** `VERTICAL_BARS`, `BAR_CLS` (0.02), `MINIMUM_TARGET_PX`
+  (44) and `BAR_CHROME_ABOVE_LIST` (0.6) are byte-identical. The only gate
+  changes are **additions**: the single-answer-paint check, and a 21st surface
+  state that is red on the unfixed build.
+- **`pnpm ui:tokens:check` was not touched and not loosened.** 217 canonical
+  tokens, no raw px literal was authored; the reserved box uses `--radius-sm`,
+  `--color-transparent`, `--alpha-white-13` and `--surface-accent`, and its only
+  lengths are percentages for the bar widths, which are not lengths under the
+  audit's own unit table.
+- **`use-plan-sync.ts` was not edited at all**, nor was the outbox, the service
+  worker, the IndexedDB schema, or anything under `src/server`. The restore in
+  `use-account-lifecycle.ts` gained exactly one guarded call to a UI state
+  setter, placed after every existing statement.
+- **The tabs were not renamed or reordered**, and Monthly Wrap was not moved out
+  of Budget's grouping. The reviewer's 9/10 placement evidence is only worth
+  something if the thing it measured is the thing that ships.
+- **`Plan` was not renamed** and `Activity` was not renamed, for the same reason.
+- **The reservation was not extended past the headline.** Every number on a
+  provisional draft is provisional, but the category rows, the recent-activity
+  rows and the metric row carry their own labels and are not the surface's
+  answer. Reserving them would have to guess a row count, which cannot be a
+  zero-shift reservation. Recorded as a residual instead.
+
+---
+
+### Residual risk
+
+- **The reservation covers the headline, not the whole surface.** During the
+  provisional window Home's `Needs attention` and `Recent activity` rows still
+  show the cached year's rows. They are labeled, they are not the answer, and
+  they no longer move anything above them — the measured CLS at the transition
+  is 0.0000 / 0.0001 / 0.0000 — but a reader who looks past the reserved box
+  during those tens of milliseconds is looking at a year the app is replacing.
+- **Budget's reservation is proven by test, not by the harness**, because the
+  provisional window closes faster than a deterministic tap can reach Budget.
+- **The `answer` fail-demo only binds where `singleAnswerPaint` is declared**,
+  which is the one state that stages the defect. Extending it to every surface
+  would be the stronger gate; it was not done this loop because several surfaces
+  legitimately have no hero and the check has not been exercised against them.
+- **`--disable-frame-rate-limit` is now load-bearing for the CLS instrument.**
+  If a future Chromium ignores it, `frameTicks` will say so on every row, but
+  the run will need a new flag rather than a new interpretation.
+- **The fixture is still one data shape**, and the D2 row's determinism rests on
+  it seeding exactly two plan years. If the fixture ever seeds one, the row
+  fails loudly on arrival rather than passing silently — that is why the arrival
+  assertion checks the remaining year count.
+- Everything the harness cannot see is unchanged and still listed in
+  [`mobile-density-baseline.md`](./mobile-density-baseline.md#what-this-harness-cannot-see).

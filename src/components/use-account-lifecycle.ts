@@ -64,6 +64,7 @@ export function useAccountLifecycle(
     beginAccount,
     getOwnerSignal,
     invalidateSession,
+    markPlanAwaitingAuthority,
     setDraft,
     setLoading,
     setPlans,
@@ -217,6 +218,17 @@ export function useAccountLifecycle(
             setUser(
               userWithLatestSession(remembered, latestSessionRef.current),
             );
+            // Nothing above changed: the same plans were restored from the
+            // same cache at the same moment, and the outbox, the service
+            // worker and the database are untouched. The one added fact is
+            // that these numbers are known-provisional — `planRefreshNeeded`
+            // is set and `setUser` above is what starts the authoritative
+            // refresh — so the surfaces reserve the headline box until it
+            // lands instead of painting a figure that changes meaning (C9,
+            // rule 3). A device that cannot reach the server gets no refresh
+            // to wait for, so its cached plan is its settled value and it
+            // renders normally.
+            if (navigator.onLine) markPlanAwaitingAuthority();
           } else if (remembered) {
             invalidateSession("");
             ownedGeneration = runtimeRef.current.accountGeneration;
@@ -241,6 +253,7 @@ export function useAccountLifecycle(
     cancelDevicePersistenceRetry,
     invalidateSession,
     loadPlansFor,
+    markPlanAwaitingAuthority,
     queueDevicePersistenceRetry,
     setDraft,
     setLoading,

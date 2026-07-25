@@ -30,14 +30,17 @@ export function MonthlyWrapSurface({
   plan,
   result,
   period,
+  backTo,
   onBack,
 }: {
   today: string;
   plan: StoredPlan;
   result: PlanResult;
   period: SelectedPeriod;
+  backTo: "home" | "activity";
   onBack: () => void;
 }) {
+  const backLabel = backTo === "activity" ? "Activity" : "Home";
   const month =
     period.kind === "month"
       ? period
@@ -49,7 +52,11 @@ export function MonthlyWrapSurface({
   const phase = monthlyWrapPhase(month.year, month.month, today);
   if (phase === "future") {
     return (
-      <BackPage title={`${periodLabel(month)} wrap`} onBack={onBack}>
+      <BackPage
+        title={`${periodLabel(month)} wrap`}
+        backLabel={backLabel}
+        onBack={onBack}
+      >
         <section className={styles.panel}>
           <p className={styles.eyebrow}>Forecast not started</p>
           <h2>This month has not begun.</h2>
@@ -71,7 +78,11 @@ export function MonthlyWrapSurface({
   const livePreview = phase === "current";
   const balance = wrapBalanceCopy(wrap.budget.safeToSpendCents, phase);
   return (
-    <BackPage title={`${periodLabel(month)} wrap`} onBack={onBack}>
+    <BackPage
+      title={`${periodLabel(month)} wrap`}
+      backLabel={backLabel}
+      onBack={onBack}
+    >
       <section className={styles.wrapHero}>
         <p>{balance.label}</p>
         <strong>{money(balance.valueCents)}</strong>

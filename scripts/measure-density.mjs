@@ -377,6 +377,104 @@ const SURFACES = [
     expect: `document.querySelector('[role="dialog"][aria-modal="true"] h2#fast-log-title')?.textContent === "Edit expense"`,
     after: [clickSelector('button[aria-label="Close Fast Log"]')],
   },
+  // D2, made into a gated row.
+  //
+  // The defect needs two things a happy-path fixture never supplies at once: a
+  // device cache holding a plan year other than the one the server will answer
+  // with, and a startup session request that fails for a reason other than 401.
+  // Both are staged from the browser only — one IndexedDB row is deleted and
+  // one URL is made to reject — so no application source, no sync decision, no
+  // outbox entry and no service worker is involved, and nothing about what the
+  // device stores changes: the authoritative refresh re-caches the year on the
+  // way back. It is deterministic because the density fixture always seeds two
+  // plan years and always caches both.
+  //
+  // Last in the catalogue on purpose: it leaves the app in a restored session,
+  // and the viewport loop signs in again before the next pass.
+  {
+    id: "home-provisional-restore",
+    label: "Home · cache restore awaiting the server",
+    account: "fixture",
+    bar: VERTICAL_BARS.home,
+    singleAnswerPaint: true,
+    prefix: [
+      clickExact("Home"),
+      `(() => {
+        sessionStorage.setItem('__density_block', '/api/bootstrap');
+        const open = (name) => new Promise((resolve, reject) => {
+          const request = indexedDB.open(name);
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+        const cachedYears = (db) => new Promise((resolve, reject) => {
+          const request = db.transaction('plans', 'readonly').objectStore('plans').getAllKeys();
+          request.onsuccess = () => resolve(request.result.map(Number));
+          request.onerror = () => reject(request.error);
+        });
+        // The browser profile is shared across every surface in the run, so the
+        // onboarding account has left its own (single-year, in fact empty)
+        // database behind. Pick the multi-year one by inspection rather than by
+        // enumeration order, which is not specified.
+        const openFixtureDatabase = async () => {
+          const databases = await indexedDB.databases();
+          const names = databases
+            .map((entry) => entry.name)
+            .filter((entry) => entry && entry.startsWith('kyle-financial-account-'));
+          if (names.length === 0) throw new Error('no account database on this device');
+          for (const name of names) {
+            const db = await open(name);
+            if ((await cachedYears(db)).length >= 2) return db;
+            db.close();
+          }
+          throw new Error('no cached account holds two plan years: ' + names.join(', '));
+        };
+        const removeNewestCachedYear = async () => {
+          const db = await openFixtureDatabase();
+          try {
+            const years = await cachedYears(db);
+            const newest = Math.max(...years);
+            await new Promise((resolve, reject) => {
+              const transaction = db.transaction('plans', 'readwrite');
+              transaction.objectStore('plans').delete(newest);
+              transaction.oncomplete = () => resolve();
+              transaction.onerror = () => reject(transaction.error);
+              transaction.onabort = () => reject(transaction.error);
+            });
+            // sessionStorage, not a window global: the measured step is a
+            // reload, and the evidence that the cache really was made
+            // multi-year-stale has to survive into the new document.
+            sessionStorage.setItem('__densityD2', JSON.stringify({
+              removedYear: newest,
+              remainingYears: years.length - 1,
+            }));
+          } finally {
+            db.close();
+          }
+        };
+        sessionStorage.removeItem('__densityD2');
+        removeNewestCachedYear().catch((error) => {
+          sessionStorage.setItem('__densityD2', JSON.stringify({ error: String(error) }));
+        });
+        return 'd2: /api/bootstrap set to reject; newest cached plan year being removed';
+      })()`,
+    ],
+    nav: [RELOAD_STEP],
+    // Arrival requires all four: the surface is Home, the sabotage actually
+    // fired, the cache really did lose a year (so the stale draft was a
+    // different year from the server's), and nothing is left reserved.
+    expect: `document.querySelector('main h1')?.textContent === "Home"
+      && window.__density.blockedRequests > 0
+      && JSON.parse(sessionStorage.getItem('__densityD2') ?? '{}').remainingYears >= 1
+      && document.querySelector('main [data-reserved]') === null
+      && /^\\$[\\d,]+$/.test(
+        document.querySelector('main [role="meter"][aria-label="Spending budget used"]')
+          ?.closest('section')?.querySelector('div > strong')?.textContent ?? '')`,
+    after: [
+      `sessionStorage.removeItem('__density_block');
+       sessionStorage.removeItem('__densityD2');
+       'd2: unblocked'`,
+    ],
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -401,6 +499,19 @@ const FAIL_DEMOS = {
     const heading = document.querySelector('main h1');
     if (heading) heading.textContent = '$0 planned spending';
   }, 900); 'headline: main h1 rewritten at +900ms'`,
+  // Repaints the primary answer with a second, different value under the same
+  // label. It is the only injection that trips the single-answer-paint check,
+  // and it deliberately puts the value back so that first paint still equals
+  // settled — which is exactly the shape the generic headline check cannot see
+  // and D2 had.
+  answer: `setTimeout(() => {
+    const meter = document.querySelector('main [role="meter"][aria-label="Spending budget used"]');
+    const amount = meter && meter.closest('section').querySelector('div > strong');
+    if (!amount) return;
+    const settled = amount.textContent;
+    amount.textContent = '$1';
+    setTimeout(() => { amount.textContent = settled; }, 200);
+  }, 900); 'answer: the primary answer repainted with a second value at +900ms'`,
   touch: `(() => {
     const button = document.createElement('button');
     button.textContent = 'x';
@@ -569,6 +680,16 @@ const measureExpression = (rowSelector) => `(() => {
     clsGeometric: geometricCls,
     clsSource: geometricCls > nativeCls ? 'geometric' : (nativeCls > 0 ? 'layout-shift API' : 'both zero'),
     shiftCount: shifts.length,
+    // The largest few shifts with the elements the browser says moved, so a red
+    // CLS row names its own cause instead of sending a reader guessing.
+    shiftDetail: [...shifts]
+      .sort((left, right) => right.value - left.value)
+      .slice(0, 4)
+      .map((entry) => ({
+        value: Math.round(entry.value * 1e6) / 1e6,
+        startTime: Math.round(entry.startTime),
+        sources: entry.sources ?? [],
+      })),
     geometricShiftCount: geometricShifts.length,
     geometricScrollSkips: probe.geometricScrollSkips,
     geometricSamples: probe.geometricSamples,
@@ -590,7 +711,12 @@ const measureExpression = (rowSelector) => `(() => {
     headlineFirstPaint:
       (headlines.find((entry) => !entry.busy) ?? { text: probe.headline() }).text,
     headlineSettled: probe.headline(),
-    headlineSamples: headlines.map((entry) => ({ text: entry.text, busy: entry.busy })),
+    headlineSamples: headlines.map((entry) => ({ text: entry.text, hero: entry.hero, busy: entry.busy })),
+    // Every distinct non-empty primary answer painted during the window. Rule 3
+    // is about a *number* changing meaning, and a headline that goes from "no
+    // answer yet" to "the answer" is not that. Two different answers is.
+    heroPaints: [...new Set(headlines.map((entry) => entry.hero).filter(Boolean))],
+    blockedRequests: probe.blockedRequests,
     smallTargets: small.length,
     smallTargetDetail: small.slice(0, 10).map((node) => ({
       label: (node.getAttribute('aria-label') || node.textContent || '').replace(/\\s+/g, ' ').trim().slice(0, 48),
@@ -615,6 +741,22 @@ const measureExpression = (rowSelector) => `(() => {
 // ---------------------------------------------------------------------------
 // agent-browser driver
 // ---------------------------------------------------------------------------
+
+// Headless Chrome has no display sink, so its frame-rate limiter never
+// schedules a BeginFrame and the compositor presents nothing. The Layout
+// Instability API only emits when frames are presented, so `layout-shift` goes
+// permanently silent and CLS reads 0.0000 on a page that is jumping — the dead
+// instrument the previous wave found and could only detect, not cure. Measured
+// directly on this machine: a requestAnimationFrame loop ticks **1** time in two
+// seconds by default and **115** times with the flag below, and the three
+// throttling flags that look like plausible culprits
+// (--disable-backgrounding-occluded-windows, --disable-renderer-backgrounding,
+// --disable-background-timer-throttling) each leave it at 1. This flag is the
+// instrument's power switch. It changes nothing about layout or the scores the
+// API reports; it only makes the API able to report. `frameTicks` on every row
+// stays, because a flag that stops working must still be visible.
+const BROWSER_LAUNCH_ARGS = ["--disable-frame-rate-limit"];
+
 class Browser {
   constructor(session) {
     this.session = session;
@@ -632,7 +774,14 @@ class Browser {
   }
 
   async open(url) {
-    await this.call(["open", "--init-script", probeScript, url]);
+    await this.call([
+      "open",
+      "--init-script",
+      probeScript,
+      "--args",
+      BROWSER_LAUNCH_ARGS.join(","),
+      url,
+    ]);
   }
 
   async reload() {
@@ -801,6 +950,7 @@ async function measureSurface(browser, surface, viewport, failDemo) {
     primaryViewport: viewport.primary,
     bar: surface.bar,
     listExemption: surface.listExemption ?? null,
+    singleAnswerPaint: surface.singleAnswerPaint === true,
     markTime,
     arrivalError,
     injection,
@@ -836,10 +986,23 @@ function violations(row, mode) {
     );
   }
   if (row.cls > BAR_CLS)
-    failures.push(`CLS ${row.cls.toFixed(4)} exceeds ${BAR_CLS}`);
+    failures.push(
+      `CLS ${row.cls.toFixed(4)} exceeds ${BAR_CLS}: ${JSON.stringify(row.shiftDetail)}`,
+    );
   if (row.headlineFirstPaint !== row.headlineSettled) {
     failures.push(
       `headline changed between first paint and settled: ${JSON.stringify(row.headlineFirstPaint)} -> ${JSON.stringify(row.headlineSettled)}`,
+    );
+  }
+  // A narrower gate than the one above, and it is added, never substituted: on
+  // a surface that declares it, the primary answer may be painted exactly once.
+  // The generic check compares first paint with settled and so cannot see a
+  // figure that appears and is replaced while the region is still marked busy;
+  // this one sees every sample, busy or not. It is what holds D2 shut.
+  if (row.singleAnswerPaint && (row.heroPaints?.length ?? 0) > 1) {
+    failures.push(
+      `the primary answer was painted ${row.heroPaints.length} times with different values, ` +
+        `so a number rendered provisionally and changed meaning: ${JSON.stringify(row.heroPaints)}`,
     );
   }
   if (row.smallTargets > 0) {

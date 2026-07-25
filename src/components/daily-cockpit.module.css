@@ -173,6 +173,33 @@
   color: var(--text-inverse-muted);
 }
 
+/* Reserved headline box (C9). Every element below keeps its own font, leading,
+   margin and grid position and holds a single non-breaking space, so the box it
+   occupies is the settled box to the sub-pixel; only the ink changes. Nothing
+   here sets a height, because a hard-coded height is a second source of truth
+   that can drift away from the type it is supposed to match. */
+.runwayHeadline[data-reserved] > span,
+.runwayHeadline[data-reserved] > strong,
+.runwayHeadline[data-reserved] > small,
+.surfaceHeader h1[data-reserved] {
+  width: 62%;
+  border-radius: var(--radius-sm);
+  color: var(--color-transparent);
+  background: var(--alpha-white-13);
+}
+
+.runwayHeadline[data-reserved] > span {
+  width: 44%;
+}
+
+.runwayHeadline[data-reserved] > small {
+  width: 80%;
+}
+
+.surfaceHeader h1[data-reserved] {
+  background: var(--surface-accent);
+}
+
 .runwayTrack {
   height: var(--space-2);
   overflow: hidden;

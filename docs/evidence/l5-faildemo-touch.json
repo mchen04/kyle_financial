@@ -1,0 +1,217 @@
+{
+  "generatedAt": "2026-07-25T08:43:14.108Z",
+  "mode": "gate",
+  "failDemo": "touch",
+  "deviceScaleFactor": 3,
+  "bars": {
+    "vertical": {
+      "home": 1,
+      "standard": 3,
+      "deep": 4,
+      "entry": 1.5
+    },
+    "cls": 0.02,
+    "minimumTargetPx": 44,
+    "chromeAboveExemptList": 0.6
+  },
+  "rows": [
+    {
+      "surface": "home",
+      "label": "Home",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 1,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 5121.4000000059605,
+      "arrivalError": null,
+      "injection": "touch: 20x20 button prepended to main",
+      "listRegion": null,
+      "scrollHeight": 844,
+      "documentScrollHeight": 844,
+      "measuredRegion": "documentElement",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0.019137178187735086,
+      "clsNative": 0.019137178187735086,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 2,
+      "shiftDetail": [
+        {
+          "value": 0.018608,
+          "startTime": 5204,
+          "sources": [
+            {
+              "node": "div :: HomeMonthYTDYearJan 2026Feb 2026Mar 2026Apr 2026May 2026Jun ",
+              "from": [12, 80, 366, 683],
+              "to": [12, 100, 366, 663]
+            },
+            {
+              "node": "section :: Left to spend$123exact: $4,478.00 − $4,354.57 = $123.43Savin",
+              "from": [0, 114, 390, 334],
+              "to": [0, 134, 390, 334]
+            }
+          ]
+        },
+        {
+          "value": 0.000529,
+          "startTime": 5130,
+          "sources": [
+            {
+              "node": "span :: Saved",
+              "from": [176, 29, 51, 14],
+              "to": [279, 29, 51, 14]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 67,
+      "frameTicks": 7633,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [
+        {
+          "text": "Home | Left to spend $123",
+          "hero": "Left to spend $123",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Left to spend $123"],
+      "blockedRequests": 0,
+      "smallTargets": 1,
+      "smallTargetDetail": [
+        {
+          "label": "x",
+          "width": 20,
+          "height": 20
+        }
+      ],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": [
+        "1 interactive target(s) under 44px: [{\"label\":\"x\",\"width\":20,\"height\":20}]"
+      ]
+    },
+    {
+      "surface": "activity",
+      "label": "Activity",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 3,
+      "listExemption": {
+        "reason": "transaction history (named by the mission)",
+        "rowSelector": "main [data-density-row=\"transaction\"]"
+      },
+      "singleAnswerPaint": false,
+      "markTime": 8535.40000000596,
+      "arrivalError": null,
+      "injection": "touch: 20x20 button prepended to main",
+      "listRegion": {
+        "rowSelector": "main [data-density-row=\"transaction\"]",
+        "rowCount": 61,
+        "chromeAboveFirstRowPx": 272.89,
+        "chromeAboveFirstRowCost": 0.32333012440758296,
+        "rowHeights": [
+          {
+            "height": 64,
+            "count": 46
+          },
+          {
+            "height": 80,
+            "count": 15
+          }
+        ],
+        "rowRegionPx": 4144,
+        "error": null
+      },
+      "scrollHeight": 4481,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 5.309241706161138,
+      "cls": 0.007600965030043442,
+      "clsNative": 0.007600965030043442,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 2,
+      "shiftDetail": [
+        {
+          "value": 0.007543,
+          "startTime": 8553,
+          "sources": [
+            {
+              "node": "button",
+              "from": [201, 680, 189, 144],
+              "to": [278, 680, 112, 144]
+            }
+          ]
+        },
+        {
+          "value": 0.000058,
+          "startTime": 8628,
+          "sources": [
+            {
+              "node": "button :: x",
+              "from": [12, 84, 20, 20],
+              "to": [32, 84, 20, 20]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 102,
+      "frameTicks": 7824,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Activity",
+      "headlineSettled": "Activity",
+      "headlineSamples": [
+        {
+          "text": "Activity",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 2,
+      "smallTargetDetail": [
+        {
+          "label": "x",
+          "width": 20,
+          "height": 20
+        },
+        {
+          "label": "x",
+          "width": 20,
+          "height": 20
+        }
+      ],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": [
+        "2 interactive target(s) under 44px: [{\"label\":\"x\",\"width\":20,\"height\":20},{\"label\":\"x\",\"width\":20,\"height\":20}]"
+      ]
+    }
+  ]
+}

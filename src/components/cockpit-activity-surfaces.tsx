@@ -1,6 +1,12 @@
 "use client";
 
-import { CirclePlus, Plus, Search } from "lucide-react";
+import {
+  CalendarDays,
+  ChevronRight,
+  CirclePlus,
+  Plus,
+  Search,
+} from "lucide-react";
 import { useState } from "react";
 import {
   observedTransactionsThrough,
@@ -12,6 +18,7 @@ import {
 } from "@/domain/daily-money";
 import { BackPage } from "./cockpit-back-page";
 import { PeriodControl } from "./cockpit-period-control";
+import { selectedPeriodPhase } from "./cockpit-period-phase";
 import { Metric, TransactionRows } from "./cockpit-rows";
 import { money, type StoredPlan } from "./plan-types";
 import styles from "./cockpit-shared.module.css";
@@ -22,6 +29,7 @@ export function ActivitySurface({
   period,
   onPeriod,
   onEdit,
+  onWrap,
   onFastLog,
 }: {
   today: string;
@@ -29,8 +37,10 @@ export function ActivitySurface({
   period: SelectedPeriod;
   onPeriod: (period: SelectedPeriod) => void;
   onEdit: (id: string) => void;
+  onWrap: () => void;
   onFastLog?: () => void;
 }) {
+  const unstarted = selectedPeriodPhase(period, today) === "future";
   const [query, setQuery] = useState("");
   const [categoryId, setCategoryId] = useState("all");
   const [visibleLimit, setVisibleLimit] = useState(100);
@@ -81,6 +91,29 @@ export function ActivitySurface({
         </div>
         <PeriodControl period={period} today={today} onPeriod={onPeriod} />
       </header>
+      {/* "What did I overspend on last month?" is a retrospective question, and
+          a fresh reader reads that as a history question and taps Activity. The
+          wrap is not removed from Home; this is a second path to the same
+          surface, above a list that can run to hundreds of rows, carrying its
+          own summary value rather than a bare chevron (C12). */}
+      <div className={styles.rowGroup}>
+        <button
+          className={styles.navRow}
+          onClick={onWrap}
+          disabled={period.kind !== "month" || unstarted}
+        >
+          <CalendarDays />
+          <strong>Monthly wrap</strong>
+          <em>
+            {unstarted
+              ? "Starts with the period"
+              : period.kind === "month"
+                ? periodLabel(period)
+                : "Choose a month"}
+          </em>
+          <ChevronRight />
+        </button>
+      </div>
       {futureTransactions.length > 0 && (
         <section
           className={styles.panel}

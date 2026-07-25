@@ -24,14 +24,17 @@ export type WorkspaceRoute =
         | "activity"
         | "plan"
         | "manage-categories"
-        | "wrap"
         | "plan-details"
         | "benefits"
         | "compare"
         | "account";
     }
   | { screen: "category"; categoryId: string }
-  | { screen: "edit-budget"; returnTo: "budget" | "plan" };
+  | { screen: "edit-budget"; returnTo: "budget" | "plan" }
+  // Monthly wrap is reachable from Home and from Activity (C12: a labeled 48px
+  // row on both). The origin travels with the route so the back control names
+  // the surface it actually returns to and the tab bar keeps its highlight.
+  | { screen: "wrap"; returnTo: "home" | "activity" };
 
 export type Screen = WorkspaceRoute["screen"];
 

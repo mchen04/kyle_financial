@@ -17,6 +17,7 @@
     geometricScrollSkips: 0,
     geometricSamples: 0,
     frameTicks: 0,
+    blockedRequests: 0,
   };
   window.__density = state;
 
@@ -35,8 +36,36 @@
   // The measurement window is "network idle plus one second". In a single-route
   // client app the interesting requests are the app's own fetches, so count
   // them rather than relying on document load alone.
+  //
+  // The same wrapper is where a gated harness state simulates a failing
+  // request. `sessionStorage.__density_block` holds a comma-separated list of
+  // URL fragments; a fetch whose URL contains one rejects the way a flaky
+  // network makes it reject. It survives a reload (which is the point — the
+  // failure has to happen during document start-up) and it is browser-side
+  // only: no application source, no service worker and no stored data is
+  // involved, exactly like the `--fail-demo` injections.
+  const blockedFragments = () => {
+    try {
+      return (sessionStorage.getItem("__density_block") ?? "")
+        .split(",")
+        .filter(Boolean);
+    } catch {
+      return [];
+    }
+  };
   const nativeFetch = window.fetch.bind(window);
   window.fetch = (...args) => {
+    const url = String(
+      typeof args[0] === "string" || args[0] instanceof URL
+        ? args[0]
+        : (args[0] && args[0].url) || "",
+    );
+    for (const fragment of blockedFragments()) {
+      if (url.includes(fragment)) {
+        state.blockedRequests += 1;
+        return Promise.reject(new TypeError("Failed to fetch"));
+      }
+    }
     state.inflight += 1;
     return nativeFetch(...args).finally(() => {
       state.inflight -= 1;
@@ -53,10 +82,44 @@
   };
 
   try {
+    // `sources` names the elements the browser saw move. A gate that reports
+    // "CLS 0.0633 exceeds 0.02" and nothing else cannot be acted on without
+    // guessing; this makes the failure self-diagnosing. Descriptions are short
+    // strings taken at observation time, so nothing holds a node reference.
+    const describeShiftSource = (source) => {
+      const node = source && source.node;
+      const rect = (box) =>
+        box
+          ? [
+              Math.round(box.x),
+              Math.round(box.y),
+              Math.round(box.width),
+              Math.round(box.height),
+            ]
+          : null;
+      let name = "(detached)";
+      if (node && node.tagName) {
+        name = node.tagName.toLowerCase();
+        if (node.id) name += "#" + node.id;
+        const text = (node.textContent || "").replace(/\s+/g, " ").trim();
+        if (text) name += " :: " + text.slice(0, 60);
+      }
+      return {
+        node: name,
+        from: rect(source && source.previousRect),
+        to: rect(source && source.currentRect),
+      };
+    };
     new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
         if (entry.hadRecentInput) continue;
-        state.shifts.push({ value: entry.value, startTime: entry.startTime });
+        state.shifts.push({
+          value: entry.value,
+          startTime: entry.startTime,
+          sources: [...(entry.sources || [])]
+            .slice(0, 4)
+            .map(describeShiftSource),
+        });
       }
     }).observe({ type: "layout-shift", buffered: true });
   } catch (error) {
@@ -226,6 +289,11 @@
     if (last && last.text === text) return;
     state.headlines.push({
       text,
+      // The hero on its own — the primary answer's label and figure, without
+      // the surface heading. A surface may legitimately go from "no hero yet"
+      // to "the hero"; what rule 3 forbids is two *different* hero strings, and
+      // that is only visible if the hero is recorded separately.
+      hero: heroText(),
       at: performance.now(),
       // The branded loading view is a placeholder, not the surface's own
       // headline. Recorded so readers can exclude it rather than mistaking

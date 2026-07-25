@@ -46,6 +46,7 @@ export function PlanWorkspaceContent({
   draft,
   route,
   saveState,
+  planAwaitingAuthority,
   result,
   period,
   onPeriod,
@@ -62,6 +63,7 @@ export function PlanWorkspaceContent({
   draft: StoredPlan;
   route: WorkspaceRoute;
   saveState: SaveState;
+  planAwaitingAuthority: boolean;
   result: PlanResult;
   period: SelectedPeriod;
   onPeriod: (period: SelectedPeriod) => void;
@@ -78,7 +80,7 @@ export function PlanWorkspaceContent({
   const preferredHsaAllocation =
     currentHsaFamilyAllocation(draft) ?? hsaAllocationIntents.get(draft.id);
   const navigateScreen = (screen: Screen) => {
-    if (screen === "category" || screen === "edit-budget")
+    if (screen === "category" || screen === "edit-budget" || screen === "wrap")
       throw new Error(`${screen} requires route context`);
     onNavigate({ screen });
   };
@@ -98,9 +100,20 @@ export function PlanWorkspaceContent({
           plan={draft}
           result={result}
           period={period}
-          compactForOffline={saveState === "offline"}
+          // Awaiting the server's answer is not the settled offline state, and
+          // the compact offline layout is a different box. Keeping the full
+          // layout through the reserved window is what makes the swap to the
+          // settled value a zero-shift swap.
+          compactForOffline={saveState === "offline" && !planAwaitingAuthority}
+          awaitingAuthority={planAwaitingAuthority}
           onPeriod={onPeriod}
-          onScreen={navigateScreen}
+          onScreen={(screen) => {
+            if (screen === "wrap") {
+              onNavigate({ screen, returnTo: "home" });
+              return;
+            }
+            navigateScreen(screen);
+          }}
           onCategory={(categoryId) =>
             onNavigate({ screen: "category", categoryId })
           }
@@ -113,6 +126,7 @@ export function PlanWorkspaceContent({
           today={today}
           plan={draft}
           period={period}
+          awaitingAuthority={planAwaitingAuthority}
           onPeriod={onPeriod}
           onScreen={(screen) => {
             if (screen === "edit-budget") {
@@ -134,6 +148,7 @@ export function PlanWorkspaceContent({
           period={period}
           onPeriod={onPeriod}
           onEdit={onOpenTransaction}
+          onWrap={() => onNavigate({ screen: "wrap", returnTo: "activity" })}
           onFastLog={canCreateExpense ? () => onOpenTransaction() : undefined}
         />
       );
@@ -171,7 +186,8 @@ export function PlanWorkspaceContent({
           plan={draft}
           result={result}
           period={period}
-          onBack={() => onNavigate({ screen: "home" })}
+          backTo={route.returnTo}
+          onBack={() => onNavigate({ screen: route.returnTo })}
         />
       );
     case "plan":

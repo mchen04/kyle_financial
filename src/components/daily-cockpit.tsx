@@ -37,12 +37,21 @@ import { CategoryRow, Metric, TransactionRows } from "./cockpit-rows";
 import { money, type Screen, type StoredPlan } from "./plan-types";
 import styles from "./cockpit-shared.module.css";
 
+/**
+ * The only content a reserved headline box carries. A non-breaking space forms
+ * exactly one line box in whatever font and leading the settled text would have
+ * used, so the reservation is the settled geometry by construction rather than
+ * by a hard-coded height that could drift away from it.
+ */
+const RESERVED_LINE = "\u00a0";
+
 export function HomeSurface({
   today,
   plan,
   result,
   period,
   compactForOffline,
+  awaitingAuthority,
   onPeriod,
   onScreen,
   onCategory,
@@ -53,6 +62,7 @@ export function HomeSurface({
   result: PlanResult;
   period: SelectedPeriod;
   compactForOffline: boolean;
+  awaitingAuthority: boolean;
   onPeriod: (period: SelectedPeriod) => void;
   onScreen: (screen: Screen) => void;
   onCategory: (id: string) => void;
@@ -112,25 +122,40 @@ export function HomeSurface({
       </header>
 
       <section className={styles.runwayCard}>
-        <div className={styles.runwayHeadline}>
+        {/* Two legal states and no third (C9-2): the reserved box, or the
+            settled value. The reserved box is these same three elements
+            carrying a single non-breaking space, so each line box is set by the
+            same font, leading and grid gap as the settled block and the swap
+            moves nothing. The label lives inside the reservation because it is
+            derived from the same provisional numbers (C9-3). */}
+        <div
+          className={styles.runwayHeadline}
+          data-reserved={awaitingAuthority || undefined}
+        >
           <span>
-            {unstarted
-              ? "Planned spending"
-              : over
-                ? "Over budget"
-                : "Left to spend"}
+            {awaitingAuthority
+              ? RESERVED_LINE
+              : unstarted
+                ? "Planned spending"
+                : over
+                  ? "Over budget"
+                  : "Left to spend"}
           </span>
-          <strong data-negative={over}>
-            {money(
-              unstarted
-                ? rollup.spendingAllocatedCents
-                : Math.abs(rollup.safeToSpendCents),
-            )}
+          <strong data-negative={!awaitingAuthority && over}>
+            {awaitingAuthority
+              ? RESERVED_LINE
+              : money(
+                  unstarted
+                    ? rollup.spendingAllocatedCents
+                    : Math.abs(rollup.safeToSpendCents),
+                )}
           </strong>
           {/* The period is named by the month picker directly above, so it is
               not restated here. */}
           <small>
-            {unstarted ? (
+            {awaitingAuthority ? (
+              RESERVED_LINE
+            ) : unstarted ? (
               <>
                 {money(rollup.spendingAllocatedCents, 2)} planned; actuals begin
                 when the period starts
@@ -226,6 +251,7 @@ export function BudgetSurface({
   today,
   plan,
   period,
+  awaitingAuthority,
   onPeriod,
   onScreen,
   onCategory,
@@ -233,6 +259,7 @@ export function BudgetSurface({
   today: string;
   plan: StoredPlan;
   period: SelectedPeriod;
+  awaitingAuthority: boolean;
   onPeriod: (period: SelectedPeriod) => void;
   onScreen: (screen: Screen) => void;
   onCategory: (id: string) => void;
@@ -259,12 +286,19 @@ export function BudgetSurface({
       <header className={styles.surfaceHeader}>
         <div>
           <p className={styles.eyebrow}>Budget</p>
-          <h1>
-            {unstarted
-              ? `${money(rollup.spendingAllocatedCents)} planned spending`
-              : `${money(Math.abs(rollup.safeToSpendCents))} ${
-                  rollup.safeToSpendCents < 0 ? "over" : "safe to spend"
-                }`}
+          {/* The eyebrow is a fixed section name and never moves. The `h1`
+              carries both the figure and the phrase that gives it meaning, so
+              the whole line is the reservation (C9-2, C9-3). It sets on one
+              line in every phase at every width, so one non-breaking space
+              reserves exactly the settled box. */}
+          <h1 data-reserved={awaitingAuthority || undefined}>
+            {awaitingAuthority
+              ? RESERVED_LINE
+              : unstarted
+                ? `${money(rollup.spendingAllocatedCents)} planned spending`
+                : `${money(Math.abs(rollup.safeToSpendCents))} ${
+                    rollup.safeToSpendCents < 0 ? "over" : "safe to spend"
+                  }`}
           </h1>
         </div>
         <PeriodControl period={period} today={today} onPeriod={onPeriod} />
