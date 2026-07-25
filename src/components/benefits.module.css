@@ -1,7 +1,3 @@
-.eyebrow {
-  composes: eyebrow from "./surface-primitives.module.css";
-}
-
 .muted {
   composes: muted from "./surface-primitives.module.css";
 }

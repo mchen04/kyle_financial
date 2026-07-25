@@ -77,7 +77,6 @@
 
   .detailMetrics,
   .homeGrid,
-  .actionRail,
   .linkGrid,
   .planOutcome {
     grid-template-columns: minmax(0, 1fr);
@@ -112,8 +111,7 @@
     padding: var(--space-4);
   }
 
-  .sectionHeading,
-  .toolbar {
+  .sectionHeading {
     align-items: start;
     flex-direction: column;
   }

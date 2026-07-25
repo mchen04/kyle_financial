@@ -16,7 +16,6 @@ export {
   periodForYear,
 } from "./cockpit-period-control";
 
-import { CalendarDays, ChevronRight } from "lucide-react";
 import { guidanceBucket } from "@/domain/budget";
 import {
   categoryRollupIsVisible,
@@ -33,7 +32,12 @@ import {
 } from "./cockpit-home-projection";
 import { PeriodControl, savingsSources } from "./cockpit-period-control";
 import { selectedPeriodPhase } from "./cockpit-period-phase";
-import { CategoryRow, Metric, TransactionRows } from "./cockpit-rows";
+import {
+  CategoryRow,
+  Metric,
+  MonthlyWrapRow,
+  TransactionRows,
+} from "./cockpit-rows";
 import { money, type Screen, type StoredPlan } from "./plan-types";
 import styles from "./cockpit-shared.module.css";
 
@@ -225,24 +229,11 @@ export function HomeSurface({
         )}
       </section>
 
-      <div className={styles.rowGroup}>
-        <button
-          className={styles.navRow}
-          onClick={() => onScreen("wrap")}
-          disabled={period.kind !== "month" || unstarted}
-        >
-          <CalendarDays />
-          <strong>Monthly wrap</strong>
-          <em>
-            {unstarted
-              ? "Starts with the period"
-              : period.kind === "month"
-                ? periodLabel(period)
-                : "Choose a month"}
-          </em>
-          <ChevronRight />
-        </button>
-      </div>
+      <MonthlyWrapRow
+        period={period}
+        unstarted={unstarted}
+        onOpen={() => onScreen("wrap")}
+      />
     </div>
   );
 }

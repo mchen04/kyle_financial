@@ -1,8 +1,46 @@
-import { ChevronRight } from "lucide-react";
+import { CalendarDays, ChevronRight } from "lucide-react";
 import type { BudgetCategory, TransactionEntry } from "@/domain/budget";
-import type { CategoryRollup } from "@/domain/daily-money";
+import {
+  periodLabel,
+  type CategoryRollup,
+  type SelectedPeriod,
+} from "@/domain/daily-money";
 import { money } from "./plan-types";
 import styles from "./cockpit-shared.module.css";
+
+// Monthly wrap is reachable from Home and from Activity. C12 wants a labeled
+// 48px row carrying its own summary value rather than a bare chevron, and it
+// has to be the same row on both surfaces, so there is one definition of it.
+export function MonthlyWrapRow({
+  period,
+  unstarted,
+  onOpen,
+}: {
+  period: SelectedPeriod;
+  unstarted: boolean;
+  onOpen: () => void;
+}) {
+  return (
+    <div className={styles.rowGroup}>
+      <button
+        className={styles.navRow}
+        onClick={onOpen}
+        disabled={period.kind !== "month" || unstarted}
+      >
+        <CalendarDays />
+        <strong>Monthly wrap</strong>
+        <em>
+          {unstarted
+            ? "Starts with the period"
+            : period.kind === "month"
+              ? periodLabel(period)
+              : "Choose a month"}
+        </em>
+        <ChevronRight />
+      </button>
+    </div>
+  );
+}
 
 export function Metric({
   label,
@@ -80,10 +118,6 @@ const DAY_FORMAT = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
-function transactionDayLabel(date: string): string {
-  return DAY_FORMAT.format(new Date(`${date}T00:00:00Z`));
-}
-
 export function TransactionRows({
   transactions,
   categories,
@@ -121,7 +155,7 @@ export function TransactionRows({
               <strong>{transaction.title}</strong>
               <small>
                 {category?.name ?? "Archived category"} ·{" "}
-                {transactionDayLabel(transaction.date)}
+                {DAY_FORMAT.format(new Date(`${transaction.date}T00:00:00Z`))}
               </small>
               {transaction.note && (
                 <small className={styles.transactionNote}>

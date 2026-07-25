@@ -286,15 +286,11 @@
   box-shadow: var(--shadow-card);
 }
 
-.sectionHeading,
-.toolbar {
+.sectionHeading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-}
-
-.sectionHeading {
   margin-bottom: var(--space-4);
 }
 
@@ -302,25 +298,6 @@
 .emptyHero h2 {
   margin: var(--space-1) 0 0;
   font: var(--weight-bold) var(--text-xl) / 1.15 var(--font-display);
-}
-
-.textButton {
-  min-height: var(--control-sm);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: 0;
-  border: 0;
-  background: var(--color-transparent);
-  color: var(--text-action-strong);
-  font-weight: var(--weight-bold);
-  cursor: pointer;
-}
-
-.textButton svg,
-.actionCard > svg:last-child {
-  width: var(--icon-sm);
-  height: var(--icon-sm);
 }
 
 /* C4: rows inside a group sit at 0px with a hairline between them; the 8px
@@ -548,7 +525,6 @@
   line-height: var(--leading-body);
 }
 
-.actionRail,
 .linkGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -582,6 +558,8 @@
 }
 
 .actionCard > svg:last-child {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
   margin-left: auto;
 }
 
@@ -590,25 +568,6 @@
   cursor: default;
 }
 
-.toolbar {
-  min-height: var(--control-lg);
-  padding: var(--space-3) var(--space-4);
-  border: var(--border-hairline) solid var(--border-default);
-  border-radius: var(--radius-md);
-  background: var(--surface-panel);
-}
-
-.toolbar p {
-  margin: 0;
-  color: var(--text-secondary);
-}
-
-.toolbar > div {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.toolbar button,
 .budgetActions button,
 .emptyHero button,
 .loadMore {

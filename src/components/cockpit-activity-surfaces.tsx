@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  CalendarDays,
-  ChevronRight,
-  CirclePlus,
-  Plus,
-  Search,
-} from "lucide-react";
+import { CirclePlus, Plus, Search } from "lucide-react";
 import { useState } from "react";
 import {
   observedTransactionsThrough,
@@ -19,7 +13,7 @@ import {
 import { BackPage } from "./cockpit-back-page";
 import { PeriodControl } from "./cockpit-period-control";
 import { selectedPeriodPhase } from "./cockpit-period-phase";
-import { Metric, TransactionRows } from "./cockpit-rows";
+import { Metric, MonthlyWrapRow, TransactionRows } from "./cockpit-rows";
 import { money, type StoredPlan } from "./plan-types";
 import styles from "./cockpit-shared.module.css";
 
@@ -96,24 +90,7 @@ export function ActivitySurface({
           wrap is not removed from Home; this is a second path to the same
           surface, above a list that can run to hundreds of rows, carrying its
           own summary value rather than a bare chevron (C12). */}
-      <div className={styles.rowGroup}>
-        <button
-          className={styles.navRow}
-          onClick={onWrap}
-          disabled={period.kind !== "month" || unstarted}
-        >
-          <CalendarDays />
-          <strong>Monthly wrap</strong>
-          <em>
-            {unstarted
-              ? "Starts with the period"
-              : period.kind === "month"
-                ? periodLabel(period)
-                : "Choose a month"}
-          </em>
-          <ChevronRight />
-        </button>
-      </div>
+      <MonthlyWrapRow period={period} unstarted={unstarted} onOpen={onWrap} />
       {futureTransactions.length > 0 && (
         <section
           className={styles.panel}

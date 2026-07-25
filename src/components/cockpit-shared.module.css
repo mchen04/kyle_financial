@@ -2,11 +2,6 @@
   composes: actionCard from "./daily-cockpit.module.css";
 }
 
-.actionRail {
-  composes: actionRail from "./daily-cockpit.module.css";
-  composes: actionRail from "./daily-cockpit-responsive.module.css";
-}
-
 .activityGroups {
   composes: activityGroups from "./daily-cockpit.module.css";
 }
@@ -34,30 +29,6 @@
 
 .budgetNote {
   composes: budgetNote from "./daily-cockpit.module.css";
-}
-
-.groupEmpty {
-  composes: groupEmpty from "./daily-cockpit.module.css";
-}
-
-.groupLabel {
-  composes: groupLabel from "./daily-cockpit.module.css";
-}
-
-.homeSurface {
-  composes: homeSurface from "./daily-cockpit-responsive.module.css";
-}
-
-.navRow {
-  composes: navRow from "./daily-cockpit.module.css";
-}
-
-.rowFigures {
-  composes: rowFigures from "./daily-cockpit.module.css";
-}
-
-.rowGroup {
-  composes: rowGroup from "./daily-cockpit.module.css";
 }
 
 .budgetSurface {
@@ -97,9 +68,21 @@
   composes: filters from "./daily-cockpit-responsive.module.css";
 }
 
+.groupEmpty {
+  composes: groupEmpty from "./daily-cockpit.module.css";
+}
+
+.groupLabel {
+  composes: groupLabel from "./daily-cockpit.module.css";
+}
+
 .homeGrid {
   composes: homeGrid from "./daily-cockpit.module.css";
   composes: homeGrid from "./daily-cockpit-responsive.module.css";
+}
+
+.homeSurface {
+  composes: homeSurface from "./daily-cockpit-responsive.module.css";
 }
 
 .linkGrid {
@@ -123,6 +106,10 @@
 .monthStepper {
   composes: monthStepper from "./daily-cockpit.module.css";
   composes: monthStepper from "./daily-cockpit-responsive.module.css";
+}
+
+.navRow {
+  composes: navRow from "./daily-cockpit.module.css";
 }
 
 .offlineHome {
@@ -164,6 +151,14 @@
   composes: planOutcome from "./daily-cockpit-responsive.module.css";
 }
 
+.rowFigures {
+  composes: rowFigures from "./daily-cockpit.module.css";
+}
+
+.rowGroup {
+  composes: rowGroup from "./daily-cockpit.module.css";
+}
+
 .runwayCard {
   composes: runwayCard from "./daily-cockpit.module.css";
   composes: runwayCard from "./daily-cockpit-responsive.module.css";
@@ -200,15 +195,6 @@
 .surfaceStack {
   composes: surfaceStack from "./daily-cockpit.module.css";
   composes: surfaceStack from "./daily-cockpit-responsive.module.css";
-}
-
-.textButton {
-  composes: textButton from "./daily-cockpit.module.css";
-}
-
-.toolbar {
-  composes: toolbar from "./daily-cockpit.module.css";
-  composes: toolbar from "./daily-cockpit-responsive.module.css";
 }
 
 .transactionNote {
