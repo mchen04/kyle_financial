@@ -389,6 +389,183 @@ describe("offline mutation reconciliation", () => {
     );
   });
 
+  it.each([
+    [
+      "a transaction created after its category was deleted",
+      (
+        categoryId: string,
+        benefitId: string,
+        transactionId: string,
+        emptyCategoryId: string,
+      ) => [
+        {
+          mutationId: "00000000-0000-4000-8000-000000001201",
+          planYear: 2026,
+          field: `expense:${emptyCategoryId}` as const,
+          value: null,
+          updatedAt: "2026-07-24T12:00:00.000Z",
+        },
+        {
+          mutationId: "00000000-0000-4000-8000-000000001202",
+          planYear: 2026,
+          field: `transaction:00000000-0000-4000-8000-0000000012a0` as const,
+          value: {
+            id: "00000000-0000-4000-8000-0000000012a0",
+            categoryId: emptyCategoryId,
+            amountCents: 500,
+            title: "Orphan",
+            date: "2026-07-24",
+            createdAt: "2026-07-24T12:00:01.000Z",
+            updatedAt: "2026-07-24T12:00:01.000Z",
+          },
+          updatedAt: "2026-07-24T12:00:01.000Z",
+        },
+      ],
+    ],
+    [
+      "a transaction repointed at a category of no plan",
+      (
+        categoryId: string,
+        benefitId: string,
+        transactionId: string,
+        emptyCategoryId: string,
+      ) => [
+        {
+          mutationId: "00000000-0000-4000-8000-000000001203",
+          planYear: 2026,
+          field: `transaction:${transactionId}:categoryId` as const,
+          value: "00000000-0000-4000-8000-0000000019ff",
+          updatedAt: "2026-07-24T12:00:02.000Z",
+        },
+      ],
+    ],
+    [
+      "a tax treatment set on a benefit that is not custom",
+      (
+        categoryId: string,
+        benefitId: string,
+        transactionId: string,
+        emptyCategoryId: string,
+      ) => [
+        {
+          mutationId: "00000000-0000-4000-8000-000000001204",
+          planYear: 2026,
+          field: `benefit:${benefitId}:customTaxTreatment` as const,
+          value: {
+            reducesFederalTaxable: true,
+            reducesFicaTaxable: false,
+            reducesStateTaxable: true,
+            reducesTakeHome: true,
+            countsAsSavings: true,
+            employerSide: false,
+          },
+          updatedAt: "2026-07-24T12:00:03.000Z",
+        },
+      ],
+    ],
+    [
+      "a timestamp outside the storable range",
+      (
+        categoryId: string,
+        benefitId: string,
+        transactionId: string,
+        emptyCategoryId: string,
+      ) => [
+        {
+          mutationId: "00000000-0000-4000-8000-000000001205",
+          planYear: 2026,
+          field: `transaction:${transactionId}:updatedAt` as const,
+          value: "0000-01-01T00:00:00.000Z",
+          updatedAt: "2026-07-24T12:00:04.000Z",
+        },
+      ],
+    ],
+  ])(
+    "rejects %s without condemning the batch, and records a receipt",
+    async (label, build) => {
+      const slug = label.replaceAll(/[^a-z]+/g, "-");
+      const user = await createUser(
+        sql,
+        `sync-isolated-${slug}@example.com`,
+        "sync isolated rejection password",
+      );
+      const created = await createPlanWithDefaults(sql, user.id, {
+        year: 2026,
+        stateCode: "TX",
+        filingStatus: "single",
+        grossSalaryCents: 10_000_000,
+        additionalWageIncomeCents: 0,
+        spouseWageIncomeCents: 0,
+        otherOrdinaryIncomeCents: 0,
+        hsaCoverage: "self",
+      });
+      const [category, bystander, emptyCategory] = created.expenses;
+      const benefit = created.benefits.find(({ type }) => type !== "custom");
+      expect(benefit).toBeDefined();
+      const transactionId = "00000000-0000-4000-8000-000000001200";
+      await applySyncMutations(sql, user.id, [
+        {
+          mutationId: "00000000-0000-4000-8000-0000000011ff",
+          planYear: 2026,
+          field: `transaction:${transactionId}`,
+          value: {
+            id: transactionId,
+            categoryId: category.id,
+            amountCents: 1_000,
+            title: "Anchor",
+            date: "2026-07-24",
+            createdAt: "2026-07-24T11:00:00.000Z",
+            updatedAt: "2026-07-24T11:00:00.000Z",
+          },
+          updatedAt: "2026-07-24T11:00:00.000Z",
+        },
+      ]);
+
+      const offending = build(
+        category.id,
+        benefit!.id,
+        transactionId,
+        emptyCategory.id,
+      );
+      const bystanderId = "00000000-0000-4000-8000-0000000012ff";
+      const response = await applySyncMutations(sql, user.id, [
+        ...offending,
+        {
+          mutationId: bystanderId,
+          planYear: 2026,
+          field: `expense:${bystander.id}:name`,
+          value: "Bystander survived",
+          updatedAt: "2026-07-24T12:30:00.000Z",
+        },
+      ]);
+
+      // No acknowledgement may claim the whole plan year was rejected.
+      expect(response.acknowledgements.some(({ rejected }) => rejected)).toBe(
+        false,
+      );
+      expect(
+        response.acknowledgements.find(
+          ({ mutationId }) => mutationId === bystanderId,
+        ),
+      ).toEqual({ mutationId: bystanderId, applied: true });
+
+      const plan = await getPlanByYear(sql, user.id, 2026);
+      expect(plan?.expenses.find(({ id }) => id === bystander.id)?.name).toBe(
+        "Bystander survived",
+      );
+
+      // A receipt must exist for every mutation, or the client's outbox can
+      // never drain and the account wedges.
+      const receipts = await sql<{ mutation_id: string }[]>`
+        SELECT mutation_id FROM applied_mutations WHERE user_id = ${user.id}
+      `;
+      const recorded = new Set(receipts.map(({ mutation_id }) => mutation_id));
+      for (const { mutationId } of offending) {
+        expect(recorded.has(mutationId)).toBe(true);
+      }
+    },
+  );
+
   it("merges disjoint expense edits instead of replacing the collection", async () => {
     const user = await createUser(
       sql,

@@ -207,6 +207,7 @@ describe("database migrations", () => {
       expect(await migrate(url.toString())).toEqual([
         "012_daily_money_cockpit.sql",
         "013_sync_receipt_lookup_index.sql",
+        "014_drop_duplicate_rate_limit_index.sql",
       ]);
       const upgraded = await legacySql<
         {
@@ -298,6 +299,33 @@ describe("database migrations", () => {
       `;
       await expect(migrate(url.toString())).rejects.toThrow(
         /001_initial\.sql changed after it was applied/,
+      );
+    } finally {
+      await ledgerSql.end();
+      await admin`DROP SCHEMA IF EXISTS ${admin(schema)} CASCADE`;
+      await admin.end();
+    }
+  });
+
+  it("refuses to run when an applied migration file was renamed away", async () => {
+    const schema = `kf_test_renamed_${randomUUID().replaceAll("-", "").slice(0, 12)}`;
+    const admin = testSql();
+    const url = new URL(testDatabaseUrl());
+    url.searchParams.set("options", `-csearch_path=${schema}`);
+    await admin`CREATE SCHEMA ${admin(schema)}`;
+    const ledgerSql = postgres(url.toString(), {
+      max: 1,
+      onnotice: () => undefined,
+    });
+    try {
+      await migrate(url.toString());
+      await ledgerSql`
+        UPDATE app_migrations
+        SET name = '001_initial_renamed.sql'
+        WHERE name = '001_initial.sql'
+      `;
+      await expect(migrate(url.toString())).rejects.toThrow(
+        /Applied migrations have no file: 001_initial_renamed\.sql/,
       );
     } finally {
       await ledgerSql.end();

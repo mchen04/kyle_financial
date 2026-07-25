@@ -6,6 +6,7 @@ import {
   parseJsonRequest,
   validatedJsonResponse,
 } from "@/server/http";
+import { isTransientContentionFailure } from "@/server/postgres-errors";
 import { syncRequestSchema } from "@/server/request-contracts";
 import {
   applySyncMutations,
@@ -27,6 +28,15 @@ export async function POST(request: Request): Promise<Response> {
   } catch (error) {
     if (error instanceof SyncPlanNotFoundError) {
       return errorResponse(404, "Plan not found for sync");
+    }
+    // Two devices reconciling the same plan contend for its row lock. That is
+    // ordinary traffic, not a failed request, so the client is told to retry
+    // rather than shown an error it cannot act on.
+    if (isTransientContentionFailure(error)) {
+      return errorResponse(
+        503,
+        "Another device is syncing this plan. Please retry.",
+      );
     }
     return errorResponse(500, "Offline changes could not be reconciled.");
   }

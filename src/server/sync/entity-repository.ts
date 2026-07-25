@@ -150,10 +150,12 @@ async function replaceExpense(
       LIMIT 1
     `;
     if (blocking.length > 0) return false;
-    await transaction`
-      DELETE FROM expenses WHERE plan_id = ${planId} AND id = ${entryId}
+    const removed = await transaction`
+      DELETE FROM expenses
+      WHERE plan_id = ${planId} AND id = ${entryId}
+      RETURNING id
     `;
-    return true;
+    return removed.length > 0;
   }
   const entry = mutation.value;
   // The arbiter must be the primary key, so an id already owned by another

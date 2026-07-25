@@ -28,16 +28,27 @@ import {
 } from "@/domain/sync";
 import { canonicalUuidSchema } from "@/domain/sync-field";
 import { transportSafeFieldVersion } from "@/domain/field-version";
-import type { FieldVersions } from "@/domain/stored-plan";
+import type { FieldVersions, StoredPlan } from "@/domain/stored-plan";
 import {
   getPlanByYearInTransaction,
   listPlans,
 } from "@/server/plans/repository";
 import { parseFieldVersions } from "@/server/field-versions";
-import { isForeignKeyConstraintViolation } from "@/server/postgres-errors";
+import {
+  isForeignKeyConstraintViolation,
+  isRejectableMutationViolation,
+} from "@/server/postgres-errors";
 import { persistDecodedEntityMutation } from "@/server/sync/entity-repository";
 
 class InvalidFinalPlanError extends Error {}
+
+function isAdmissibleProjection(plan: StoredPlan): boolean {
+  return (
+    plan.transactions.every(({ date }) =>
+      localDateBelongsToYear(date, plan.year),
+    ) && normalizedFullPlanSchema.safeParse(plan).success
+  );
+}
 export class SyncPlanNotFoundError extends Error {}
 
 function mutationUsesFutureActualDate(
@@ -257,15 +268,37 @@ async function reconcilePlanYear(
           baseMatches || isIncomingVersionNewer(incoming, newestVersion);
 
         if (applied) {
-          if (mutation.kind !== "scalar") {
-            applied = await persistDecodedEntityMutation(
-              transaction,
-              plan.id,
-              mutation,
-            );
+          const candidatePlan = applyDecodedSyncMutation(
+            projectedPlan,
+            mutation,
+          );
+          // An entity edit stands alone, so an inadmissible one is refused on
+          // its own rather than condemning everything it travelled with.
+          // Scalar plan fields are deliberately cross-coupled — HSA eligibility
+          // and its complementary family allocation are only valid as a pair —
+          // so those are still judged together once the batch is complete.
+          if (
+            mutation.kind !== "scalar" &&
+            !isAdmissibleProjection(candidatePlan)
+          ) {
+            applied = false;
+          } else {
+            try {
+              // A savepoint bounds the blast radius of a constraint the client
+              // payload violates: the failing statement rolls back alone and
+              // still earns a receipt, so the outbox can drain.
+              applied = await transaction.savepoint((savepoint) =>
+                mutation.kind === "scalar"
+                  ? Promise.resolve(true)
+                  : persistDecodedEntityMutation(savepoint, plan.id, mutation),
+              );
+            } catch (error) {
+              if (!isRejectableMutationViolation(error)) throw error;
+              applied = false;
+            }
           }
           if (applied) {
-            projectedPlan = applyDecodedSyncMutation(projectedPlan, mutation);
+            projectedPlan = candidatePlan;
             if (mutation.kind !== "scalar" && mutation.property === null) {
               for (const field of Object.keys(versions)) {
                 const target = parseSyncTarget(field);
@@ -312,13 +345,9 @@ async function reconcilePlanYear(
           ) AS receipt(mutation_id text, result jsonb)
         `;
       }
-      const transactionOutsidePlanYear = projectedPlan.transactions.some(
-        ({ date }) => !localDateBelongsToYear(date, projectedPlan.year),
-      );
-      if (
-        transactionOutsidePlanYear ||
-        !normalizedFullPlanSchema.safeParse(projectedPlan).success
-      )
+      // Every mutation was admitted individually, so this is a backstop against
+      // a combination none of them produced alone.
+      if (!isAdmissibleProjection(projectedPlan))
         throw new InvalidFinalPlanError();
       return result;
     });

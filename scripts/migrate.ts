@@ -34,7 +34,22 @@ export async function migrate(databaseUrl: string): Promise<string[]> {
     `;
     const known = new Map(existing.map((row) => [row.name, row.checksum]));
 
-    let lastApplied: string | undefined;
+    // A ledger entry with no file means a migration was renamed or removed.
+    // Under name-keyed bookkeeping a rename re-runs the migration under its new
+    // name, which for anything not idempotent is data loss.
+    const orphaned = [...known.keys()]
+      .filter((name) => !files.includes(name))
+      .sort();
+    if (orphaned.length > 0) {
+      throw new Error(
+        `Applied migrations have no file: ${orphaned.join(", ")}. Applied migrations are immutable; restore the file rather than renaming or deleting it.`,
+      );
+    }
+    // There is deliberately no out-of-order guard. A file that sorts before the
+    // highest applied migration is indistinguishable, by name alone, from an
+    // older migration being re-applied on purpose after its ledger row was
+    // removed — which is a supported repair path. Checksums catch the case that
+    // actually diverges environments: an applied migration whose content moved.
     for (const file of files) {
       const body = await readFile(resolve(migrationsDirectory, file), "utf8");
       const digest = checksum(body);
@@ -51,13 +66,7 @@ export async function migrate(databaseUrl: string): Promise<string[]> {
             `Migration ${file} changed after it was applied. Applied migrations are immutable; add a new forward migration instead.`,
           );
         }
-        lastApplied = file;
         continue;
-      }
-      if (lastApplied && file < lastApplied) {
-        throw new Error(
-          `Migration ${file} sorts before the already-applied ${lastApplied}. Out-of-order insertion would diverge environments.`,
-        );
       }
       await sql.begin(async (transaction) => {
         await transaction.unsafe(body);
