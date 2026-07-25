@@ -226,7 +226,7 @@
 .runwayMetrics dd,
 .detailMetrics dd,
 .mathBreakdown dd,
-.activitySummary strong,
+.activityTotal,
 .wrapHero > strong,
 .planOutcome > div > strong,
 .categoryRow small,
@@ -234,8 +234,7 @@
 .transactionRow small,
 .transactionRow em,
 .navRow em,
-.budgetNote,
-.dateHeading {
+.budgetNote {
   font-variant-numeric: tabular-nums;
 }
 
@@ -410,28 +409,14 @@
   gap: var(--space-2);
 }
 
-.activitySummary {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.activitySummary p,
-.activitySummary span {
-  margin: 0;
-}
-
-.activitySummary strong {
+/* C1/C5: the period total is one labelled line beside the heading, not a
+   bordered summary card. A <span> rather than a <p> so it is not subject to the
+   header's prose rules, which hide the trailing paragraph in landscape. */
+.activityTotal {
   display: block;
   margin-top: var(--space-1);
-  font-family: var(--font-display);
-  font-size: var(--text-2xl);
-  letter-spacing: var(--tracking-tight);
-}
-
-.activitySummary span {
   color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 
 .categoryRow,
@@ -638,12 +623,6 @@
 .filters svg {
   width: var(--icon-md);
   color: var(--text-tertiary);
-}
-
-.dateHeading {
-  margin: 0 0 var(--space-2);
-  color: var(--text-secondary);
-  font: var(--weight-bold) var(--text-sm) / 1.2 var(--font-data);
 }
 
 .emptyHero {

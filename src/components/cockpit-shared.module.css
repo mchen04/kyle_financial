@@ -11,8 +11,12 @@
   composes: activityGroups from "./daily-cockpit.module.css";
 }
 
-.activitySummary {
-  composes: activitySummary from "./daily-cockpit.module.css";
+.activitySurface {
+  composes: activitySurface from "./daily-cockpit-responsive.module.css";
+}
+
+.activityTotal {
+  composes: activityTotal from "./daily-cockpit.module.css";
 }
 
 .backHeader {
@@ -68,10 +72,6 @@
 
 .categoryRows {
   composes: categoryRows from "./daily-cockpit.module.css";
-}
-
-.dateHeading {
-  composes: dateHeading from "./daily-cockpit.module.css";
 }
 
 .detailMetrics {

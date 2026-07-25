@@ -143,12 +143,25 @@
     font-size: var(--text-sm);
   }
 
-  .filters {
-    grid-template-columns: minmax(0, 1fr);
+  /* C2: "Find and fix expenses." restates the Activity tab and carries no
+     figure, so it is a label, not a display headline (same reading as Home). */
+  .activitySurface .surfaceHeader h1 {
+    font-size: var(--text-lg);
   }
 
-  .surfaceStack:has(.emptyHero) .emptyHero > svg,
-  .surfaceStack:has(.emptyHero) .emptyHero button {
+  /* C1/C4: search and category are two 48px controls that fit one row at
+     360px; stacking them cost a second control row plus a 12px gap. */
+  .filters {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 42%);
+  }
+
+  .filters input,
+  .filters select {
+    min-width: 0;
+  }
+
+  .emptyHero > svg,
+  .emptyHero button {
     display: none;
   }
 }
@@ -232,14 +245,6 @@
     padding: var(--space-3);
   }
 
-  .surfaceStack:has(.emptyHero) .surfaceHeader > div:first-child {
-    display: none;
-  }
-
-  .surfaceStack:has(.emptyHero) .surfaceHeader {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .emptyHero {
     min-height: var(--layout-sm);
     gap: var(--space-2);
@@ -299,16 +304,6 @@
 
   .budgetSurface .surfaceHeader h1 {
     font-size: var(--text-xl);
-  }
-}
-
-@media (--short-phone-740) {
-  .surfaceStack:has(.emptyHero) .surfaceHeader > div:first-child {
-    display: none;
-  }
-
-  .surfaceStack:has(.emptyHero) .surfaceHeader {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
 

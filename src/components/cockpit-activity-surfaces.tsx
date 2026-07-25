@@ -2,7 +2,6 @@
 
 import { CirclePlus, Plus, Search } from "lucide-react";
 import { useState } from "react";
-import type { TransactionEntry } from "@/domain/budget";
 import {
   observedTransactionsThrough,
   periodLabel,
@@ -67,18 +66,18 @@ export function ActivitySurface({
         right.updatedAt.localeCompare(left.updatedAt),
     );
   const visibleTransactions = transactions.slice(0, visibleLimit);
-  const groups = visibleTransactions.reduce((grouped, transaction) => {
-    const entries = grouped.get(transaction.date) ?? [];
-    entries.push(transaction);
-    grouped.set(transaction.date, entries);
-    return grouped;
-  }, new Map<string, TransactionEntry[]>());
   return (
-    <div className={styles.surfaceStack}>
+    <div className={`${styles.surfaceStack} ${styles.activitySurface}`}>
       <header className={styles.surfaceHeader}>
         <div>
-          <p className={styles.eyebrow}>Activity</p>
           <h1>Find and fix expenses.</h1>
+          {/* C5: the period total is two facts nobody acts on, so it is one
+              line under the heading rather than a bordered summary card. The
+              period itself is named by the control beside it. */}
+          <span className={styles.activityTotal}>
+            {money(periodTotalCents)} · {periodTransactions.length}{" "}
+            {periodTransactions.length === 1 ? "expense" : "expenses"}
+          </span>
         </div>
         <PeriodControl period={period} today={today} onPeriod={onPeriod} />
       </header>
@@ -104,19 +103,6 @@ export function ActivitySurface({
           />
         </section>
       )}
-      <section
-        className={`${styles.panel} ${styles.activitySummary}`}
-        aria-label={`${periodLabel(period)} activity total`}
-      >
-        <div>
-          <p className={styles.eyebrow}>{periodLabel(period)} total</p>
-          <strong>{money(periodTotalCents)}</strong>
-        </div>
-        <span>
-          {periodTransactions.length}{" "}
-          {periodTransactions.length === 1 ? "expense" : "expenses"}
-        </span>
-      </section>
       <div className={styles.filters}>
         <label>
           <Search />
@@ -144,25 +130,17 @@ export function ActivitySurface({
           </select>
         </label>
       </div>
+      {/* C2: this list spanned 24 date headings inside 24 bordered panels,
+          against a maximum of 5 section headers per surface and a rule that a
+          group of fewer than 3 rows gets no header at all. The day now rides on
+          each row, so the list is one hairline-separated group (C4). */}
       {transactions.length ? (
         <div className={styles.activityGroups}>
-          {[...groups].map(([date, items]) => (
-            <section className={styles.panel} key={date}>
-              <h2 className={styles.dateHeading}>
-                {new Intl.DateTimeFormat("en-US", {
-                  weekday: "long",
-                  month: "short",
-                  day: "numeric",
-                  timeZone: "UTC",
-                }).format(new Date(`${date}T00:00:00Z`))}
-              </h2>
-              <TransactionRows
-                transactions={items}
-                categories={categories}
-                onEdit={onEdit}
-              />
-            </section>
-          ))}
+          <TransactionRows
+            transactions={visibleTransactions}
+            categories={categories}
+            onEdit={onEdit}
+          />
           {visibleTransactions.length < transactions.length && (
             <button
               className={styles.loadMore}

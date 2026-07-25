@@ -226,3 +226,197 @@ authenticated screen.
 - Everything the harness itself cannot see is unchanged and still listed in
   [`mobile-density-baseline.md`](./mobile-density-baseline.md#what-this-harness-cannot-see)
   — real iOS Safari, real touch, font rasterisation, dark mode, landscape.
+
+---
+
+## L3b — Activity and Monthly wrap
+
+Every number below was read out of a live production build.
+BEFORE is [`l3b-before.json`](./l3b-before.json), measured at the head of this
+loop (i.e. on top of L3a); AFTER is [`l3b-after.json`](./l3b-after.json).
+[`l3b-full-after.json`](./l3b-full-after.json) is the 20-state capture used only
+to prove no other surface regressed.
+
+```
+pnpm ui:density:measure -- --mode gate \
+  --surfaces activity,activity-empty-search,monthly-wrap \
+  --viewports 390x844,360x740,430x932 --session l3b
+# 9 measurement(s); 3 violating row(s)   EXIT=1  (Activity, see the arithmetic below)
+```
+
+### Vertical cost (VH) and CLS
+
+| Surface                 | Viewport | Before VH |  After VH | Bar | Before CLS |  After CLS | CLS bar |
+| ----------------------- | -------- | --------: | --------: | --: | ---------: | ---------: | ------: |
+| Activity                | 390x844  | **7.245** | **5.103** | 3.0 |     0.0075 |     0.0075 |    0.02 |
+| Activity                | 360x740  | **7.982** | **5.820** | 3.0 |     0.0106 |     0.0106 |    0.02 |
+| Activity                | 430x932  | **6.572** | **4.621** | 3.0 |     0.0056 |     0.0056 |    0.02 |
+| Activity · empty search | 390x844  |     1.013 |     1.000 | 3.0 |     0.0000 |     0.0000 |    0.02 |
+| Activity · empty search | 360x740  |     1.000 |     1.000 | 3.0 | **0.0804** | **0.0000** |    0.02 |
+| Activity · empty search | 430x932  |     1.000 |     1.000 | 3.0 |     0.0000 |     0.0000 |    0.02 |
+| Monthly wrap            | 390x844  |     2.114 |     2.114 | 3.0 |     0.0000 |     0.0000 |    0.02 |
+| Monthly wrap            | 360x740  |     2.768 |     2.768 | 3.0 |     0.0000 |     0.0000 |    0.02 |
+| Monthly wrap            | 430x932  |     1.867 |     1.867 | 3.0 |     0.0000 |     0.0000 |    0.02 |
+
+Headline first paint equals headline settled on all 9 rows; 0 interactive
+targets under 44px, 0 horizontal overflow, 0 console errors on all 9 rows.
+Monthly wrap is byte-identical before and after: it was already under bar and
+nothing on it was touched.
+
+### The long-list exemption, measured
+
+The mission exempts a legitimately long list from the absolute cap **for its row
+region only**, on two conditions. Both are measured directly, not estimated
+(scroll-region content top → first transaction row top; and the live
+`getBoundingClientRect().height` of all 61 rows).
+
+| Signal                              |         Before 390x844 |           Before 360x740 |         Before 430x932 |         After (all three) |
+| ----------------------------------- | ---------------------: | -----------------------: | ---------------------: | ------------------------: |
+| Chrome above the first row          | 471.22px = **0.558VH** | 451.69px = **0.610VH** ✗ | 481.31px = **0.516VH** |              **188.89px** |
+| …as VH                              |                  0.558 |                    0.610 |                  0.516 | **0.224 / 0.255 / 0.203** |
+| Sub-bar                             |                 ≤ 0.60 |                   ≤ 0.60 |                 ≤ 0.60 |                    ≤ 0.60 |
+| Section headings (`h2`) on the list |                     24 |                       24 |                     24 |                     **0** |
+| Bordered `section` panels           |                     25 |                       25 |                     25 |                     **0** |
+
+The 0.6 VH chrome sub-bar was **busted at 360x740 before this loop** (0.610) and
+is now met at every viewport with a 2.4–2.9x margin.
+
+Per-row height, identical at all three viewports (rows do not re-wrap on width):
+
+| Row shape                                 | Count |   Height | C1 justification                                     |
+| ----------------------------------------- | ----: | -------: | ---------------------------------------------------- |
+| title / `category · Fri, Jul 24` / amount |    46 | **64px** | C1 two-line row = 64px                               |
+| the same plus a note line                 |    15 | **74px** | a fifth fact; C1 has no three-line row, see refusals |
+
+### Activity did not reach 3.0 VH. The honest arithmetic.
+
+Measured decomposition of the 4307px Activity surface at every viewport:
+
+```
+  188.89 px  chrome above the first row      (4.4 %)
+4054.00 px  61 transaction rows             (94.1 %)
+   64.00 px  bottom clearance for the floating Fast Log button (1.5 %)
+--------
+ 4306.89 px  = 4307 px measured scrollHeight
+```
+
+**3.0 VH is arithmetically unreachable for this fixture at any legal row
+height.** The fixture holds 61 in-period transactions. Rule 4 and C1 both floor
+a row at 44px:
+
+| Row height                      | 61 rows | VH @390x844 | VH @360x740 | VH @430x932 |
+| ------------------------------- | ------: | ----------: | ----------: | ----------: |
+| 44px — the absolute touch floor |  2684px | **3.180** ✗ | **3.627** ✗ |       2.880 |
+| 48px — C1 single-line row       |  2928px | **3.469** ✗ | **3.957** ✗ |     3.141 ✗ |
+| 64px — C1 two-line row (built)  |  3904px |       4.626 |       5.276 |       4.189 |
+
+Even with **zero chrome** and every row at the illegal-to-cross 44px floor,
+Activity measures 3.180 VH at 390x844 and 3.627 VH at 360x740. The 3.0 bar
+cannot be met without deleting rows, shrinking targets below 44px, or
+virtualising — all three forbidden. What is irreducible is exactly the 4054px of
+rows: 94.1 % of the surface. Everything else has been cut to 253px.
+
+The mission's percentage rule (a surface above 5.0 VH at baseline must be cut by
+≥ 60 %) is unreachable for the same reason: 60 % of the 7.873 VH baseline is
+3.149 VH, which is below the 44px-floor arithmetic above. The achieved cut is
+**7.245 → 5.103 VH at 390x844 (−29.6 %)**, **7.982 → 5.820 (−27.1 %)** and
+**6.572 → 4.621 (−29.7 %)**; against the original 7.873 baseline at 390x844 that
+is **−35.2 %**. This is reported as a **miss on the absolute bar with the
+row-region exemption satisfied**, not as a pass.
+
+### What was cut, and why
+
+| Cut                                                                                                                                                                                            | Citation                                                                                       |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **24 date section headings inside 24 bordered panels** → one hairline-separated row group. The day moves onto every row as `Groceries · Fri, Jul 24`, keeping the weekday the heading carried. | **C2** (max 5 section headers; a group of <3 rows gets no header), **C4** (0px inside a group) |
+| Panel padding, border and 8px inter-panel gap × 24 — the cost of the grouping above                                                                                                            | C4, C5 (a date is not a card)                                                                  |
+| `Activity` eyebrow above the heading — restates the Activity tab in the bottom nav, carries no figure                                                                                          | C2, rule 1 (redundant)                                                                         |
+| The bordered `July 2026 total / $5,255.44 / 61 expenses` summary panel → one line under the heading reading `$5,255.44 · 61 expenses`                                                          | **C5** (nobody acts on it, so it is not a card), C1                                            |
+| …and its `July 2026` label — the period control names the period 40px away, same reading as L3a's Home runway qualifier                                                                        | rule 1 (restated value)                                                                        |
+| Search + category filter stacked (two 48px rows + a 12px gap) → **one 48px row** at ≤720px                                                                                                     | C1, C4                                                                                         |
+| Activity `h1` `Find and fix expenses.` 30px → 18px at ≤720px. It labels the tab; it carries no figure                                                                                          | C2 (same reading L3a applied to Home)                                                          |
+| Raw ISO `2026-07-02` on every row → `Fri, Jul 24`                                                                                                                                              | C6 (a date figure is a figure), rule 6                                                         |
+
+Dead CSS removed with the markup it styled: `.dateHeading`, `.activitySummary`.
+
+### The empty-search CLS bust: root cause and fix
+
+Baseline `Activity · empty search` shifted **0.1093** at 360x740 in the frozen
+baseline and **0.0804** after L3a, against a 0.02 bar.
+
+Root cause, found by inspection and confirmed by the fix: two rules,
+`@media (--short-shell-740)` and `@media (--short-phone-740)`, said
+
+```css
+.surfaceStack:has(.emptyHero) .surfaceHeader > div:first-child {
+  display: none;
+}
+```
+
+so the moment a search matched nothing, the empty hero mounted, `:has()` matched,
+and **the surface heading was deleted from the layout** — teleporting the search
+field and everything under it ~50px upward on a 740px viewport. That is exactly
+the defect **C9** names: the label changed identity between renders and the
+settled box was not reserved. Both rules are deleted; the heading is now present
+in both states and the measured CLS is **0.0000** at 360x740.
+
+The companion `:has()` rules that shrink the hero itself (`> svg`, `button`)
+were rewritten as plain `.emptyHero` selectors — same effect, no dependency on
+an ancestor's contents.
+
+### Tap paths walked after the change
+
+Nothing became unreachable; every path is unchanged in length.
+
+| Capability                           | Path                                                           | Taps |
+| ------------------------------------ | -------------------------------------------------------------- | ---: |
+| Activity surface                     | Activity tab                                                   |    1 |
+| **Correct / edit a transaction**     | Activity tab → tap the row → Fast Log `Edit expense`           |    2 |
+| Search expenses                      | Activity tab → search field (still `input[type=search]`, 16px) |    1 |
+| Filter by category                   | Activity tab → category select (all 15 + archived)             |    1 |
+| Change the reporting period          | Activity tab → period control (unchanged, one 44px row)        |    1 |
+| Show transactions past the first 100 | Activity tab → `Load 100 more · N remaining`                   |    1 |
+| Correct a future-dated expense       | Activity tab → `Needs correction` group → row                  |    2 |
+| Fast Log a new expense               | floating action, `position: fixed`, on screen at all times     |    1 |
+| Monthly wrap                         | Home → `Monthly wrap` row                                      |    1 |
+
+The harness proves the edit path independently: its `fast-log-edit` state clicks
+a transaction row on Activity and asserts it lands on `Edit expense` — 0.782 VH,
+green, in the 20-state capture.
+
+### What was refused
+
+- **The note line was not folded into the meta line.** 15 of the 61 fixture rows
+  carry a note and are 74px rather than 64px, costing 150px (0.18 VH). Merging
+  the note into `category · date · note` would have made every row a uniform C1
+  64px two-line row, but the note is already ellipsis-truncated and sharing the
+  line would shrink the visible portion further. Rule 2 outranks 0.18 VH.
+- **A 48px single-line row was rejected.** It would have taken Activity to
+  ~3.77 VH — still over bar. A C1 48px row holds one flexible text column plus a
+  fixed figure column; a transaction carries four facts (title, category, day,
+  amount), and fitting them on one line at 360px forces the _title_ to ellipsise.
+  Truncating the thing the user searches by, to miss the bar by less, is not a
+  trade worth making.
+- **The list was not virtualised or paginated smaller.** `visibleLimit` stays at 100. Rendering fewer rows would move the number without moving the density.
+- **`Needs correction` (future-dated expenses) was not merged into the list.**
+  Those entries are excluded from every money total; the fixture has none, so it
+  costs 0px in the measured numbers and deleting the distinction would hide the
+  reason a total looks wrong.
+- **No bar, threshold or measurement semantic in `scripts/measure-density.mjs`
+  was touched**, and no test was changed or deleted.
+
+### Residual risk
+
+- The 0.6 VH chrome sub-bar is met with room, but chrome is a _fixed_ cost while
+  the bar is a _ratio_: on a viewport shorter than 315px the same 188.89px would
+  bust it. No such phone exists.
+- The fixture is one data shape. 61 rows over 24 days is a busy month; a quiet
+  month reads proportionally lower, a 90-day period proportionally higher. The
+  row region scales linearly at 64px/row and the chrome does not scale at all.
+- A transaction title long enough to wrap would add a line to that row. No
+  seeded title wraps at 360px; row heights are identical at 360, 390 and 430,
+  which is the evidence for that.
+- The `--fail-demo headline` injection does not fire on `Activity · empty
+search` (React re-renders the heading and restores the text before the sample).
+  It is proven red on `Monthly wrap`; the other five checks are proven red on
+  both surfaces.

@@ -68,6 +68,22 @@ export function CategoryRow({
   );
 }
 
+// Activity used to carry the day in a section heading above each date's rows.
+// C2 caps a surface at five section headers and gives a group of fewer than
+// three rows no header at all, and a month of expenses is two dozen such
+// groups, so the day rides on the row instead. Weekday is kept because the
+// heading carried it.
+const DAY_FORMAT = new Intl.DateTimeFormat("en-US", {
+  weekday: "short",
+  month: "short",
+  day: "numeric",
+  timeZone: "UTC",
+});
+
+function transactionDayLabel(date: string): string {
+  return DAY_FORMAT.format(new Date(`${date}T00:00:00Z`));
+}
+
 export function TransactionRows({
   transactions,
   categories,
@@ -95,7 +111,8 @@ export function TransactionRows({
             <span>
               <strong>{transaction.title}</strong>
               <small>
-                {category?.name ?? "Archived category"} · {transaction.date}
+                {category?.name ?? "Archived category"} ·{" "}
+                {transactionDayLabel(transaction.date)}
               </small>
               {transaction.note && (
                 <small className={styles.transactionNote}>
