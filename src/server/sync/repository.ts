@@ -55,6 +55,16 @@ class InvalidFinalPlanError extends Error {
  * spouse wages and a benefit's owner together — is inadmissible after any one
  * of its parts and admissible after all of them, and must survive intact.
  */
+/**
+ * Rounds of single-removal search. Each round costs one projection per
+ * surviving mutation, so the total is bounded at `ROUNDS × batch` rather than
+ * growing with the square of the batch — the search runs while the plan row is
+ * held `FOR UPDATE`, and an unbounded one outlived the connection's
+ * idle-in-transaction timeout, which killed the request and left the whole
+ * batch without receipts.
+ */
+const REFUSAL_SEARCH_ROUNDS = 3;
+
 function refusableMutationIds(
   initialPlan: StoredPlan,
   appliedMutations: readonly DecodedSyncMutation[],
@@ -66,24 +76,23 @@ function refusableMutationIds(
     );
   let survivors = [...appliedMutations];
   const refused: string[] = [];
-  // Searching for the single removal that restores admissibility is quadratic,
-  // so it is reserved for batches small enough to afford it; larger ones drop
-  // the newest work first, which is the same rule with a cheaper search.
-  const searchLimit = 64;
-  while (survivors.length > 0 && !isAdmissibleProjection(project(survivors))) {
-    const culprit =
-      survivors.length <= searchLimit
-        ? survivors.findIndex((_, index) =>
-            isAdmissibleProjection(
-              project(survivors.filter((__, other) => other !== index)),
-            ),
-          )
-        : -1;
-    const target = culprit >= 0 ? culprit : survivors.length - 1;
-    refused.push(survivors[target].mutationId);
-    survivors = survivors.filter((_, index) => index !== target);
+  for (let round = 0; round < REFUSAL_SEARCH_ROUNDS; round += 1) {
+    if (isAdmissibleProjection(project(survivors))) return refused;
+    const culprit = survivors.findIndex((_, index) =>
+      isAdmissibleProjection(
+        project(survivors.filter((__, other) => other !== index)),
+      ),
+    );
+    // Nothing was proven guilty. Refusing by recency instead would discard
+    // whichever edits happened to arrive last — work the batch never showed to
+    // be at fault — and each would carry a receipt, so the client would delete
+    // it silently. Give up the search and let the caller reject the year, which
+    // at least surfaces as a sync error the owner can see.
+    if (culprit < 0) return [];
+    refused.push(survivors[culprit].mutationId);
+    survivors = survivors.filter((_, index) => index !== culprit);
   }
-  return refused;
+  return isAdmissibleProjection(project(survivors)) ? refused : [];
 }
 
 function isAdmissibleProjection(plan: StoredPlan): boolean {

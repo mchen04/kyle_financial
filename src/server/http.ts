@@ -29,16 +29,20 @@ export function crossSiteWriteResponse(request: Request): Response | undefined {
   // own URL: behind a proxy that URL is the internal one, so the comparison
   // rejects legitimate sign-ins rather than attacks.
   //
-  // A cross-origin form can only send these three content types, and anything
-  // else from another site needs a preflight this app never answers. So
-  // requiring JSON is what actually closes the hole for browsers too old to
-  // send `Sec-Fetch-Site`.
-  const contentType = request.headers.get("content-type")?.split(";")[0].trim();
-  if (
-    contentType === "text/plain" ||
-    contentType === "application/x-www-form-urlencoded" ||
-    contentType === "multipart/form-data"
-  )
+  // Requiring JSON is what closes the hole for browsers too old to send
+  // `Sec-Fetch-Site`, because a cross-origin request that avoids a preflight
+  // can only carry a form content type — and `application/json` is not one.
+  //
+  // This allowlists rather than denylisting: media types are case-insensitive
+  // and the header is optional, so naming the three form types missed both
+  // `TEXT/PLAIN` and a body sent with no content type at all, each of which is
+  // a CORS-safelisted cross-origin post.
+  const contentType = request.headers
+    .get("content-type")
+    ?.split(";")[0]
+    .trim()
+    .toLowerCase();
+  if (contentType !== "application/json")
     return errorResponse(415, "Send this request as application/json.");
   return undefined;
 }

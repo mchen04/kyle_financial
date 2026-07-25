@@ -119,18 +119,20 @@ async function consumeBucket(
  * either from the left lets anyone mint a fresh bucket per request and walk
  * straight through the limit. Each proxy appends the peer it saw, so counting
  * back from the right by the number of proxies in front of this app yields the
- * first value the caller could not choose. With no proxy configured, nothing
- * about the request is trustworthy and every caller shares one bucket, which
- * fails closed rather than open.
+ * first value the caller could not choose.
+ *
+ * Undefined when no such value exists. Pooling those callers into one shared
+ * bucket looks like failing closed, but it hands any one of them the ability to
+ * spend that bucket and lock everyone else out of signing in.
  */
-export function clientAddress(request: Request): string {
+export function clientAddress(request: Request): string | undefined {
   const hops = Number.parseInt(process.env.TRUSTED_PROXY_HOPS ?? "1", 10);
-  if (!Number.isInteger(hops) || hops < 1) return "untrusted";
+  if (!Number.isInteger(hops) || hops < 1) return undefined;
   const forwarded = (request.headers.get("x-forwarded-for") ?? "")
     .split(",")
     .map((entry) => entry.trim())
     .filter(Boolean);
-  return forwarded.at(-hops) ?? "unknown";
+  return forwarded.at(-hops);
 }
 
 export async function consumeAuthenticationIpAttempt(
@@ -141,13 +143,13 @@ export async function consumeAuthenticationIpAttempt(
 ): Promise<AuthenticationRateLimit> {
   await cleanupExpiredBuckets(sql, now);
   const policy = AUTHENTICATION_POLICIES[action];
-  return consumeBucket(
-    sql,
-    `${action}:ip`,
-    clientAddress(request),
-    policy.ip,
-    now,
-  );
+  const address = clientAddress(request);
+  // With no trustworthy address, every caller would otherwise share one bucket,
+  // and a single client could spend it and lock *everyone* out of signing in.
+  // Skip the address dimension instead; the per-identity limit still bounds an
+  // attack on any one account, and it cannot be turned against other people.
+  if (address === undefined) return { allowed: true, retryAfterSeconds: 0 };
+  return consumeBucket(sql, `${action}:ip`, address, policy.ip, now);
 }
 
 export function consumeAuthenticationIdentityAttempt(
