@@ -72,96 +72,11 @@
 .authPage {
   min-height: var(--viewport-height);
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(var(--layout-xl), 0.7fr);
-}
-
-.authStory {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: var(--viewport-height);
-  padding: clamp(var(--space-7), var(--fluid-6), var(--space-20));
-  overflow: hidden;
-  background: var(--ink);
-  color: var(--text-inverse);
-}
-
-.authStory::after {
-  content: "";
-  position: absolute;
-  width: var(--fluid-45);
-  aspect-ratio: 1;
-  right: var(--fluid-negative-15);
-  bottom: var(--fluid-negative-20);
-  border: var(--border-hairline) solid var(--alpha-white-12);
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 var(--fluid-6) var(--alpha-white-02),
-    0 0 0 var(--fluid-12) var(--alpha-white-02);
-}
-
-.authStory .brandMark {
-  background: var(--surface-panel);
-  color: var(--ink);
-}
-
-.authThesis {
-  position: relative;
-  z-index: 1;
-  max-width: var(--layout-8xl);
-}
-
-.authThesis .eyebrow {
-  color: var(--color-blue-300);
-}
-
-.authThesis h1 {
-  max-width: var(--layout-7xl);
-  margin: 0;
-  font: 650 clamp(var(--text-4xl), var(--fluid-6-5), var(--text-6xl))/0.95
-    var(--display);
-  letter-spacing: var(--tracking-tighter);
-}
-
-.authThesis > p:last-child {
-  max-width: var(--layout-5xl);
-  margin: var(--space-7) 0 0;
-  color: var(--text-inverse-soft);
-  font-size: clamp(var(--text-md), var(--fluid-2), var(--text-xl));
-  line-height: 1.5;
-}
-
-.previewLedger {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--space-2) var(--space-7);
-  width: min(var(--layout-3xl), 100%);
-  color: var(--text-inverse-muted);
-  font-size: var(--text-sm);
-}
-
-.previewLedger strong {
-  color: var(--text-inverse);
-  font: 600 var(--text-sm)/1 var(--data);
-  text-align: right;
-}
-
-.previewLedger i {
-  grid-column: 1 / -1;
-  height: var(--border-hairline);
-  background: var(--alpha-white-13);
-}
-
-.previewLedger .previewSurplus {
-  color: var(--color-teal-300);
-  font-size: var(--text-lg);
+  place-content: center;
+  padding: var(--space-4);
 }
 
 .authPanel {
-  align-self: center;
   width: min(var(--layout-2xl), calc(100% - var(--control-md)));
   margin: auto;
   padding: var(--space-10);
@@ -170,6 +85,10 @@
     var(--radius-sm);
   background: var(--alpha-white-90);
   box-shadow: var(--shadow);
+}
+
+.authPanel > .wordmark {
+  margin: 0 0 var(--space-4);
 }
 
 .authPanel h2,
@@ -225,15 +144,6 @@
   margin-top: var(--space-2);
   background: var(--color-transparent);
   color: var(--blue);
-  font-size: var(--text-sm);
-}
-
-.privacyNote {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin: var(--space-5) 0 0;
-  color: var(--ink-soft);
   font-size: var(--text-sm);
 }
 
@@ -296,30 +206,10 @@
 
 @media (--viewport-phone) {
   .authPage {
-    display: block;
-  }
-  .authStory {
-    min-height: var(--viewport-auth-panel-height);
-    padding: max(var(--space-6), env(safe-area-inset-top)) var(--space-5)
-      var(--space-7);
-  }
-  .authThesis {
-    margin-top: var(--space-8);
-  }
-  .authThesis h1 {
-    font-size: clamp(var(--text-3xl), var(--fluid-12), var(--text-4xl));
-  }
-  .authThesis > p:last-child {
-    margin-top: var(--space-4);
-    font-size: var(--text-md);
-  }
-  .previewLedger {
-    display: none;
+    padding: var(--space-3);
   }
   .authPanel {
-    position: relative;
-    width: calc(100% - var(--space-5));
-    margin: calc(-1 * var(--space-2)) auto var(--space-5);
+    width: 100%;
     padding: var(--space-6) var(--space-5);
     border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg)
       var(--radius-sm);
@@ -341,24 +231,6 @@
 }
 
 @media (--short-phone-650) {
-  .authStory {
-    min-height: var(--layout-sm);
-    padding: max(var(--space-3), env(safe-area-inset-top)) var(--space-4);
-  }
-
-  .authThesis {
-    margin-top: var(--space-2);
-  }
-
-  .authThesis .eyebrow,
-  .authThesis > p:last-child {
-    display: none;
-  }
-
-  .authThesis h1 {
-    font-size: var(--text-xl);
-  }
-
   .authPanel {
     padding: var(--space-4);
   }
@@ -374,26 +246,8 @@
 }
 
 @media (--landscape-short-shell) {
-  .authPage {
-    grid-template-columns: minmax(0, 0.85fr) minmax(var(--layout-xl), 1.15fr);
-  }
-
-  .authStory {
-    min-height: var(--viewport-height);
-    padding: var(--space-5);
-  }
-
-  .authThesis h1 {
-    font-size: var(--text-2xl);
-  }
-
-  .authThesis > p:last-child,
-  .previewLedger {
-    display: none;
-  }
-
   .authPanel {
-    width: calc(100% - var(--space-4));
+    width: min(var(--layout-2xl), calc(100% - var(--space-4)));
     max-height: calc(var(--viewport-height) - var(--space-4));
     overflow-y: auto;
     padding: var(--space-4);
@@ -418,10 +272,6 @@
 
   .textButton {
     margin-top: var(--space-1);
-  }
-
-  .privacyNote {
-    display: none;
   }
 
   .onboarding {

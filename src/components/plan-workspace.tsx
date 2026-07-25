@@ -129,8 +129,6 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
           <PrimaryNav screen={screen} onRoute={navigate} />
         </nav>
         <p className={styles.sidebarFoot}>
-          Daily decisions · annual plan
-          <br />
           Tax data {currentResult.appliedTaxYear}
         </p>
       </aside>

@@ -1,10 +1,3 @@
-.eyebrow {
-  margin: 0 0 var(--space-1);
-  color: var(--text-action-strong);
-  font: var(--weight-bold) var(--text-xs) / 1 var(--font-data);
-  letter-spacing: var(--tracking-wider);
-}
-
 .sheetBackdrop {
   position: fixed;
   z-index: var(--layer-sheet);

@@ -70,7 +70,7 @@ export function ActivitySurface({
     <div className={`${styles.surfaceStack} ${styles.activitySurface}`}>
       <header className={styles.surfaceHeader}>
         <div>
-          <h1>Find and fix expenses.</h1>
+          <h1>Activity</h1>
           {/* C5: the period total is two facts nobody acts on, so it is one
               line under the heading rather than a bordered summary card. The
               period itself is named by the control beside it. */}

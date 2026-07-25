@@ -106,7 +106,7 @@ export function HomeSurface({
     >
       <header className={styles.surfaceHeader}>
         <div>
-          <h1>{unstarted ? "Your plan, ahead." : "Your money, right now."}</h1>
+          <h1>Home</h1>
         </div>
         <PeriodControl period={period} today={today} onPeriod={onPeriod} />
       </header>

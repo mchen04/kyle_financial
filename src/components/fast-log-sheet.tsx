@@ -204,7 +204,6 @@ export function FastLogSheet({
       >
         <header>
           <div>
-            <p className={styles.eyebrow}>One clean entry</p>
             <h2 id="fast-log-title">
               {existing ? "Edit expense" : "Fast Log"}
             </h2>
@@ -280,7 +279,7 @@ export function FastLogSheet({
                 );
               }}
             >
-              <Plus /> Create category without losing this expense
+              <Plus /> Create category
             </button>
           )}
           <label>

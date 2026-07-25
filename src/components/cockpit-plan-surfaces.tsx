@@ -111,7 +111,7 @@ export function MonthlyWrapSurface({
       </section>
       <div className={styles.homeGrid}>
         <WrapList
-          title={livePreview ? "Currently unspent" : "Wins"}
+          title={livePreview ? "Currently unspent" : "Under budget"}
           items={wrap.underBudget}
         />
         <WrapList title="Overruns" items={wrap.overBudget} />
@@ -119,8 +119,7 @@ export function MonthlyWrapSurface({
       <section className={styles.panel}>
         <div className={styles.sectionHeading}>
           <div>
-            <p className={styles.eyebrow}>How the impact is built</p>
-            <h2>Every contribution and variance, counted once</h2>
+            <h2>How the savings impact is built</h2>
           </div>
         </div>
         <dl className={styles.mathBreakdown}>

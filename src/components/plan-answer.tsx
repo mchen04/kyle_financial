@@ -58,8 +58,8 @@ export function PlanAnswer({
             : negative
               ? `Planned expenses are above take-home pay.${largestExpense ? ` ${largestExpense.name} is the largest row at ${money(annualExpenseAmount(largestExpense))} per year.` : ""}`
               : hasPlannedExpenses
-                ? "Flexible cash saving after every planned expense."
-                : "Starting estimate. Add housing and everyday expenses to see what is truly left."}
+                ? "Cash remaining after every planned expense."
+                : "Starting estimate. Add housing and everyday expenses to complete it."}
         </p>
         <p className={styles.answerRates}>
           {hasPlannedExpenses ? "Cash savings" : "Unallocated"} rate:{" "}

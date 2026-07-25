@@ -89,14 +89,10 @@ export function BenefitsScreen({
   return (
     <section className={styles.wideCard}>
       <div className={styles.sectionHeading}>
-        <div>
-          <p className={styles.eyebrow}>Before the paycheck lands</p>
-          <h1>Benefits and payroll choices</h1>
-          <p className={styles.muted}>
-            Percentages use the selected person’s salary and bonus/RSU wages.
-            Entered amounts stay visible when an exclusion is capped.
-          </p>
-        </div>
+        <p className={styles.muted}>
+          Percentages use the selected person’s salary and bonus/RSU wages.
+          Entered amounts stay visible when a cap applies.
+        </p>
         <label className={styles.addSelect}>
           <Plus size={17} />
           <select
@@ -116,30 +112,33 @@ export function BenefitsScreen({
           </select>
         </label>
       </div>
-      <div className={styles.benefitSummary}>
-        <span>
-          Saved from paychecks{" "}
-          <strong>{money(result.payrollSavingsAnnualCents)} / year</strong>
-        </span>
-        <span>
-          Employer contributions{" "}
-          <strong>{money(result.employerSavingsAnnualCents)} / year</strong>
-        </span>
-        <span>
-          Benefits going to savings{" "}
-          <strong>
-            {result.isPayrollFeasible
+      {/* C5: nobody acts on these four facts as a unit, so they are hairline
+          rows, not cards. C1: one 44px line each, label in the flexible column
+          and the figure in a fixed nowrap column. C6: tabular figures. */}
+      <dl className={styles.summaryRows}>
+        <SummaryRow
+          label="Saved from paychecks"
+          value={`${money(result.payrollSavingsAnnualCents)} / year`}
+        />
+        <SummaryRow
+          label="Employer contributions"
+          value={`${money(result.employerSavingsAnnualCents)} / year`}
+        />
+        <SummaryRow
+          label="Benefits going to savings"
+          value={
+            result.isPayrollFeasible
               ? `${money(result.payrollSavingsAnnualCents + result.employerSavingsAnnualCents)} / year`
-              : "Not feasible with current payroll choices"}
-          </strong>
-        </span>
+              : "Not feasible with current payroll choices"
+          }
+        />
         {esppDiscountValueCents > 0 && (
-          <span>
-            Estimated ESPP discount value{" "}
-            <strong>{money(esppDiscountValueCents)} / year</strong>
-          </span>
+          <SummaryRow
+            label="Estimated ESPP discount value"
+            value={`${money(esppDiscountValueCents)} / year`}
+          />
         )}
-      </div>
+      </dl>
       <BoundedMessages visibleCount={result.warnings.length > 0 ? 1 : 0}>
         {[
           ...result.warnings.map((warning) => (
@@ -183,6 +182,15 @@ export function BenefitsScreen({
   );
 }
 
+function SummaryRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  );
+}
+
 function BenefitRow({
   entry,
   showOwner,
@@ -218,11 +226,10 @@ function BenefitRow({
           maxLength={100}
           onValue={(label) => onUpdate({ label })}
         />
-        <span>
-          {entry.type === "employer401kMatch" || entry.type === "employerHsa"
-            ? "Employer-side · does not reduce paycheck"
-            : "Recomputes take-home instantly"}
-        </span>
+        {(entry.type === "employer401kMatch" ||
+          entry.type === "employerHsa") && (
+          <span>Employer-side · does not reduce paycheck</span>
+        )}
         {showOwner && (
           <select
             aria-label={`${entry.label} payroll owner`}

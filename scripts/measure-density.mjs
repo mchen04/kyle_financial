@@ -151,7 +151,7 @@ const SURFACES = [
     bar: VERTICAL_BARS.entry,
     prefix: [],
     nav: [RELOAD_STEP],
-    expect: `document.querySelector('main h1#welcome-title')?.textContent === "One honest plan for every day money moves." && document.querySelector('main h2')?.textContent === "Create your private account"`,
+    expect: `document.querySelector('main h1#welcome-title') !== null && document.querySelector('main h2')?.textContent === "Create account"`,
   },
   {
     id: "signed-out-sign-in",
@@ -160,7 +160,7 @@ const SURFACES = [
     bar: VERTICAL_BARS.entry,
     prefix: [],
     nav: [clickExact("Already have an account? Sign in")],
-    expect: `document.querySelector('main h2')?.textContent === "Open your money cockpit"`,
+    expect: `document.querySelector('main h2')?.textContent === "Sign in"`,
   },
   {
     id: "onboarding",
@@ -169,7 +169,7 @@ const SURFACES = [
     bar: VERTICAL_BARS.entry,
     prefix: [],
     nav: [RELOAD_STEP],
-    expect: `document.querySelector('main h1')?.textContent === "Build the plan behind your daily budget"`,
+    expect: `document.querySelector('main h1')?.textContent === "Create your plan"`,
   },
   {
     id: "home",
@@ -178,7 +178,7 @@ const SURFACES = [
     bar: VERTICAL_BARS.home,
     prefix: [clickExact("Plan")],
     nav: [clickExact("Home")],
-    expect: `["Your money, right now.", "Your plan, ahead."].includes(document.querySelector('main h1')?.textContent)`,
+    expect: `document.querySelector('main h1')?.textContent === "Home"`,
   },
   {
     id: "home-cold-load",
@@ -187,7 +187,7 @@ const SURFACES = [
     bar: VERTICAL_BARS.home,
     prefix: [],
     nav: [RELOAD_STEP],
-    expect: `["Your money, right now.", "Your plan, ahead."].includes(document.querySelector('main h1')?.textContent)`,
+    expect: `document.querySelector('main h1')?.textContent === "Home"`,
   },
   {
     id: "budget",
@@ -217,7 +217,7 @@ const SURFACES = [
     bar: VERTICAL_BARS.standard,
     prefix: [clickExact("Home")],
     nav: [clickExact("Activity")],
-    expect: `document.querySelector('main h1')?.textContent === "Find and fix expenses."`,
+    expect: `document.querySelector('main h1')?.textContent === "Activity"`,
   },
   {
     id: "activity-empty-search",
@@ -308,7 +308,7 @@ const SURFACES = [
     bar: VERTICAL_BARS.deep,
     prefix: [clickExact("Home"), clickExact("Plan")],
     nav: [clickContains("Benefits")],
-    expect: `document.querySelectorAll('main h1')[0]?.textContent === "Benefits" && document.querySelectorAll('main h1')[1]?.textContent === "Benefits and payroll choices"`,
+    expect: `document.querySelectorAll('main h1')[0]?.textContent === "Benefits" && document.querySelector('main select[aria-label="Add benefit"]') !== null`,
   },
   {
     id: "compare",
@@ -614,7 +614,7 @@ async function resetToSignedOut(browser, baseUrl) {
   await browser.call(["navigate", baseUrl]);
   await waitFor(
     browser,
-    `document.querySelector('main h1#welcome-title')?.textContent === "One honest plan for every day money moves."`,
+    `document.querySelector('main h2')?.textContent === "Create account"`,
     { timeout: 30000 },
   );
   await settle(browser);
@@ -624,7 +624,7 @@ async function signIn(browser, email, password) {
   await browser.evaluate(clickExact("Already have an account? Sign in"));
   await waitFor(
     browser,
-    `document.querySelector('main h2')?.textContent === "Open your money cockpit"`,
+    `document.querySelector('main h2')?.textContent === "Sign in"`,
   );
   await browser.evaluate(`(() => {
     const setValue = (node, value) => {
@@ -909,14 +909,14 @@ async function main() {
             await signIn(browser, ONBOARDING_EMAIL, ONBOARDING_PASSWORD);
             await waitFor(
               browser,
-              `document.querySelector('main h1')?.textContent === "Build the plan behind your daily budget"`,
+              `document.querySelector('main h1')?.textContent === "Create your plan"`,
               { timeout: 30000 },
             );
           } else if (surface.account === "fixture") {
             await signIn(browser, FIXTURE_EMAIL, FIXTURE_PASSWORD);
             await waitFor(
               browser,
-              `document.querySelector('main h1')?.textContent === "Your money, right now."`,
+              `document.querySelector('main h1')?.textContent === "Home"`,
               { timeout: 45000 },
             );
           }

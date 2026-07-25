@@ -160,47 +160,46 @@
     flex-direction: column;
   }
 
+  /* C1 — two 44px lines instead of the four the browser's auto-placement
+     produced. Every control keeps its own 44px target; nothing moved into a
+     nested scroller and nothing was hidden. */
   .manageRow {
-    grid-template-columns: var(--space-3) minmax(0, 1fr) auto;
+    grid-template-columns:
+      var(--space-3) minmax(0, 1fr)
+      minmax(0, 1fr) auto;
+    grid-template-areas:
+      "dot name name archive"
+      "dot type color reorder";
   }
 
-  .manageRow select {
-    grid-column: 2;
+  .manageRow > i {
+    grid-area: dot;
   }
 
-  .reorderButtons,
+  .manageRow > label {
+    grid-area: name;
+  }
+
+  .manageRow > select:nth-of-type(1) {
+    grid-area: type;
+  }
+
+  .manageRow > select:nth-of-type(2) {
+    grid-area: color;
+  }
+
+  .reorderButtons {
+    grid-area: reorder;
+  }
+
   .archiveButton {
-    grid-column: 3;
+    grid-area: archive;
   }
 }
 
 @media (--viewport-narrow) {
   .formList {
     padding: var(--space-3);
-  }
-
-  .manageRow {
-    grid-template-columns: var(--space-3) repeat(2, minmax(0, 1fr));
-  }
-
-  .manageRow > label {
-    grid-column: 2 / -1;
-  }
-
-  .manageRow > select:nth-of-type(1) {
-    grid-column: 2;
-  }
-
-  .manageRow > select:nth-of-type(2) {
-    grid-column: 3;
-  }
-
-  .reorderButtons {
-    grid-column: 2;
-  }
-
-  .archiveButton {
-    grid-column: 3;
   }
 }
 

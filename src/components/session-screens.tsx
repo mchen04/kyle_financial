@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, RefreshCw, ShieldCheck } from "lucide-react";
+import { ChevronRight, RefreshCw } from "lucide-react";
 import { FormEvent, useRef, useState } from "react";
 import { planResponseSchema, type User } from "@/domain/api-contracts";
 import { PRODUCT_MARK, PRODUCT_NAME } from "@/domain/brand";
@@ -81,41 +81,15 @@ export function AuthView({
 
   return (
     <main className={styles.authPage}>
-      <section className={styles.authStory} aria-labelledby="welcome-title">
-        <Wordmark />
-        <div className={styles.authThesis}>
-          <p className={styles.eyebrow}>
-            Plan the year. Know what is left today.
-          </p>
-          <h1 id="welcome-title">One honest plan for every day money moves.</h1>
-          <p>
-            Set the long view from salary, taxes, benefits, and planned
-            spending. Then log real expenses and see what is safe to spend now.
-          </p>
-        </div>
-        <div className={styles.previewLedger} aria-hidden="true">
-          <span>Gross pay</span>
-          <strong>$150,000</strong>
-          <i />
-          <span>Taxes · benefits · life</span>
-          <strong>accounted for</strong>
-          <i />
-          <span>What&apos;s safe this month</span>
-          <strong className={styles.previewSurplus}>$2,184</strong>
-        </div>
-      </section>
       <section
         className={styles.authPanel}
         aria-label={mode === "signup" ? "Create account" : "Sign in"}
       >
-        <p className={styles.eyebrow}>
-          {mode === "signup" ? "Start your cockpit" : "Welcome back"}
-        </p>
-        <h2>
-          {mode === "signup"
-            ? "Create your private account"
-            : "Open your money cockpit"}
-        </h2>
+        <h1 id="welcome-title" className={styles.wordmark}>
+          <span className={styles.brandMark}>{PRODUCT_MARK}</span>
+          {PRODUCT_NAME}
+        </h1>
+        <h2>{mode === "signup" ? "Create account" : "Sign in"}</h2>
         <form onSubmit={submit} className={styles.authForm}>
           {notice && (
             <p className={styles.fallbackNotice} role="status">
@@ -137,7 +111,11 @@ export function AuthView({
               minLength={10}
               required
             />
-            {mode === "signup" && <small>Use at least 10 characters.</small>}
+            {/* C9 — rendered in both modes. `minLength` is 10 either way, so
+                the line is true either way, and a hint that appears only in
+                one mode changed the panel's height and shifted the whole
+                vertically-centred panel when the modes were toggled. */}
+            <small>At least 10 characters.</small>
           </label>
           {error && (
             <p className={styles.formError} role="alert">
@@ -167,10 +145,6 @@ export function AuthView({
             ? "Already have an account? Sign in"
             : "New here? Create an account"}
         </button>
-        <p className={styles.privacyNote}>
-          <ShieldCheck size={16} /> No bank connection or ads. Export or
-          permanently delete every plan anytime.
-        </p>
       </section>
     </main>
   );
@@ -261,14 +235,10 @@ export function Onboarding({
     <main className={styles.onboarding}>
       <Wordmark />
       <section className={styles.onboardingCard}>
-        <p className={styles.eyebrow}>
-          Three details · sensible defaults do the rest
-        </p>
-        <h1>Build the plan behind your daily budget</h1>
+        <h1>Create your plan</h1>
         <p className={styles.muted}>
-          Start with a rough {currentYear} income estimate. You can change every
-          value later. We add editable categories at $0; fund the ones that
-          apply, then use Home to log real spending against them. Tax figures
+          A rough {currentYear} income estimate is enough; every value can be
+          changed later. Categories are added at $0 for you to fund. Tax figures
           are planning estimates, not tax advice.
         </p>
         <form onSubmit={submit} className={styles.onboardingForm}>
@@ -288,7 +258,6 @@ export function Onboarding({
               name="income"
               type="number"
               inputMode="decimal"
-              placeholder="150,000"
               min="0"
               required
             />
@@ -319,7 +288,7 @@ export function Onboarding({
             </p>
           )}
           <button className={styles.primaryButton} disabled={busy}>
-            {busy ? "Opening your cockpit…" : "Open my cockpit"}{" "}
+            {busy ? "Creating plan…" : "Create plan"}{" "}
             {busy ? (
               <RefreshCw size={17} className={styles.spin} />
             ) : (

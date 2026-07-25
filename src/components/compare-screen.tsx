@@ -51,17 +51,8 @@ export function CompareScreen({ plans }: { plans: StoredPlan[] }) {
         previousComparison.result.expensesAnnualCents
       : null;
   const singleYear = comparisonRows.length < 2;
-  const soleYear = comparisonRows.at(-1)?.plan.year;
   return (
     <section className={styles.wideCard}>
-      <p className={styles.eyebrow}>
-        {singleYear ? "This year" : "Year over year"}
-      </p>
-      <h1>
-        {singleYear
-          ? `Your ${soleYear} plan at a glance.`
-          : "See what changed—and what stayed yours."}
-      </h1>
       <p className={styles.muted}>
         {singleYear
           ? "Start next year's plan to compare them side by side."

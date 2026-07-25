@@ -43,9 +43,7 @@ export function EditBudgetSurface({
   };
   return (
     <BackPage title="Edit monthly budget" onBack={onBack}>
-      <p className={styles.pageIntro}>
-        Change planned amounts in one pass. Annual categories remain annual.
-      </p>
+      <p className={styles.pageIntro}>Annual categories remain annual.</p>
       <section className={styles.formList}>
         {plan.expenses
           .filter(({ archived }) => !archived)
@@ -100,7 +98,7 @@ export function ManageCategoriesSurface({
   return (
     <BackPage title="Manage categories" onBack={onBack}>
       <div className={styles.toolbar}>
-        <p>Rename, classify, reorder, or archive. History stays attached.</p>
+        <p>Archiving keeps the category&apos;s history.</p>
         <button
           onClick={() =>
             onDraft({

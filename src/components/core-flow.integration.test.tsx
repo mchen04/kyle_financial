@@ -296,7 +296,7 @@ describe("daily cockpit integration contract", () => {
       );
     });
 
-    expect(container.textContent).toContain("Your money, right now.");
+    expect(container.querySelector("main h1")?.textContent).toBe("Home");
     expect(container.textContent).toContain(
       "exact: $1,000.00 − $250.00 = $750.00",
     );
@@ -439,7 +439,7 @@ describe("daily cockpit integration contract", () => {
       input.closest("label")?.textContent?.includes("What was it?"),
     )!;
     fill(title, "Offline coffee");
-    click(button(container, "Create category without losing this expense"));
+    click(button(container, "Create category"));
     const categoryName = [
       ...container.querySelectorAll<HTMLInputElement>("input"),
     ].find((input) =>

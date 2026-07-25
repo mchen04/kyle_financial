@@ -420,3 +420,343 @@ green, in the 20-state capture.
 search` (React re-renders the heading and restores the text before the sample).
   It is proven red on `Monthly wrap`; the other five checks are proven red on
   both surfaces.
+
+---
+
+## L3d/e — Benefits, Manage categories, and the removal of all promotional copy
+
+Every number below was read out of a live production build.
+BEFORE is [`l3de-before.json`](./l3de-before.json), measured at the head of this
+loop (i.e. on top of L3a and L3b); AFTER is
+[`l3de-after.json`](./l3de-after.json).
+[`l3de-full-after.json`](./l3de-full-after.json) is the 60-row capture (20
+surface states × 3 viewports) used to prove no other surface regressed.
+
+```
+pnpm ui:density:measure -- --mode gate \
+  --surfaces benefits,manage-categories,compare,plan,plan-details,account,onboarding,signed-out-sign-in,signed-out-create-account \
+  --viewports 390x844,360x740,430x932 --session l3de
+# 27 measurement(s); 0 violating row(s); mode=gate   EXIT=0
+```
+
+### Vertical cost (VH) and CLS
+
+| Surface                    | Viewport | Before VH |  After VH | Bar | Before CLS | After CLS | CLS bar |
+| -------------------------- | -------- | --------: | --------: | --: | ---------: | --------: | ------: |
+| **Benefits**               | 390x844  | **4.204** | **2.757** | 4.0 |     0.0000 |    0.0000 |    0.02 |
+| **Benefits**               | 360x740  | **5.649** | **3.166** | 4.0 |     0.0000 |    0.0000 |    0.02 |
+| Benefits                   | 430x932  |     3.789 |     2.461 | 4.0 |     0.0000 |    0.0000 |    0.02 |
+| **Manage categories**      | 390x844  | **4.233** | **2.364** | 4.0 |     0.0000 |    0.0000 |    0.02 |
+| Manage categories          | 360x740  |     3.699 |     2.645 | 4.0 |     0.0000 |    0.0000 |    0.02 |
+| Manage categories          | 430x932  |     3.798 |     2.105 | 4.0 |     0.0000 |    0.0000 |    0.02 |
+| Compare years              | 390x844  |     1.748 |     1.634 | 4.0 |     0.0000 |    0.0000 |    0.02 |
+| Compare years              | 360x740  |     2.018 |     1.888 | 4.0 |     0.0000 |    0.0000 |    0.02 |
+| Compare years              | 430x932  |     1.583 |     1.480 | 4.0 |     0.0000 |    0.0000 |    0.02 |
+| Plan                       | 390x844  |     2.359 |     2.359 | 3.0 |     0.0005 |    0.0005 |    0.02 |
+| Plan                       | 360x740  |     2.399 |     2.399 | 3.0 |     0.0007 |    0.0007 |    0.02 |
+| Plan                       | 430x932  |     2.100 |     2.100 | 3.0 |     0.0005 |    0.0005 |    0.02 |
+| Plan details               | 390x844  |     2.870 |     2.845 | 4.0 |     0.0000 |    0.0000 |    0.02 |
+| Plan details               | 360x740  |     3.295 |     3.265 | 4.0 |     0.0000 |    0.0000 |    0.02 |
+| Plan details               | 430x932  |     2.511 |     2.488 | 4.0 |     0.0000 |    0.0000 |    0.02 |
+| Account                    | 390x844  |     1.137 |     1.000 | 3.0 |     0.0000 |    0.0000 |    0.02 |
+| Account                    | 360x740  |     1.400 |     1.208 | 3.0 |     0.0000 |    0.0000 |    0.02 |
+| Account                    | 430x932  |     1.013 |     1.000 | 3.0 |     0.0000 |    0.0000 |    0.02 |
+| Onboarding · cold load     | 390x844  |     1.000 |     1.000 | 1.5 |     0.0000 |    0.0000 |    0.02 |
+| Onboarding · cold load     | 360x740  |     1.101 |     1.000 | 1.5 |     0.0000 |    0.0000 |    0.02 |
+| Onboarding · cold load     | 430x932  |     1.000 |     1.000 | 1.5 |     0.0000 |    0.0000 |    0.02 |
+| Signed out · create (cold) | 390x844  |     1.000 |     1.000 | 1.5 |     0.0000 |    0.0000 |    0.02 |
+| Signed out · create (cold) | 360x740  |     1.158 |     1.000 | 1.5 |     0.0000 |    0.0000 |    0.02 |
+| Signed out · create (cold) | 430x932  |     1.000 |     1.000 | 1.5 |     0.0000 |    0.0000 |    0.02 |
+| Signed out · sign in       | 390x844  |     1.000 |     1.000 | 1.5 |     0.0083 |    0.0005 |    0.02 |
+| Signed out · sign in       | 360x740  |     1.131 |     1.000 | 1.5 |     0.0071 |    0.0007 |    0.02 |
+| Signed out · sign in       | 430x932  |     1.000 |     1.000 | 1.5 |     0.0068 |    0.0004 |    0.02 |
+
+Headline first paint equals headline settled on all 27 rows. 0 interactive
+targets under 44px, 0 horizontal overflow, 0 console errors on all 27 rows.
+
+### No other surface regressed
+
+`l3de-full-after.json` is 60 measurements. Compared row-by-row against the
+frozen original baseline, **0 of 60 rows moved in the wrong direction on either
+VH or CLS**, and compared against `l3b-full-after.json` (390x844) the same holds:
+
+| Surface (390x844)       |     After L3b |   After L3d/e | Note                                                           |
+| ----------------------- | ------------: | ------------: | -------------------------------------------------------------- |
+| Home / Home · cold load |         1.000 |         1.000 | headline is now `Home`; geometry unchanged                     |
+| Budget / future month   |         1.367 |         1.367 | untouched                                                      |
+| Activity                |         5.103 |         5.103 | untouched; still the residual documented in L3b                |
+| Activity · empty search |         1.000 |         1.000 | untouched                                                      |
+| Category detail         |         1.417 |         1.417 | untouched                                                      |
+| Edit budget             |         1.627 |     **1.608** | one sentence shortened on the page intro                       |
+| Monthly wrap            |         2.114 |     **2.098** | one duplicated section eyebrow removed                         |
+| Manage categories       |         4.233 |     **2.364** | this loop                                                      |
+| Benefits                |         4.204 |     **2.757** | this loop                                                      |
+| Plan details            |         2.870 |     **2.845** | shared `.eyebrow` untouched; the delta is the Fast Log eyebrow |
+| Compare years           |         1.748 |     **1.634** | duplicated eyebrow + h1 removed                                |
+| Account                 |         1.137 |     **1.000** | two positioning paragraphs removed                             |
+| Plan                    |         2.359 |         2.359 | untouched                                                      |
+| Fast Log new / edit     | 0.848 / 0.782 | 0.848 / 0.782 | eyebrow removal did not change the sheet's height              |
+
+### Benefits: what was cut, and why
+
+| Cut                                                                                                                                                                                                                                                                    | Citation                                                     |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| The **five-line benefit row** (name / kind / amount+delete / discount / result at ≤360px, and a three-line variant above it) → **two 44px lines**: name plus the computed annual figure in a fixed `nowrap` `tabular-nums` column, then amount kind, amount and delete | **C1** (48px single-line row, no row below 44px), **C6**     |
+| …measured: 271px → **117px** per plain row at 360x740, 11 rows 3198px → **1544px**                                                                                                                                                                                     | C1                                                           |
+| The four `benefitSummary` **cards** (12px padding, rounded, 61px each) → a hairline **row group** of 44px lines, label left, figure right                                                                                                                              | **C5** (nobody acts on these four facts as a unit), C1, C6   |
+| The second `<h1>` `Benefits and payroll choices` — the sub-page already renders `<h1>Benefits</h1>` 32px above it                                                                                                                                                      | **C2** (header ≤ 32px, no subtitle), rule 1 (restated value) |
+| The eyebrow `Before the paycheck lands`                                                                                                                                                                                                                                | C2, rule 6 (promotional flavour)                             |
+| The per-row line `Recomputes take-home instantly`, rendered on 9 of the 11 rows                                                                                                                                                                                        | **rule 6** (a feature claim carrying no information)         |
+| …the _other_ branch of that line, `Employer-side · does not reduce paycheck`, was **kept** on the two employer-side rows: it is the only place that fact is stated                                                                                                     | rule 1 (no capability or fact removed)                       |
+| The intro note shortened and set at 13px                                                                                                                                                                                                                               | order 6 (type scale, last resort)                            |
+
+### Manage categories: what was cut, and why
+
+| Cut                                                                                                                                                                                                                                            | Citation                                                  |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| The category row's **four auto-placed 44px lines** (dot+name / type / colour / reorder / archive) → an explicit **two-line grid**: `dot name … archive` over `dot type colour reorder`. 217px → **112px** per row, 15 rows 3255px → **1680px** | **C1**, C4 (0px inside a group)                           |
+| The toolbar sentence `Rename, classify, reorder, or archive. History stays attached.` → `Archiving keeps the category's history.` — the four verbs name controls that are visible on every row                                                 | rule 1 (restated), rule 6 (factual copy may be shortened) |
+| `Edit budget` intro `Change planned amounts in one pass. Annual categories remain annual.` → `Annual categories remain annual.`                                                                                                                | rule 6 (shortened, not deleted)                           |
+
+Every control kept its own ≥44px target: the harness reports **0 targets under
+44px** on all 60 rows.
+
+### Benefits and the 60 % rule: the honest arithmetic
+
+The frozen original baseline for Benefits at 360x740 is **5.746 VH = 4252px**,
+which is above 5.0, so the mission requires a cut of at least 60 % — a target of
+**2.298 VH = 1701px** — _and_ the absolute 4.0 bar.
+
+- **The absolute bar is met at every viewport**: 2.757 / 3.166 / 2.461 VH.
+- **The 60 % target is not met.** Achieved 3.166 VH at 360x740 = **2343px**, a
+  **−44.9 %** cut against the frozen baseline (−43.9 % against this loop's head
+  of 5.649). Against the 390x844 baseline the cut is 4.289 → 2.757 (−35.7 %) and
+  at 430x932 3.866 → 2.461 (−36.3 %).
+
+Measured decomposition of the 2343px surface at 360x740:
+
+```
+   44 px  back control                                        ( 1.9 %)
+   32 px  page heading "Benefits"                             ( 1.4 %)
+  136 px  intro note + the "Add benefit" control              ( 5.8 %)
+  176 px  four 44px summary rows                              ( 7.5 %)
+  237 px  bounded warning + tax-notice region                 (10.1 %)
+ 1544 px  11 benefit rows                                     (65.9 %)
+  174 px  card padding, group gaps, scroll-region clearance   ( 7.4 %)
+--------
+ 2343 px  = measured scrollHeight
+```
+
+Per-row heights at 360x740, identical at 390 and 430 (rows do not re-wrap on width):
+
+| Row shape                                         | Count |    Height | Why                                             |
+| ------------------------------------------------- | ----: | --------: | ----------------------------------------------- |
+| name+figure / kind+amount+delete                  |     7 | **117px** | C1 two 44px control lines, 8px gap, 8px padding |
+| the same plus the employer-side note              |     2 |     149px | the note is the only statement of that fact     |
+| the same plus the ESPP discount input             |     1 |     169px | a sixth control                                 |
+| the same plus the custom tax-treatment checkboxes |     1 |     258px | four checkbox targets, each ≥44px               |
+
+**The 60 % target is not arithmetically impossible here, and it would be
+dishonest to claim it is.** The floor under the never-cross rules is roughly:
+
+```
+ 968 px  11 rows × two 44px control lines, zero padding, zero gap
+  44 px  the ESPP discount input
+  88 px  two wrapped 44px rows of custom tax-treatment checkboxes
+  44 px  back control
+  32 px  page heading
+  44 px  "Add benefit" control
+ 176 px  four summary lines
+ 237 px  warning + notice region (rule 2: attention items must stay visible)
+--------
+1633 px  = 2.207 VH
+```
+
+The 1701px target therefore sits **68px above that floor**, i.e. it is reachable
+only by a page with zero padding, zero gaps between groups and no explanatory
+note — which **C4 forbids outright** (16px between groups, 24px between major
+sections). The 642px between the built page and the target is exactly the
+padding, gaps, 48px money-input height, the operational intro note, and the four
+row shapes above that carry a sixth or seventh control.
+
+**One mechanism would reach it, and it was refused.** C12 licenses promoting a
+section over 400px to a sub-page behind a labeled 48px row showing its summary
+value. Promoting each benefit to its own editor page would leave 11 labeled 48px
+rows (~540px) and project to ≈1350px = **1.82 VH at 360x740, a −68 % cut**. It
+was refused because:
+
+- Benefits exists to be _compared while tuning_: the whole point of the surface
+  is seeing all eleven payroll choices and the three summary figures move
+  together. Eleven sub-pages turns one screen of work into 22 taps.
+- C12's own trigger is a section "opened less than once per session". The
+  benefit list is not a section of this surface; it **is** this surface.
+- It would satisfy the percentage by relocating the content the percentage is
+  measuring — the same class of move the mission blocks for nested scrollers and
+  virtualisation.
+
+This is reported as a **pass on the absolute 4.0 bar and a miss on the 60 %
+reduction**, with the arithmetic above, not as a pass.
+
+### The signed-out CLS regression this loop introduced, and its fix
+
+Removing the marketing panel made the auth card the only content on the page and
+vertically centred it. The password hint `Use at least 10 characters.` rendered
+in create-account mode only, so toggling to sign-in shortened the card and the
+centring moved the whole panel: measured **0.0277 / 0.0361 / 0.0214** against a
+0.02 bar, worse than the 0.0083 / 0.0071 / 0.0068 baseline.
+
+Root cause is exactly what **C9** names: a box that exists in one state and not
+the other. `minLength` is 10 in both modes, so the line is true in both modes and
+it is now rendered in both. Measured after the fix: **0.0005 / 0.0007 / 0.0004** —
+an order of magnitude better than the baseline it started from.
+
+### Promotional copy removed
+
+The app has two private users, no customers and nothing to sell. Every string
+below was deleted or reduced to a factual label. Nothing in the "kept" list was
+touched beyond shortening.
+
+| Where                  | String removed                                                                                                                          | Class                     |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| Signed out             | eyebrow `Plan the year. Know what is left today.`                                                                                       | tagline                   |
+| Signed out             | `<h1>` `One honest plan for every day money moves.`                                                                                     | product promise           |
+| Signed out             | `Set the long view from salary, taxes, benefits, and planned spending. Then log real expenses and see what is safe to spend now.`       | feature-selling pitch     |
+| Signed out             | `previewLedger`: `Gross pay $150,000`, `Taxes · benefits · life — accounted for`, `What's safe this month $2,184`                       | **fabricated data**       |
+| Signed out             | eyebrows `Start your cockpit` / `Welcome back`                                                                                          | flavour                   |
+| Signed out             | `<h2>` `Create your private account` / `Open your money cockpit` → `Create account` / `Sign in`                                         | positioning               |
+| Signed out             | `No bank connection or ads. Export or permanently delete every plan anytime.`                                                           | differentiation claim     |
+| Signed out             | the entire dark `authStory` panel that framed the above                                                                                 | marketing chrome          |
+| Onboarding             | eyebrow `Three details · sensible defaults do the rest`                                                                                 | effort-minimisation pitch |
+| Onboarding             | `<h1>` `Build the plan behind your daily budget` → `Create your plan`                                                                   | positioning               |
+| Onboarding             | button `Open my cockpit` / `Opening your cockpit…` → `Create plan` / `Creating plan…`                                                   | positioning               |
+| Onboarding             | `placeholder="150,000"` on the wages field                                                                                              | **fabricated figure**     |
+| Account                | eyebrow `Your data`; `Your plans stay private to this account. Export a complete copy whenever you want.`                               | restated / positioning    |
+| Account                | `No bank connection or ads.` (leading clause of the privacy line)                                                                       | differentiation claim     |
+| Account                | `<h2>` `Keep your plan one tap away.` → `Install on iPhone`                                                                             | benefit promise           |
+| Benefits               | eyebrow `Before the paycheck lands`; `<h1>` `Benefits and payroll choices`                                                              | flavour / restated        |
+| Benefits               | per-row `Recomputes take-home instantly` (9 rows)                                                                                       | feature claim             |
+| Home                   | `<h1>` `Your money, right now.` / `Your plan, ahead.` → `Home`                                                                          | tagline                   |
+| Activity               | `<h1>` `Find and fix expenses.` → `Activity`                                                                                            | pitch voice               |
+| Monthly expense ledger | eyebrow `Your planned life`                                                                                                             | aspirational flavour      |
+| Fast Log               | eyebrow `One clean entry`                                                                                                               | quality claim             |
+| Fast Log               | `Create category without losing this expense` → `Create category`                                                                       | reassurance claim         |
+| Compare years          | `<h1>` `See what changed—and what stayed yours.` / `Your {year} plan at a glance.` and its eyebrow                                      | pitch / restated          |
+| Monthly wrap           | `<h2>` `Every contribution and variance, counted once` → `How the savings impact is built` (and its duplicate eyebrow)                  | correctness claim         |
+| Monthly wrap           | list title `Wins` → `Under budget`                                                                                                      | celebratory framing       |
+| Plan answer            | `Flexible cash saving after every planned expense.` → `Cash remaining after every planned expense.`                                     | reassurance tone          |
+| Plan answer            | `…to see what is truly left.` → `…to complete it.`                                                                                      | truth/clarity promise     |
+| Sidebar                | strapline `Daily decisions · annual plan`                                                                                               | tagline                   |
+| Manifest               | `name: "House by 30 — Daily Money Cockpit"` → `"House by 30"`                                                                           | tagline suffix            |
+| `brand.ts`             | `PRODUCT_DESCRIPTION` `Plan the year, log daily spending, and know what is safe to spend.` → `Annual money plan and daily expense log.` | pitch → descriptor        |
+
+**Kept, as the mission requires:** every field label, every validation and error
+message, the sign-in / create-account controls and their toggle, the Add-to-Home-Screen
+install steps, `Installed plans will remain available offline after their first
+sync.`, `Plans remain on the server until you delete this account; deletion also
+clears this device's cached copy.`, the tax-estimate disclaimer, the ESPP /
+HSA / limit notices, and every line that explains what a number means.
+
+#### The `PRODUCT_DESCRIPTION` decision
+
+**Kept, rewritten from a pitch to a descriptor.** A PWA manifest `description`
+and the document `<meta name="description">` are install-time metadata: the
+install sheet and the Home Screen listing render it, and dropping it degrades a
+real operational surface. What is _not_ defensible is putting a pitch there.
+`Plan the year, log daily spending, and know what is safe to spend.` addresses
+the reader in the second person and promises an outcome ("know what is safe").
+`Annual money plan and daily expense log.` states what the software is, in the
+third person, with no promise, benefit claim, or address to a reader. It is
+rendered nowhere inside the app — the two call sites are `src/app/manifest.ts`
+and `src/app/layout.tsx`, both metadata. The manifest's `name` field lost its
+`— Daily Money Cockpit` suffix outright: that was a tagline, not metadata.
+
+### Tap paths walked after the change
+
+Nothing became unreachable; no path grew.
+
+| Capability                           | Path                                                         | Taps |
+| ------------------------------------ | ------------------------------------------------------------ | ---: |
+| Benefits surface                     | Plan tab → `Benefits`                                        |    2 |
+| Edit a 401(k) / HSA / payroll amount | Plan tab → `Benefits` → the row's amount field, inline       |    2 |
+| Change a benefit's amount kind       | same row, `% of wages` / `$ per year` / `$ per month` select |    2 |
+| Rename a benefit                     | same row, name field                                         |    2 |
+| Delete a benefit                     | same row, 44px trash control                                 |    2 |
+| Add a benefit                        | Plan tab → `Benefits` → `Add benefit` select (13 types)      |    2 |
+| ESPP discount rate                   | the ESPP row's `Discount %` field                            |    2 |
+| Custom benefit tax treatment         | the custom row's four checkboxes                             |    2 |
+| Manage categories                    | Budget tab → `Manage categories`                             |    2 |
+| Create a category                    | → `Add category`                                             |    3 |
+| Rename a category                    | → the row's name field                                       |    3 |
+| Archive / reactivate a category      | → the row's `Archive` / `Reactivate` control                 |    3 |
+| Reorder a category                   | → the row's up / down controls                               |    3 |
+| Change a category's type or colour   | → the row's two selects                                      |    3 |
+| Export all years / this device       | Account → the two export buttons                             |    2 |
+| Add to Home Screen instructions      | Account → the three numbered steps                           |    1 |
+| Log out / delete account permanently | Account → `Log out` / `Delete account`                       |    2 |
+| Create an account / sign in          | signed-out panel, both modes via the toggle                  |  1–2 |
+
+### FAIL-DEMO, re-proven on this loop's surfaces
+
+Each check was re-proven red on **Benefits and Manage categories** after the
+change, by browser-side injection only — no application source was touched.
+
+| Check         | Injection                         | Manage categories     | Benefits               |
+| ------------- | --------------------------------- | --------------------- | ---------------------- |
+| vertical cost | 4000px of padding on the scroller | 7.027 VH ✗            | 7.421 VH ✗             |
+| CLS           | 220px block prepended at +900ms   | 0.2097 ✗              | 0.1418 ✗               |
+| headline swap | `main h1` rewritten at +900ms     | swapped ✗             | swapped ✗              |
+| touch target  | 20x20 button prepended            | 1 target under 44px ✗ | 2 targets under 44px ✗ |
+| overflow      | body widened to 3000px            | 390 ≠ 3000 ✗          | 390 ≠ 3000 ✗           |
+| console error | one `console.error`               | 1 error ✗             | 1 error ✗              |
+
+Evidence: `l3de-faildemo-{vh,cls,headline,touch,overflow,console}.json`, each run
+exiting non-zero.
+
+### What was refused
+
+- **Eleven benefit sub-pages** — see the 60 % arithmetic above.
+- **The bounded warning / tax-notice region (237px) was not cut.** It is 10 % of
+  the Benefits surface and the largest remaining non-row block, but it carries
+  the HSA/FSA conflict warning and the contribution-limit notices. Rule 2 puts
+  attention items above density; it is already bounded to one visible message
+  plus a labeled `Show 5 more warnings and tax notes` disclosure.
+- **`Benefits going to savings` was not deleted** even though it is the sum of
+  the two rows above it (the pattern L3a used to delete Home's metric trio). It
+  is the only place the `Not feasible with current payroll choices` state is
+  stated, and deleting it would delete an attention signal.
+- **No input font-size was touched.** C10's 16px floor is intact on both
+  restructured surfaces; the money field is still 48px tall with a 16px value.
+- **The category colour select was not replaced by a swatch picker.** Eleven
+  named tokens in a native select is one 44px target; a swatch grid would be
+  eleven smaller ones.
+- **No bar, threshold or measurement semantic in `scripts/measure-density.mjs`
+  was touched.** The only edits to that file are the surface-arrival assertions
+  for headings whose text this loop intentionally changed (`Create account`,
+  `Sign in`, `Create your plan`, `Home`, `Activity`, and the Benefits assertion,
+  which now asserts the sub-page heading plus the presence of the `Add benefit`
+  control rather than the deleted duplicate `<h1>`).
+- **No test was deleted or weakened.** All 498 tests in 61 files pass. Two
+  assertions in `core-flow.integration.test.tsx` encoded copy this loop
+  intentionally changed and were updated in place: `Your money, right now.` →
+  an assertion that `main h1` is `Home`, and the Fast Log button label
+  `Create category without losing this expense` → `Create category`.
+
+### Residual risk
+
+- **Benefits misses the 60 % reduction target** at 3.166 VH against a 2.298 VH
+  target at 360x740. The mechanism that would close it is documented and
+  refused above; a reviewer who disagrees with that judgement has the projected
+  number (≈1.82 VH) to act on.
+- **The fixture is one data shape.** Eleven benefits is a full payroll; the row
+  region scales linearly at 117px per plain row and the chrome does not scale.
+  A twelfth benefit adds 0.16 VH at 360x740, so ~16 more benefits would reach
+  the 4.0 bar. Fifteen categories likewise costs 112px each on Manage
+  categories; ~11 more would reach it.
+- **A benefit label long enough to wrap** would add a line to that row. No
+  seeded label wraps at 360px — the seven plain rows all measure 117px at 360,
+  390 and 430, which is the evidence for that.
+- The auth panel is now the only thing on the signed-out page. Its CLS is
+  measured at 0.0005–0.0007, but any future control that renders in one mode and
+  not the other will re-open the C9 defect that this loop closed.
+- Everything the harness cannot see is unchanged and still listed in
+  [`mobile-density-baseline.md`](./mobile-density-baseline.md#what-this-harness-cannot-see).
