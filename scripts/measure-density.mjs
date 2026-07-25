@@ -1618,6 +1618,36 @@ async function waitForServer(url, timeout = 120000) {
   }
 }
 
+/**
+ * Refuse to run against a server this process did not start.
+ *
+ * Two overlapping runs on the default port cost a whole measurement round: the
+ * second `next start` lost the bind, the first run's server answered instead,
+ * and the second run measured a build it had not built — silently, because a
+ * healthy foreign server looks exactly like your own. A harness that can be
+ * pointed at the wrong build without saying so is not a verifier. `--base-url`
+ * is the supported way to measure something you started yourself, and it skips
+ * this check by construction.
+ */
+async function assertPortFree(port) {
+  try {
+    const response = await fetch(`http://localhost:${port}`, {
+      redirect: "manual",
+      signal: AbortSignal.timeout(2000),
+    });
+    throw new Error(
+      `port ${port} is already serving (HTTP ${response.status}). Another ` +
+        `measurement run or dev server is using it, and this run would measure ` +
+        `that build instead of the one it just compiled. Stop it, or pass ` +
+        `--port with a free port, or --base-url to target it deliberately.`,
+    );
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith("port "))
+      throw error;
+    // Nothing listening, or it did not answer in time: the port is ours.
+  }
+}
+
 function parseArguments(argv) {
   const options = {
     mode: "gate",
@@ -1741,6 +1771,7 @@ async function main() {
   let server = null;
   let baseUrl = options.baseUrl;
   if (!baseUrl) {
+    await assertPortFree(options.port);
     if (options.build) {
       console.log("Building production bundle…");
       await run("pnpm", ["build"], {

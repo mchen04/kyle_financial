@@ -65,17 +65,24 @@
   composes: primaryButton from "./surface-primitives.module.css";
 }
 
+/* `place-content: center` sized the column track to its own content, so the
+   panel's `width: min(440px, 100% - 48px)` resolved against a content-sized
+   track and the card came out ~252px wide inside a 390px phone — two thirds of
+   the screen, with 68px of dead gutter on each side, while onboarding one screen
+   later used the full width. Two judges called it the surface that reads as
+   coming from a different app. `align-content` keeps the vertical centring and
+   lets the track fill, and the panel now takes the same gutter onboarding does. */
 .authPage {
   min-height: var(--viewport-height);
   display: grid;
-  place-content: center;
+  align-content: center;
   padding: var(--space-4);
 }
 
 .authPanel {
-  width: min(var(--layout-2xl), calc(100% - var(--control-md)));
+  width: min(var(--layout-6xl), calc(100% - var(--space-2)));
   margin: auto;
-  padding: var(--space-10);
+  padding: var(--space-6);
   border: var(--border-hairline) solid var(--line);
   border-radius: var(--radius-xl) var(--radius-xl) var(--radius-xl)
     var(--radius-sm);

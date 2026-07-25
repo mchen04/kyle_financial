@@ -2302,3 +2302,90 @@ was varying. The back control is as wide as its own label, so `Back to Home`,
 positions, none of which matched the tab-root headlines sitting at the page
 gutter. Stacking costs ~44px on seven surfaces whose bars have 0.9-3.0 VH of
 headroom, and it is the platform's own arrangement.
+
+---
+
+## L5 cycle 5 — the panel caught a regression the wave shipped
+
+Full record in [`l5-judge-cycle5/scores.md`](./l5-judge-cycle5/scores.md).
+
+| Axis                     | Cycle 4 |  Cycle 5 |     Δ |   Bar |
+| ------------------------ | ------: | -------: | ----: | ----: |
+| Visual coherence         |     7.2 |  **7.4** |  +0.2 | > 8.0 |
+| Typographic hierarchy    |     7.6 |  **7.8** |  +0.2 | > 8.0 |
+| Density without crowding |     7.4 |  **7.2** |  -0.2 | > 8.0 |
+| iOS nativeness           |     5.5 |  **6.5** |  +1.0 | > 8.0 |
+| **Panel average**        |    6.93 | **7.23** | +0.30 | > 8.5 |
+
+None of cycle 4's nine convergent findings was raised again. Density fell 0.2
+because the cycle-5 wave **shipped a defect**, and two judges who could not see
+each other's work both caught it: the chevron drawn to replace the `<select>`
+triangle was two diagonal gradient _bands_ over one box, and two bands over one
+box cross into an `✗` rather than meeting in a caret. It was overlapping the `6`
+of the year chip on all 21 states. Confirmed by cropping the capture at 4x,
+reverted to the triangle, gutter widened.
+
+**The shape critique is refused, with the reason stated:** a `<select>` cannot
+carry a pseudo-element, and the token authority forbids raw colours, so an SVG
+data URI with a fill is not available either. Two half-gradients meeting at a
+shared edge is the one construction that renders a clean glyph under both
+constraints, and it is verified in both engines.
+
+### The cycle-6 wave
+
+| Judges | Change                                                                                                                                                                                    |
+| -----: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|  **2** | The malformed caret reverted; `padding-inline-end` 20px -> 24px, glyph 12px in                                                                                                            |
+|  **2** | One section rung product-wide — grey letterspaced caps. The `<h2>` elements are kept, so the document outline is untouched; only their dress changes                                      |
+|  **2** | The auth card: `place-content: center` sized its track to content, so a `min(440px, 100% - 48px)` panel came out **~252px wide in a 390px viewport**. `align-content` lets the track fill |
+|  **2** | The Fast Log pill clears the tab-bar hairline by 8px. It is `position: fixed`, so this costs no surface a pixel                                                                           |
+|      1 | Plan's hero card puts the input and the projected figure side by side instead of stacking them down a half-empty card                                                                     |
+|      1 | Compare's explainer stops being the largest text in its own card                                                                                                                          |
+
+### Two more regressions, both caught by the gate rather than by review
+
+1. **The tab-bar capsule.** 4px of block margin on four nav buttons grew the bar
+   8px, which came out of `<main>`; Home fits with 2.9px of slack and went
+   **5.1px over its own scroll region**. The capsule is now inset with
+   `background-clip: content-box` and changes no box by a pixel.
+2. **A comment inside a selector list.** The two-column `.planOutcome` rule was
+   written by inserting a comment between `.linkGrid,` and `.planOutcome` in a
+   shared selector list. A comment there is still _inside the list_, so the
+   two-column layout silently reached `.homeGrid` and `.linkGrid` too and
+   collapsed Plan's four navigation rows to **35.6px wide** — a rule-4 violation
+   on both engines, at one viewport only. Split into its own rule.
+
+Neither was visible in review; both were caught by measurement, on the engine
+they affected, before they were committed.
+
+### One more hole closed in the harness itself
+
+Two measurement runs overlapped on the default port. The second `next start`
+lost the bind, the **first run's server answered instead**, and the second run
+measured a build it had not compiled — silently, because a healthy foreign
+server is indistinguishable from your own. A harness that can be pointed at the
+wrong build without saying so is not a verifier. `assertPortFree` now refuses to
+run against a server it did not start, and is proven red:
+
+```
+Error: port 3299 is already serving (HTTP 200). Another measurement run or dev
+server is using it, and this run would measure that build instead of the one it
+just compiled.
+EXIT=1
+```
+
+`--base-url` remains the supported way to measure a server you started
+deliberately, and skips the check by construction.
+
+### The opinion loop is stopped at cycle 6 of a cap of 8, below bar
+
+The three design axes are converging slowly and honestly. **iOS nativeness is
+not, and its remaining findings are out of this mission's scope by
+construction** — delete the floating action button, convert every form to inset
+grouped rows, give the sheet a grabber and a Cancel/Save nav bar, make the tab
+bar a translucent material, move from Lucide to SF Symbols. Every one is a
+rebuild of an interaction or an asset system, and the mission's non-goals name
+"new product features" and "redesigned iconography" explicitly.
+
+**The bar is not lowered. It is reported unmet: 7.23 against 8.5, all four axes
+under 8.0.**

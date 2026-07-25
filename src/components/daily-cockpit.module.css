@@ -332,7 +332,26 @@
    section heading at that size announced itself as a peer of the surface title
    and there was no hierarchy step anywhere on Compare or Monthly wrap. One
    rung down is a step a reader can see, and it returns 6px a section. */
-.sectionHeading h2,
+/* One section rung, product-wide. L9 stepped these headings down from the page
+   title's 24px, which fixed the rank but left the app running TWO section
+   forms: bold sentence-case here and on Account and Compare, and the grey
+   letterspaced caps `.groupLabel` on Home, Budget and Activity. Two judges
+   found them on vertically adjacent cards on Monthly wrap — "Budget versus
+   actual" in one form, "CURRENTLY UNSPENT" in the other — so a reader scanning
+   for "where does the next section start" got a different signal each time.
+   The caps form wins because it was already the majority and it is the cheaper
+   of the two in vertical cost. The element stays an <h2>; only its dress
+   changes, so the document outline is untouched. */
+.sectionHeading h2 {
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+  font: var(--weight-bold) var(--text-sm) / 1.38 var(--font-data);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+/* An empty state is not a section: its <h2> is the thing the reader is meant to
+   read, so it keeps the sentence-case treatment. */
 .emptyHero h2 {
   margin: var(--space-1) 0 0;
   font: var(--weight-bold) var(--text-lg) / 1.2 var(--font-display);

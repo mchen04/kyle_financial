@@ -89,9 +89,21 @@
   background: var(--paper);
 }
 
+/* The explainer above the table is context, not the headline. At body size it
+   was the largest text in the card — bigger than the heading beneath it and
+   every row label — so the one line carrying no data was the one the eye landed
+   on first. It takes the same secondary size the other surfaces give their
+   footnotes. */
+.wideCard > .muted:first-child {
+  font-size: var(--text-sm);
+}
+
 .compareCardHeading h2 {
   margin: 0;
-  font-size: var(--text-lg);
+  color: var(--ink-soft);
+  font: var(--weight-bold) var(--text-sm) / 1.38 var(--data);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
 }
 
 .compareCardHeading span {

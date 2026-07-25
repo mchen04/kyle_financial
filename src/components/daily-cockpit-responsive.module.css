@@ -99,6 +99,28 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  /* One column put the 120px input on its own full-width row and the projected
+     figure on another, so more than half the card was empty white on both. The
+     two belong side by side: the input is the number you change and the figure
+     is what changing it produces. `auto` sizes the input column to the field
+     itself, and the projection takes the rest and sets against the card's right
+     edge, so the card stops being half empty and loses a row.
+
+     This is its own rule and not a fourth selector on the one above, which is
+     how it was written first: a comment placed between `.linkGrid,` and
+     `.planOutcome` is still inside the selector list, so the two-column layout
+     silently reached `.homeGrid` and `.linkGrid` as well and collapsed Plan's
+     navigation rows to 35.6px wide. The gate caught it on both engines. */
+  .planOutcome {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: end;
+    gap: var(--space-3);
+  }
+
+  .planOutcome > div {
+    text-align: right;
+  }
+
   /* C5 + C1. Three label/value pairs stacked down 197px with the entire right
      half of the card empty: three facts that are read together, compared
      against each other, and never acted on individually. Stacking them bought

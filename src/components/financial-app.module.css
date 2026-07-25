@@ -537,8 +537,13 @@
     position: fixed;
     z-index: var(--layer-nav);
     right: max(var(--space-4), env(safe-area-inset-right));
+    /* The bar is 72px of button plus 4px of padding above and below, so the old
+       `+ space-2` put the pill's bottom edge exactly on the bar's top hairline:
+       two judges read the pill and the rule as one welded object. `space-4`
+       clears the divider by 8px. The button is `position: fixed`, so this costs
+       no surface a single pixel of vertical space. */
     bottom: calc(
-      var(--bottom-nav-height) + var(--space-2) + env(safe-area-inset-bottom)
+      var(--bottom-nav-height) + var(--space-4) + env(safe-area-inset-bottom)
     );
     display: inline-flex;
     min-width: var(--control-md);

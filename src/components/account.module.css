@@ -80,14 +80,16 @@
   gap: var(--space-1);
 }
 
-/* This is a section title and it sits on a screen whose other section title
-   ("Install on iPhone") is an <h2>. It used to be plain <strong> at body size,
-   so two peers announced themselves at two ranks. It matches its peer now.
-   The destructive button beside it keeps body size deliberately: a delete
-   control should not be the loudest type on its own card. */
+/* A section title on a screen whose other section title is "Install on iPhone".
+   It was plain <strong> at body size, so two peers announced themselves at two
+   ranks. It now carries the product's one section treatment. The destructive
+   button beside it keeps body size deliberately: a delete control should not be
+   the loudest type on its own card. */
 .deleteAccountRow strong {
-  font: var(--weight-bold) var(--text-lg) / 1.2 var(--display);
-  color: var(--ink);
+  color: var(--ink-soft);
+  font: var(--weight-bold) var(--text-sm) / 1.38 var(--data);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
 }
 
 .deleteAccountRow span {

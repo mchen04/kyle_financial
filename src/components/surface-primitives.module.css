@@ -111,15 +111,17 @@
   letter-spacing: var(--tracking-tight);
 }
 
-/* D7, applied to the one card family the L9 pass missed. An <h2> inside a card
-   is a section within a page, not the page, and this rule was still setting it
-   to the same 24px the page title uses — which is why Account's "Install on
-   iPhone" announced itself a rank above the section beside it. One rung down,
-   matching every other section heading in the product. */
+/* The one section rung, applied to the card family that carried a second one.
+   This set an <h2> inside a card to the same 24px the page title uses, so
+   Account's "Install on iPhone" announced itself a rank above the section
+   beside it. It is now the same grey letterspaced caps every other section
+   heading in the product uses. */
 .wideCard h2 {
-  margin: 0 0 var(--space-5);
-  font: 650 var(--text-lg) / 1.2 var(--display);
-  letter-spacing: var(--tracking-tight);
+  margin: 0 0 var(--space-4);
+  color: var(--ink-soft);
+  font: 700 var(--text-sm)/1.38 var(--data);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
 }
 
 /* A note that sits under the figures it explains rather than above them, so it
@@ -140,15 +142,17 @@
   gap: var(--space-4);
 }
 
-/* D7. This used to size an <h1>, and Plan details carried two of them: the
-   page title from the detail header and "Monthly expense ledger" from the card
-   inside it, both 24px and 50 points of weight apart. The card heading is a
-   section within the page, so it is an <h2>, and it steps down from the page
-   title rather than matching it. */
+/* The one section rung. This used to size an <h1>, and Plan details carried two
+   of them: the page title from the detail header and "Monthly expense ledger"
+   from the card inside it. L9 made the card heading an <h2> and stepped it
+   down; two judges then found the product still running two section forms, so
+   it is now the grey letterspaced caps that was already the majority. */
 .sectionHeading h2 {
   margin: 0;
-  font: 650 var(--text-lg) / 1.2 var(--display);
-  letter-spacing: var(--tracking-tight);
+  color: var(--ink-soft);
+  font: 700 var(--text-sm)/1.38 var(--data);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
 }
 
 .iconButton {
