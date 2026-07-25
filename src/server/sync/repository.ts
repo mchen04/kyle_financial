@@ -28,16 +28,71 @@ import {
 } from "@/domain/sync";
 import { canonicalUuidSchema } from "@/domain/sync-field";
 import { transportSafeFieldVersion } from "@/domain/field-version";
-import type { FieldVersions } from "@/domain/stored-plan";
+import type { FieldVersions, StoredPlan } from "@/domain/stored-plan";
 import {
   getPlanByYearInTransaction,
   listPlans,
 } from "@/server/plans/repository";
 import { parseFieldVersions } from "@/server/field-versions";
-import { isForeignKeyConstraintViolation } from "@/server/postgres-errors";
+import {
+  isForeignKeyConstraintViolation,
+  isRejectableMutationViolation,
+} from "@/server/postgres-errors";
 import { persistDecodedEntityMutation } from "@/server/sync/entity-repository";
 
-class InvalidFinalPlanError extends Error {}
+class InvalidFinalPlanError extends Error {
+  constructor(readonly refusable: readonly string[] = []) {
+    super();
+  }
+}
+
+/**
+ * The smallest set of mutations whose removal makes the batch admissible again.
+ *
+ * Candidates are judged by the plan they *finish* in, never by the plan they
+ * pass through, so the answer does not depend on the order the batch arrived
+ * in. A coupled save — leaving married-filing-jointly changes filing status,
+ * spouse wages and a benefit's owner together — is inadmissible after any one
+ * of its parts and admissible after all of them, and must survive intact.
+ */
+function refusableMutationIds(
+  initialPlan: StoredPlan,
+  appliedMutations: readonly DecodedSyncMutation[],
+): string[] {
+  const project = (candidates: readonly DecodedSyncMutation[]): StoredPlan =>
+    candidates.reduce(
+      (plan, mutation) => applyDecodedSyncMutation(plan, mutation),
+      initialPlan,
+    );
+  let survivors = [...appliedMutations];
+  const refused: string[] = [];
+  // Searching for the single removal that restores admissibility is quadratic,
+  // so it is reserved for batches small enough to afford it; larger ones drop
+  // the newest work first, which is the same rule with a cheaper search.
+  const searchLimit = 64;
+  while (survivors.length > 0 && !isAdmissibleProjection(project(survivors))) {
+    const culprit =
+      survivors.length <= searchLimit
+        ? survivors.findIndex((_, index) =>
+            isAdmissibleProjection(
+              project(survivors.filter((__, other) => other !== index)),
+            ),
+          )
+        : -1;
+    const target = culprit >= 0 ? culprit : survivors.length - 1;
+    refused.push(survivors[target].mutationId);
+    survivors = survivors.filter((_, index) => index !== target);
+  }
+  return refused;
+}
+
+function isAdmissibleProjection(plan: StoredPlan): boolean {
+  return (
+    plan.transactions.every(({ date }) =>
+      localDateBelongsToYear(date, plan.year),
+    ) && normalizedFullPlanSchema.safeParse(plan).success
+  );
+}
 export class SyncPlanNotFoundError extends Error {}
 
 function mutationUsesFutureActualDate(
@@ -130,6 +185,12 @@ async function reconcilePlanYear(
   planYear: number,
   yearMutations: DecodedSyncMutation[],
   receivedAt: Date,
+  /**
+   * Mutations the first attempt identified as the reason the finished batch was
+   * inadmissible. They are refused by id on the second pass so the rest commit
+   * and every mutation still earns a receipt.
+   */
+  refusedIds: ReadonlySet<string> = new Set(),
 ): Promise<PlanYearSyncResult> {
   try {
     const acknowledgements = await sql.begin(async (transaction) => {
@@ -178,6 +239,7 @@ async function reconcilePlanYear(
         mutation_id: string;
         result: { applied: boolean; fingerprint: string };
       }> = [];
+      const appliedMutations: DecodedSyncMutation[] = [];
       for (const [index, mutation] of yearMutations.entries()) {
         const transportMutation = encodeSyncMutation(mutation);
         const fingerprint = syncIntentFingerprint(transportMutation);
@@ -199,7 +261,13 @@ async function reconcilePlanYear(
               (candidate) => acceptedFingerprints.has(candidate),
             )
           ) {
-            throw new Error("Mutation ID was reused with different content");
+            // A reused id carrying different content is a client fault, but
+            // throwing aborted the whole plan year and wrote no receipts, so
+            // every innocent mutation in the batch retried forever against a
+            // request that could only ever 500. Refuse this one instead; the
+            // original receipt already records what that id actually did.
+            result.push({ mutationId: mutation.mutationId, applied: false });
+            continue;
           }
           result.push({
             mutationId: mutation.mutationId,
@@ -257,15 +325,30 @@ async function reconcilePlanYear(
           baseMatches || isIncomingVersionNewer(incoming, newestVersion);
 
         if (applied) {
-          if (mutation.kind !== "scalar") {
-            applied = await persistDecodedEntityMutation(
-              transaction,
-              plan.id,
-              mutation,
-            );
+          // The projection is judged once, after the batch, never mid-batch: a
+          // coupled save legitimately passes through invalid intermediate
+          // states, so judging a mutation against a half-applied plan rejects
+          // valid edits depending on delivery order. When the finished batch is
+          // inadmissible, the culprits are identified from the finished
+          // projection and refused by id on a second pass.
+          if (refusedIds.has(mutation.mutationId)) {
+            applied = false;
+          } else if (mutation.kind !== "scalar") {
+            try {
+              // A savepoint bounds the blast radius of a constraint the client
+              // payload violates: the failing statement rolls back alone and
+              // still earns a receipt, so the outbox can drain.
+              applied = await transaction.savepoint((savepoint) =>
+                persistDecodedEntityMutation(savepoint, plan.id, mutation),
+              );
+            } catch (error) {
+              if (!isRejectableMutationViolation(error)) throw error;
+              applied = false;
+            }
           }
           if (applied) {
             projectedPlan = applyDecodedSyncMutation(projectedPlan, mutation);
+            appliedMutations.push(mutation);
             if (mutation.kind !== "scalar" && mutation.property === null) {
               for (const field of Object.keys(versions)) {
                 const target = parseSyncTarget(field);
@@ -283,7 +366,10 @@ async function reconcilePlanYear(
         });
         result.push({ mutationId: mutation.mutationId, applied });
       }
-      if (receipts.length > 0) {
+      // `plans.updated_at` is the client's cache revision, so a batch that
+      // applied nothing must not move it and invalidate every other device's
+      // snapshot. Receipts are still written, so the outbox can drain.
+      if (appliedMutations.length > 0) {
         await transaction`
           UPDATE plans
           SET state_code = ${projectedPlan.stateCode},
@@ -304,6 +390,8 @@ async function reconcilePlanYear(
               updated_at = now()
           WHERE id = ${plan.id}
         `;
+      }
+      if (receipts.length > 0) {
         await transaction`
           INSERT INTO applied_mutations (user_id, mutation_id, result)
           SELECT ${userId}, receipt.mutation_id, receipt.result
@@ -312,14 +400,10 @@ async function reconcilePlanYear(
           ) AS receipt(mutation_id text, result jsonb)
         `;
       }
-      const transactionOutsidePlanYear = projectedPlan.transactions.some(
-        ({ date }) => !localDateBelongsToYear(date, projectedPlan.year),
-      );
-      if (
-        transactionOutsidePlanYear ||
-        !normalizedFullPlanSchema.safeParse(projectedPlan).success
-      )
-        throw new InvalidFinalPlanError();
+      if (!isAdmissibleProjection(projectedPlan))
+        throw new InvalidFinalPlanError(
+          refusableMutationIds(initialPlan, appliedMutations),
+        );
       return result;
     });
     return { kind: "committed", acknowledgements };
@@ -329,6 +413,22 @@ async function reconcilePlanYear(
       !isForeignKeyConstraintViolation(error)
     )
       throw error;
+    const refusable =
+      error instanceof InvalidFinalPlanError ? error.refusable : [];
+    if (refusedIds.size === 0 && refusable.length > 0) {
+      // Retry refusing exactly the edits responsible, so the rest commit and
+      // every mutation earns a receipt. A year rejected without receipts can
+      // never leave the client's outbox, and takes every later edit to that
+      // year down with it.
+      return reconcilePlanYear(
+        sql,
+        userId,
+        planYear,
+        yearMutations,
+        receivedAt,
+        new Set(refusable),
+      );
+    }
     return {
       kind: "rejected",
       acknowledgements: yearMutations.map(({ mutationId }) => ({

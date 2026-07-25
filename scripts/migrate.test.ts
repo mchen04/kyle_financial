@@ -206,6 +206,8 @@ describe("database migrations", () => {
 
       expect(await migrate(url.toString())).toEqual([
         "012_daily_money_cockpit.sql",
+        "013_sync_receipt_lookup_index.sql",
+        "014_drop_duplicate_rate_limit_index.sql",
       ]);
       const upgraded = await legacySql<
         {
@@ -239,6 +241,119 @@ describe("database migrations", () => {
       expect(await migrate(url.toString())).toEqual([]);
     } finally {
       await legacySql.end();
+      await admin`DROP SCHEMA IF EXISTS ${admin(schema)} CASCADE`;
+      await admin.end();
+    }
+  });
+
+  it("replays every migration file against a migrated schema", async () => {
+    const schema = `kf_test_replay_${randomUUID().replaceAll("-", "").slice(0, 12)}`;
+    const admin = testSql();
+    const url = new URL(testDatabaseUrl());
+    url.searchParams.set("options", `-csearch_path=${schema}`);
+    await admin`CREATE SCHEMA ${admin(schema)}`;
+    const replaySql = postgres(url.toString(), {
+      max: 1,
+      onnotice: () => undefined,
+    });
+    try {
+      await migrate(url.toString());
+      const files = (await readdir(resolve("migrations")))
+        .filter((name) => /^\d+_.+\.sql$/.test(name))
+        .sort();
+      const notIdempotent: string[] = [];
+      for (const file of files) {
+        const body = await readFile(resolve("migrations", file), "utf8");
+        try {
+          await replaySql.begin((transaction) => transaction.unsafe(body));
+        } catch (error) {
+          notIdempotent.push(
+            `${file}: ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
+      }
+      expect(notIdempotent).toEqual([]);
+    } finally {
+      await replaySql.end();
+      await admin`DROP SCHEMA IF EXISTS ${admin(schema)} CASCADE`;
+      await admin.end();
+    }
+  });
+
+  it("refuses to run when an applied migration file was edited", async () => {
+    const schema = `kf_test_edited_${randomUUID().replaceAll("-", "").slice(0, 12)}`;
+    const admin = testSql();
+    const url = new URL(testDatabaseUrl());
+    url.searchParams.set("options", `-csearch_path=${schema}`);
+    await admin`CREATE SCHEMA ${admin(schema)}`;
+    const ledgerSql = postgres(url.toString(), {
+      max: 1,
+      onnotice: () => undefined,
+    });
+    try {
+      await migrate(url.toString());
+      await ledgerSql`
+        UPDATE app_migrations
+        SET checksum = 'edited-after-it-was-applied'
+        WHERE name = '001_initial.sql'
+      `;
+      await expect(migrate(url.toString())).rejects.toThrow(
+        /001_initial\.sql changed after it was applied/,
+      );
+    } finally {
+      await ledgerSql.end();
+      await admin`DROP SCHEMA IF EXISTS ${admin(schema)} CASCADE`;
+      await admin.end();
+    }
+  });
+
+  it("refuses to run when an applied migration file was renamed away", async () => {
+    const schema = `kf_test_renamed_${randomUUID().replaceAll("-", "").slice(0, 12)}`;
+    const admin = testSql();
+    const url = new URL(testDatabaseUrl());
+    url.searchParams.set("options", `-csearch_path=${schema}`);
+    await admin`CREATE SCHEMA ${admin(schema)}`;
+    const ledgerSql = postgres(url.toString(), {
+      max: 1,
+      onnotice: () => undefined,
+    });
+    try {
+      await migrate(url.toString());
+      await ledgerSql`
+        UPDATE app_migrations
+        SET name = '001_initial_renamed.sql'
+        WHERE name = '001_initial.sql'
+      `;
+      await expect(migrate(url.toString())).rejects.toThrow(
+        /Applied migrations have no file: 001_initial_renamed\.sql/,
+      );
+    } finally {
+      await ledgerSql.end();
+      await admin`DROP SCHEMA IF EXISTS ${admin(schema)} CASCADE`;
+      await admin.end();
+    }
+  });
+
+  it("adopts a checksum-free ledger once, then enforces it", async () => {
+    const schema = `kf_test_adopt_${randomUUID().replaceAll("-", "").slice(0, 12)}`;
+    const admin = testSql();
+    const url = new URL(testDatabaseUrl());
+    url.searchParams.set("options", `-csearch_path=${schema}`);
+    await admin`CREATE SCHEMA ${admin(schema)}`;
+    const ledgerSql = postgres(url.toString(), {
+      max: 1,
+      onnotice: () => undefined,
+    });
+    try {
+      await migrate(url.toString());
+      await ledgerSql`UPDATE app_migrations SET checksum = NULL`;
+      expect(await migrate(url.toString())).toEqual([]);
+      const [{ count }] = await ledgerSql<{ count: string }[]>`
+        SELECT count(*)::text AS count FROM app_migrations WHERE checksum IS NULL
+      `;
+      expect(count).toBe("0");
+    } finally {
+      await ledgerSql.end();
       await admin`DROP SCHEMA IF EXISTS ${admin(schema)} CASCADE`;
       await admin.end();
     }

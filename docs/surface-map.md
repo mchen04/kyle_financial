@@ -19,12 +19,19 @@ The product is a living ledger rather than a generic analytics dashboard.
   the accessible allocation chart. Names and values always accompany color.
 - Motion is restrained and reduced-motion removes nonessential transitions.
 
-`pnpm ui:tokens:check` audits 214 canonical tokens and rejects component token
+`pnpm ui:tokens:check` audits 217 canonical tokens and rejects component token
 authorities, raw component colors or CSS lengths, duplicate or unknown tokens,
 noncanonical media queries, malformed dimensions or `var()` calls, and drift
 from the 4px/8px/44px/48px contract. The parser normalizes CSS escapes and
 comments, including declaration properties and at-rule parameters, while
 preserving quoted content and valid binary `calc()` arithmetic.
+
+Its scope is every authored surface, not a fixed file list: all `.css` under
+`src/` (plain stylesheets included, so none can be added as a bypass) and all
+`.ts`/`.tsx` under `src/`. The authority file is exempt only for the token
+definitions it exists to hold; its own rule declarations and media queries obey
+the same contract as any component. `src/domain/ui-tokens.ts` may carry exactly
+one raw literal, the PWA background that `--color-paper-50` must mirror.
 
 ## Surfaces and hierarchy
 

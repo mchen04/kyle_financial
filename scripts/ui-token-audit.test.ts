@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   auditUiTokens,
-  componentStyleNames,
+  auditedStylesheetNames,
   type UiTokenAuditInput,
 } from "./ui-token-audit";
 
@@ -22,7 +22,10 @@ const globalSource = `
 }
 `;
 
-function input(componentSource: string): UiTokenAuditInput {
+function input(
+  componentSource: string,
+  overrides: Partial<UiTokenAuditInput> = {},
+): UiTokenAuditInput {
   return {
     global: { file: "globals.css", source: globalSource },
     media: {
@@ -33,6 +36,8 @@ function input(componentSource: string): UiTokenAuditInput {
     authoredUi: [],
     categoryColors: ["blue"],
     pwaBackgroundColor: "paper",
+    colorRegistryFile: "ui-tokens.ts",
+    ...overrides,
   };
 }
 
@@ -281,13 +286,89 @@ describe("UI token audit", () => {
     ).toEqual([]);
   });
 
-  it("includes nested component modules in recursive discovery results", () => {
+  it.each([
+    [
+      "raw colors in base rules",
+      "body { background: #123456; }",
+      "raw color #123456",
+    ],
+    ["raw sizes in base rules", "body { margin: 7px; }", "raw size 7px"],
+    [
+      "uncentralized media queries",
+      "@media (max-width: 431px) { body { margin: 0; } }",
+      "raw size 431px",
+    ],
+  ])("rejects %s in the token authority itself", (_label, extra, expected) => {
     expect(
-      componentStyleNames([
+      auditUiTokens(
+        input(".surface { padding: var(--space-2); }", {
+          global: { file: "globals.css", source: `${globalSource}\n${extra}` },
+        }),
+      ).failures,
+    ).toContainEqual(expect.stringContaining(expected));
+  });
+
+  it("still exempts token definitions in the authority from raw-value rules", () => {
+    expect(
+      auditUiTokens(input(".surface { margin: var(--space-0); }")).failures,
+    ).toEqual([]);
+  });
+
+  it("permits the registry's single PWA background literal and nothing else", () => {
+    const registry = (source: string) =>
+      auditUiTokens(
+        input(".surface { margin: var(--space-0); }", {
+          authoredUi: [{ file: "ui-tokens.ts", source }],
+          pwaBackgroundColor: "#f7fafc",
+          global: {
+            file: "globals.css",
+            source: globalSource.replace(
+              "--color-paper-50: paper;",
+              "--color-paper-50: #f7fafc;",
+            ),
+          },
+        }),
+      ).failures;
+
+    expect(registry('export const BACKGROUND = "#f7fafc";')).toEqual([]);
+    expect(
+      registry(
+        'export const BACKGROUND = "#f7fafc";\nconst other = "#abcdef";',
+      ),
+    ).toContainEqual(expect.stringContaining("raw authored UI color #abcdef"));
+    expect(
+      registry(
+        'export const BACKGROUND = "#f7fafc";\nconst twice = "#f7fafc";',
+      ),
+    ).toContainEqual(expect.stringContaining("raw authored UI color #f7fafc"));
+  });
+
+  it("rejects raw colors in authored modules outside the registry", () => {
+    expect(
+      auditUiTokens(
+        input(".surface { margin: var(--space-0); }", {
+          authoredUi: [
+            { file: "money.ts", source: 'const shade = "#badbad";' },
+          ],
+        }),
+      ).failures,
+    ).toContainEqual(
+      expect.stringContaining("money.ts: raw authored UI color"),
+    );
+  });
+
+  it("discovers every nested stylesheet, not only CSS modules", () => {
+    expect(
+      auditedStylesheetNames([
         "surface.module.css",
         "nested/panel.module.css",
         "nested/panel.css",
+        "nested/notes.md",
       ]),
-    ).toEqual(["surface.module.css", "nested/panel.module.css"]);
+    ).toEqual([
+      "surface.module.css",
+      "nested/panel.module.css",
+      "nested/panel.css",
+    ]);
   });
 });

@@ -27,12 +27,28 @@ type TransactionPropertyMutation = Exclude<
   WholeTransactionMutation
 >;
 
+/**
+ * Entity ids arrive from the client, so a batch can name a row that belongs to
+ * someone else's plan. Every whole-entity write therefore arbitrates on the
+ * primary key and carries a `plan_id` predicate: a foreign id updates nothing
+ * and answers `applied: false`, instead of raising the duplicate-key error that
+ * used to fail the whole sync and confirm the id exists. The predicate rides
+ * inside the write, so ownership costs no extra round trip.
+ */
 async function replaceBenefit(
   transaction: TransactionSql,
   planId: string,
   mutation: WholeBenefitMutation,
-): Promise<void> {
+): Promise<boolean> {
   const entryId = mutation.entityId;
+  if (mutation.value === null) {
+    const removed = await transaction`
+      DELETE FROM benefits
+      WHERE plan_id = ${planId} AND id = ${entryId}
+      RETURNING id
+    `;
+    return removed.length > 0;
+  }
   const existing = await transaction<{ sort_order: number }[]>`
     SELECT sort_order FROM benefits WHERE plan_id = ${planId} AND id = ${entryId}
   `;
@@ -44,17 +60,13 @@ async function replaceBenefit(
         FROM benefits WHERE plan_id = ${planId}
       `
     )[0].next_order;
-  await transaction`
-    DELETE FROM benefits WHERE plan_id = ${planId} AND id = ${entryId}
-  `;
-  if (mutation.value === null) return;
   const entry = mutation.value;
   const amountValue =
     entry.amount.kind === "percent" ? entry.amount.ratePpm : entry.amount.cents;
   const customTreatment = entry.customTaxTreatment
     ? JSON.stringify(entry.customTaxTreatment)
     : null;
-  await transaction`
+  const written = await transaction`
     INSERT INTO benefits (
       id, plan_id, owner, type, label, amount_kind, amount_value,
       discount_rate_ppm, custom_tax_treatment, sort_order
@@ -63,7 +75,19 @@ async function replaceBenefit(
       ${amountValue}, ${entry.discountRatePpm ?? null}, ${customTreatment}::jsonb,
       ${nextOrder}
     )
+    ON CONFLICT (id) DO UPDATE SET
+      owner = EXCLUDED.owner,
+      type = EXCLUDED.type,
+      label = EXCLUDED.label,
+      amount_kind = EXCLUDED.amount_kind,
+      amount_value = EXCLUDED.amount_value,
+      discount_rate_ppm = EXCLUDED.discount_rate_ppm,
+      custom_tax_treatment = EXCLUDED.custom_tax_treatment,
+      sort_order = EXCLUDED.sort_order
+    WHERE benefits.plan_id = ${planId}
+    RETURNING id
   `;
+  return written.length > 0;
 }
 
 async function updateBenefitProperty(
@@ -114,16 +138,30 @@ async function replaceExpense(
   transaction: TransactionSql,
   planId: string,
   mutation: WholeExpenseMutation,
-): Promise<void> {
+): Promise<boolean> {
   const entryId = mutation.entityId;
   if (mutation.value === null) {
-    await transaction`
-      DELETE FROM expenses WHERE plan_id = ${planId} AND id = ${entryId}
+    // A category that still carries dated transactions cannot be deleted: the
+    // composite foreign key would abort the whole sync transaction and every
+    // unrelated mutation travelling with it. Reject this one mutation instead.
+    const blocking = await transaction`
+      SELECT 1 FROM transactions
+      WHERE plan_id = ${planId} AND category_id = ${entryId}
+      LIMIT 1
     `;
-    return;
+    if (blocking.length > 0) return false;
+    const removed = await transaction`
+      DELETE FROM expenses
+      WHERE plan_id = ${planId} AND id = ${entryId}
+      RETURNING id
+    `;
+    return removed.length > 0;
   }
   const entry = mutation.value;
-  await transaction`
+  // The arbiter must be the primary key, so an id already owned by another
+  // plan updates nothing instead of raising a duplicate-key error that would
+  // both fail the batch and confirm the id exists.
+  const written = await transaction`
     INSERT INTO expenses (
       id, plan_id, name, category_group, cadence, amount_cents, sort_order,
       guidance_bucket, color_token, archived
@@ -132,7 +170,7 @@ async function replaceExpense(
       ${entry.amountCents}, ${entry.sortOrder}, ${entry.guidanceBucket},
       ${entry.colorToken}, ${entry.archived}
     )
-    ON CONFLICT (plan_id, id) DO UPDATE SET
+    ON CONFLICT (id) DO UPDATE SET
       name = EXCLUDED.name,
       category_group = EXCLUDED.category_group,
       cadence = EXCLUDED.cadence,
@@ -141,7 +179,10 @@ async function replaceExpense(
       guidance_bucket = EXCLUDED.guidance_bucket,
       color_token = EXCLUDED.color_token,
       archived = EXCLUDED.archived
+    WHERE expenses.plan_id = ${planId}
+    RETURNING id
   `;
+  return written.length > 0;
 }
 
 async function updateExpenseProperty(
@@ -182,9 +223,12 @@ async function updateExpenseProperty(
         ).length > 0
       );
     case "guidanceBucket":
+      // The column is NOT NULL; an absent bucket is a mutation this server
+      // cannot apply, not a null to write.
+      if (mutation.value === undefined || mutation.value === null) return false;
       return (
         (
-          await transaction`UPDATE expenses SET guidance_bucket = ${mutation.value ?? null} WHERE plan_id = ${planId} AND id = ${entryId} RETURNING id`
+          await transaction`UPDATE expenses SET guidance_bucket = ${mutation.value} WHERE plan_id = ${planId} AND id = ${entryId} RETURNING id`
         ).length > 0
       );
     case "colorToken":
@@ -206,14 +250,18 @@ async function replaceTransaction(
   transaction: TransactionSql,
   planId: string,
   mutation: WholeTransactionMutation,
-): Promise<void> {
+): Promise<boolean> {
   const entryId = mutation.entityId;
-  await transaction`
-    DELETE FROM transactions WHERE plan_id = ${planId} AND id = ${entryId}
-  `;
-  if (mutation.value === null) return;
+  if (mutation.value === null) {
+    const removed = await transaction`
+      DELETE FROM transactions
+      WHERE plan_id = ${planId} AND id = ${entryId}
+      RETURNING id
+    `;
+    return removed.length > 0;
+  }
   const entry = mutation.value;
-  await transaction`
+  const written = await transaction`
     INSERT INTO transactions (
       id, plan_id, category_id, amount_cents, title, note, transaction_date,
       created_at, updated_at
@@ -222,7 +270,18 @@ async function replaceTransaction(
       ${entry.title}, ${entry.note ?? null}, ${entry.date}, ${entry.createdAt},
       ${entry.updatedAt}
     )
+    ON CONFLICT (id) DO UPDATE SET
+      category_id = EXCLUDED.category_id,
+      amount_cents = EXCLUDED.amount_cents,
+      title = EXCLUDED.title,
+      note = EXCLUDED.note,
+      transaction_date = EXCLUDED.transaction_date,
+      created_at = EXCLUDED.created_at,
+      updated_at = EXCLUDED.updated_at
+    WHERE transactions.plan_id = ${planId}
+    RETURNING id
   `;
+  return written.length > 0;
 }
 
 async function updateTransactionProperty(
@@ -279,17 +338,14 @@ export async function persistDecodedEntityMutation(
   if (mutation.kind === "benefit") {
     if (mutation.property !== null)
       return updateBenefitProperty(transaction, planId, mutation);
-    await replaceBenefit(transaction, planId, mutation);
-    return true;
+    return replaceBenefit(transaction, planId, mutation);
   }
   if (mutation.kind === "expense") {
     if (mutation.property !== null)
       return updateExpenseProperty(transaction, planId, mutation);
-    await replaceExpense(transaction, planId, mutation);
-    return true;
+    return replaceExpense(transaction, planId, mutation);
   }
   if (mutation.property !== null)
     return updateTransactionProperty(transaction, planId, mutation);
-  await replaceTransaction(transaction, planId, mutation);
-  return true;
+  return replaceTransaction(transaction, planId, mutation);
 }

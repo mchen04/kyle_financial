@@ -11,10 +11,16 @@ import {
   consumeAuthenticationIpAttempt,
 } from "@/server/auth/rate-limit";
 import { database } from "@/server/database";
-import { errorResponse, parseJsonRequest } from "@/server/http";
+import {
+  crossSiteWriteResponse,
+  errorResponse,
+  parseJsonRequest,
+} from "@/server/http";
 import { credentialsSchema } from "@/server/request-contracts";
 
 export async function POST(request: Request): Promise<Response> {
+  const crossSite = crossSiteWriteResponse(request);
+  if (crossSite) return crossSite;
   try {
     const ipRateLimit = await consumeAuthenticationIpAttempt(
       database(),

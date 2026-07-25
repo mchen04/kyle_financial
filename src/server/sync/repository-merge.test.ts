@@ -245,7 +245,7 @@ describe("offline mutation reconciliation", () => {
           },
         ])
       ).acknowledgements,
-    ).toEqual([{ mutationId: deletionId, applied: false, rejected: true }]);
+    ).toEqual([{ mutationId: deletionId, applied: false }]);
     expect(await getPlanByYear(sql, user.id, 2026)).toMatchObject({
       expenses: expect.arrayContaining([
         expect.objectContaining({ id: category.id, name: "Updated elsewhere" }),
@@ -273,6 +273,560 @@ describe("offline mutation reconciliation", () => {
       ]),
       transactions: [transaction],
     });
+  });
+
+  it("rejects only the referenced deletion, not its whole batch", async () => {
+    const user = await createUser(
+      sql,
+      "sync-batch-survives@example.com",
+      "sync batch survives password",
+    );
+    const created = await createPlanWithDefaults(sql, user.id, {
+      year: 2026,
+      stateCode: "TX",
+      filingStatus: "single",
+      grossSalaryCents: 10_000_000,
+      additionalWageIncomeCents: 0,
+      spouseWageIncomeCents: 0,
+      otherOrdinaryIncomeCents: 0,
+      hsaCoverage: "self",
+    });
+    const [referenced, unrelated] = created.expenses;
+    await applySyncMutations(sql, user.id, [
+      {
+        mutationId: "00000000-0000-4000-8000-000000001130",
+        planYear: 2026,
+        field: `transaction:00000000-0000-4000-8000-000000001131`,
+        value: {
+          id: "00000000-0000-4000-8000-000000001131",
+          categoryId: referenced.id,
+          amountCents: 2_500,
+          title: "Anchors the category",
+          date: "2026-07-24",
+          createdAt: "2026-07-24T12:00:00.000Z",
+          updatedAt: "2026-07-24T12:00:00.000Z",
+        },
+        updatedAt: "2026-07-24T12:00:00.000Z",
+      },
+    ]);
+
+    const deletionId = "00000000-0000-4000-8000-000000001132";
+    const renameId = "00000000-0000-4000-8000-000000001133";
+    expect(
+      (
+        await applySyncMutations(sql, user.id, [
+          {
+            mutationId: deletionId,
+            planYear: 2026,
+            field: `expense:${referenced.id}`,
+            value: null,
+            updatedAt: "2026-07-24T12:05:00.000Z",
+          },
+          {
+            mutationId: renameId,
+            planYear: 2026,
+            field: `expense:${unrelated.id}:name`,
+            value: "Survived the batch",
+            updatedAt: "2026-07-24T12:05:01.000Z",
+          },
+        ])
+      ).acknowledgements,
+    ).toEqual([
+      { mutationId: deletionId, applied: false },
+      { mutationId: renameId, applied: true },
+    ]);
+
+    const plan = await getPlanByYear(sql, user.id, 2026);
+    expect(plan?.expenses.find(({ id }) => id === unrelated.id)?.name).toBe(
+      "Survived the batch",
+    );
+    expect(plan?.expenses.some(({ id }) => id === referenced.id)).toBe(true);
+  });
+
+  it("refuses an entity id that belongs to another account's plan", async () => {
+    const owner = await createUser(
+      sql,
+      "sync-id-owner@example.com",
+      "sync id owner password",
+    );
+    const stranger = await createUser(
+      sql,
+      "sync-id-stranger@example.com",
+      "sync id stranger password",
+    );
+    const plan = {
+      year: 2026,
+      stateCode: "TX" as const,
+      filingStatus: "single" as const,
+      grossSalaryCents: 10_000_000,
+      additionalWageIncomeCents: 0,
+      spouseWageIncomeCents: 0,
+      otherOrdinaryIncomeCents: 0,
+      hsaCoverage: "self" as const,
+    };
+    const owned = await createPlanWithDefaults(sql, owner.id, plan);
+    await createPlanWithDefaults(sql, stranger.id, plan);
+    const target = owned.expenses[0];
+
+    const attemptId = "00000000-0000-4000-8000-000000001140";
+    expect(
+      (
+        await applySyncMutations(sql, stranger.id, [
+          {
+            mutationId: attemptId,
+            planYear: 2026,
+            field: `expense:${target.id}`,
+            value: { ...target, name: "Taken over" },
+            updatedAt: "2026-07-24T12:06:00.000Z",
+          },
+        ])
+      ).acknowledgements,
+    ).toEqual([{ mutationId: attemptId, applied: false }]);
+
+    const ownerPlan = await getPlanByYear(sql, owner.id, 2026);
+    expect(ownerPlan?.expenses.find(({ id }) => id === target.id)?.name).toBe(
+      target.name,
+    );
+  });
+
+  it.each([
+    [
+      "a transaction created after its category was deleted",
+      (
+        categoryId: string,
+        benefitId: string,
+        transactionId: string,
+        emptyCategoryId: string,
+      ) => [
+        {
+          mutationId: "00000000-0000-4000-8000-000000001201",
+          planYear: 2026,
+          field: `expense:${emptyCategoryId}` as const,
+          value: null,
+          updatedAt: "2026-07-24T12:00:00.000Z",
+        },
+        {
+          mutationId: "00000000-0000-4000-8000-000000001202",
+          planYear: 2026,
+          field: `transaction:00000000-0000-4000-8000-0000000012a0` as const,
+          value: {
+            id: "00000000-0000-4000-8000-0000000012a0",
+            categoryId: emptyCategoryId,
+            amountCents: 500,
+            title: "Orphan",
+            date: "2026-07-24",
+            createdAt: "2026-07-24T12:00:01.000Z",
+            updatedAt: "2026-07-24T12:00:01.000Z",
+          },
+          updatedAt: "2026-07-24T12:00:01.000Z",
+        },
+      ],
+    ],
+    [
+      "a transaction repointed at a category of no plan",
+      (
+        categoryId: string,
+        benefitId: string,
+        transactionId: string,
+        emptyCategoryId: string,
+      ) => [
+        {
+          mutationId: "00000000-0000-4000-8000-000000001203",
+          planYear: 2026,
+          field: `transaction:${transactionId}:categoryId` as const,
+          value: "00000000-0000-4000-8000-0000000019ff",
+          updatedAt: "2026-07-24T12:00:02.000Z",
+        },
+      ],
+    ],
+    [
+      "a tax treatment set on a benefit that is not custom",
+      (
+        categoryId: string,
+        benefitId: string,
+        transactionId: string,
+        emptyCategoryId: string,
+      ) => [
+        {
+          mutationId: "00000000-0000-4000-8000-000000001204",
+          planYear: 2026,
+          field: `benefit:${benefitId}:customTaxTreatment` as const,
+          value: {
+            reducesFederalTaxable: true,
+            reducesFicaTaxable: false,
+            reducesStateTaxable: true,
+            reducesTakeHome: true,
+            countsAsSavings: true,
+            employerSide: false,
+          },
+          updatedAt: "2026-07-24T12:00:03.000Z",
+        },
+      ],
+    ],
+    [
+      "a timestamp outside the storable range",
+      (
+        categoryId: string,
+        benefitId: string,
+        transactionId: string,
+        emptyCategoryId: string,
+      ) => [
+        {
+          mutationId: "00000000-0000-4000-8000-000000001205",
+          planYear: 2026,
+          field: `transaction:${transactionId}:updatedAt` as const,
+          value: "0000-01-01T00:00:00.000Z",
+          updatedAt: "2026-07-24T12:00:04.000Z",
+        },
+      ],
+    ],
+  ])(
+    "rejects %s without condemning the batch, and records a receipt",
+    async (label, build) => {
+      const slug = label.replaceAll(/[^a-z]+/g, "-");
+      const user = await createUser(
+        sql,
+        `sync-isolated-${slug}@example.com`,
+        "sync isolated rejection password",
+      );
+      const created = await createPlanWithDefaults(sql, user.id, {
+        year: 2026,
+        stateCode: "TX",
+        filingStatus: "single",
+        grossSalaryCents: 10_000_000,
+        additionalWageIncomeCents: 0,
+        spouseWageIncomeCents: 0,
+        otherOrdinaryIncomeCents: 0,
+        hsaCoverage: "self",
+      });
+      const [category, bystander, emptyCategory] = created.expenses;
+      const benefit = created.benefits.find(({ type }) => type !== "custom");
+      expect(benefit).toBeDefined();
+      const transactionId = "00000000-0000-4000-8000-000000001200";
+      await applySyncMutations(sql, user.id, [
+        {
+          mutationId: "00000000-0000-4000-8000-0000000011ff",
+          planYear: 2026,
+          field: `transaction:${transactionId}`,
+          value: {
+            id: transactionId,
+            categoryId: category.id,
+            amountCents: 1_000,
+            title: "Anchor",
+            date: "2026-07-24",
+            createdAt: "2026-07-24T11:00:00.000Z",
+            updatedAt: "2026-07-24T11:00:00.000Z",
+          },
+          updatedAt: "2026-07-24T11:00:00.000Z",
+        },
+      ]);
+
+      const offending = build(
+        category.id,
+        benefit!.id,
+        transactionId,
+        emptyCategory.id,
+      );
+      const bystanderId = "00000000-0000-4000-8000-0000000012ff";
+      const response = await applySyncMutations(sql, user.id, [
+        ...offending,
+        {
+          mutationId: bystanderId,
+          planYear: 2026,
+          field: `expense:${bystander.id}:name`,
+          value: "Bystander survived",
+          updatedAt: "2026-07-24T12:30:00.000Z",
+        },
+      ]);
+
+      // No acknowledgement may claim the whole plan year was rejected.
+      expect(response.acknowledgements.some(({ rejected }) => rejected)).toBe(
+        false,
+      );
+      expect(
+        response.acknowledgements.find(
+          ({ mutationId }) => mutationId === bystanderId,
+        ),
+      ).toEqual({ mutationId: bystanderId, applied: true });
+
+      const plan = await getPlanByYear(sql, user.id, 2026);
+      expect(plan?.expenses.find(({ id }) => id === bystander.id)?.name).toBe(
+        "Bystander survived",
+      );
+
+      // A receipt must exist for every mutation, or the client's outbox can
+      // never drain and the account wedges.
+      const receipts = await sql<{ mutation_id: string }[]>`
+        SELECT mutation_id FROM applied_mutations WHERE user_id = ${user.id}
+      `;
+      const recorded = new Set(receipts.map(({ mutation_id }) => mutation_id));
+      for (const { mutationId } of offending) {
+        expect(recorded.has(mutationId)).toBe(true);
+      }
+    },
+  );
+
+  it.each([
+    ["filing status, owner, wages", [0, 1, 2]],
+    ["owner, filing status, wages", [1, 0, 2]],
+    ["wages, owner, filing status", [2, 1, 0]],
+  ])(
+    "applies a married-filing-jointly exit delivered %s",
+    async (label, order) => {
+      // One save emits both of these with the same timestamp and random ids, so
+      // delivery order is a coin flip. The intermediate state after whichever
+      // lands first is self-contradictory — a single filer still owning a
+      // spouse benefit — and the second must not be refused for that.
+      const user = await createUser(
+        sql,
+        `sync-mfj-exit-${order.join("")}@example.com`,
+        "sync mfj exit order password",
+      );
+      const created = await createPlanWithDefaults(sql, user.id, {
+        year: 2026,
+        stateCode: "TX",
+        filingStatus: "mfj",
+        grossSalaryCents: 10_000_000,
+        additionalWageIncomeCents: 0,
+        spouseWageIncomeCents: 4_000_000,
+        otherOrdinaryIncomeCents: 0,
+        hsaCoverage: "self",
+      });
+      const spouseBenefit = created.benefits[0];
+      await applySyncMutations(sql, user.id, [
+        {
+          mutationId: "00000000-0000-4000-8000-0000000014a0",
+          planYear: 2026,
+          field: `benefit:${spouseBenefit.id}:owner`,
+          value: "spouse",
+          updatedAt: "2026-07-24T11:00:00.000Z",
+        },
+      ]);
+
+      const exit = [
+        {
+          mutationId: "00000000-0000-4000-8000-0000000014b0",
+          planYear: 2026,
+          field: "filingStatus" as const,
+          value: "single" as const,
+          updatedAt: "2026-07-24T12:00:00.000Z",
+        },
+        {
+          mutationId: "00000000-0000-4000-8000-0000000014b1",
+          planYear: 2026,
+          field: `benefit:${spouseBenefit.id}:owner` as const,
+          value: "primary" as const,
+          updatedAt: "2026-07-24T12:00:00.000Z",
+        },
+        {
+          mutationId: "00000000-0000-4000-8000-0000000014b2",
+          planYear: 2026,
+          field: "spouseWageIncomeCents" as const,
+          value: 0,
+          updatedAt: "2026-07-24T12:00:00.000Z",
+        },
+      ];
+      const response = await applySyncMutations(
+        sql,
+        user.id,
+        order.map((index) => exit[index]),
+      );
+
+      expect(response.acknowledgements.some(({ rejected }) => rejected)).toBe(
+        false,
+      );
+      expect(response.acknowledgements.every(({ applied }) => applied)).toBe(
+        true,
+      );
+
+      const plan = await getPlanByYear(sql, user.id, 2026);
+      expect(plan?.filingStatus).toBe("single");
+      expect(plan?.spouseWageIncomeCents).toBe(0);
+      expect(
+        plan?.benefits.find(({ id }) => id === spouseBenefit.id)?.owner,
+      ).toBe("primary");
+
+      // Every mutation must leave a receipt, or the outbox cannot drain.
+      const receipts = await sql<{ mutation_id: string }[]>`
+        SELECT mutation_id FROM applied_mutations WHERE user_id = ${user.id}
+      `;
+      const recorded = new Set(receipts.map(({ mutation_id }) => mutation_id));
+      for (const { mutationId } of exit) {
+        expect(recorded.has(mutationId)).toBe(true);
+      }
+    },
+  );
+
+  it("refuses a stale edit alone rather than condemning its plan year", async () => {
+    // Two devices: one leaves married-filing-jointly, the other has an older
+    // spouse-owner edit still queued. The stale edit cannot be applied — a
+    // single filer cannot own a spouse benefit — but refusing the whole year
+    // would leave it in the outbox forever, taking every later edit with it.
+    const user = await createUser(
+      sql,
+      "sync-stale-owner@example.com",
+      "sync stale owner password",
+    );
+    const created = await createPlanWithDefaults(sql, user.id, {
+      year: 2026,
+      stateCode: "TX",
+      filingStatus: "mfj",
+      grossSalaryCents: 10_000_000,
+      additionalWageIncomeCents: 0,
+      spouseWageIncomeCents: 4_000_000,
+      otherOrdinaryIncomeCents: 0,
+      hsaCoverage: "self",
+    });
+    const benefit = created.benefits[0];
+    const expense = created.expenses[0];
+
+    await applySyncMutations(sql, user.id, [
+      {
+        mutationId: "00000000-0000-4000-8000-0000000015a0",
+        planYear: 2026,
+        field: "filingStatus",
+        value: "single",
+        updatedAt: "2026-07-24T12:00:00.000Z",
+      },
+      {
+        mutationId: "00000000-0000-4000-8000-0000000015a1",
+        planYear: 2026,
+        field: "spouseWageIncomeCents",
+        value: 0,
+        updatedAt: "2026-07-24T12:00:00.000Z",
+      },
+    ]);
+
+    const staleId = "00000000-0000-4000-8000-0000000015a2";
+    const staleResponse = await applySyncMutations(sql, user.id, [
+      {
+        mutationId: staleId,
+        planYear: 2026,
+        field: `benefit:${benefit.id}:owner`,
+        value: "spouse",
+        updatedAt: "2026-07-24T13:00:00.000Z",
+      },
+    ]);
+    expect(staleResponse.acknowledgements).toEqual([
+      { mutationId: staleId, applied: false },
+    ]);
+    expect(
+      (
+        await sql`
+        SELECT mutation_id FROM applied_mutations
+        WHERE user_id = ${user.id} AND mutation_id = ${staleId}
+      `
+      ).length,
+    ).toBe(1);
+
+    // The plan year must still accept ordinary work afterwards.
+    const laterId = "00000000-0000-4000-8000-0000000015a3";
+    expect(
+      (
+        await applySyncMutations(sql, user.id, [
+          {
+            mutationId: laterId,
+            planYear: 2026,
+            field: `expense:${expense.id}:name`,
+            value: "Still editable",
+            updatedAt: "2026-07-24T14:00:00.000Z",
+          },
+        ])
+      ).acknowledgements,
+    ).toEqual([{ mutationId: laterId, applied: true }]);
+
+    const plan = await getPlanByYear(sql, user.id, 2026);
+    expect(plan?.filingStatus).toBe("single");
+    expect(plan?.benefits.find(({ id }) => id === benefit.id)?.owner).toBe(
+      "primary",
+    );
+    expect(plan?.expenses.find(({ id }) => id === expense.id)?.name).toBe(
+      "Still editable",
+    );
+  });
+
+  it("refuses a scalar stranded by another device without wedging the year", async () => {
+    // Two devices, no hand-built payload. One leaves married-filing-jointly
+    // online; the other has been offline since before that and edits only the
+    // spouse's wages. Its own filing status never changed locally, so there is
+    // no partner field for it to emit — the invariant breaks from server-side
+    // divergence, which no amount of client-side batching can prevent.
+    const user = await createUser(
+      sql,
+      "sync-stranded-scalar@example.com",
+      "sync stranded scalar password",
+    );
+    const created = await createPlanWithDefaults(sql, user.id, {
+      year: 2026,
+      stateCode: "TX",
+      filingStatus: "mfj",
+      grossSalaryCents: 10_000_000,
+      additionalWageIncomeCents: 0,
+      spouseWageIncomeCents: 4_000_000,
+      otherOrdinaryIncomeCents: 0,
+      hsaCoverage: "self",
+    });
+    await applySyncMutations(sql, user.id, [
+      {
+        mutationId: "00000000-0000-4000-8000-0000000017a0",
+        planYear: 2026,
+        field: "filingStatus",
+        value: "single",
+        updatedAt: "2026-07-24T12:00:00.000Z",
+      },
+      {
+        mutationId: "00000000-0000-4000-8000-0000000017a1",
+        planYear: 2026,
+        field: "spouseWageIncomeCents",
+        value: 0,
+        updatedAt: "2026-07-24T12:00:00.000Z",
+      },
+    ]);
+
+    const strandedId = "00000000-0000-4000-8000-0000000017a2";
+    const stranded = {
+      mutationId: strandedId,
+      planYear: 2026,
+      field: "spouseWageIncomeCents" as const,
+      value: 7_000_000,
+      updatedAt: "2026-07-24T13:00:00.000Z",
+    };
+    expect(
+      (await applySyncMutations(sql, user.id, [stranded])).acknowledgements,
+    ).toEqual([{ mutationId: strandedId, applied: false }]);
+    expect(
+      (
+        await sql`
+          SELECT mutation_id FROM applied_mutations
+          WHERE user_id = ${user.id} AND mutation_id = ${strandedId}
+        `
+      ).length,
+    ).toBe(1);
+
+    // The year must keep accepting work even while that edit is retried.
+    const innocentId = "00000000-0000-4000-8000-0000000017a3";
+    const second = await applySyncMutations(sql, user.id, [
+      stranded,
+      {
+        mutationId: innocentId,
+        planYear: 2026,
+        field: `expense:${created.expenses[0].id}:name`,
+        value: "Innocent rename",
+        updatedAt: "2026-07-24T14:00:00.000Z",
+      },
+    ]);
+    expect(second.acknowledgements.some(({ rejected }) => rejected)).toBe(
+      false,
+    );
+    expect(
+      second.acknowledgements.find(
+        ({ mutationId }) => mutationId === innocentId,
+      ),
+    ).toEqual({ mutationId: innocentId, applied: true });
+
+    const plan = await getPlanByYear(sql, user.id, 2026);
+    expect(plan?.spouseWageIncomeCents).toBe(0);
+    expect(plan?.expenses[0].name).toBe("Innocent rename");
   });
 
   it("merges disjoint expense edits instead of replacing the collection", async () => {
@@ -353,13 +907,39 @@ describe("offline mutation reconciliation", () => {
         .applied,
     ).toBe(true);
 
+    // Reusing an id for different content is a client fault. It must not be
+    // applied, but it also must not abort the batch: throwing here returned a
+    // 500, wrote no receipts, and left every innocent mutation travelling with
+    // it retrying forever against a request that could only ever fail.
     const reused = { ...later, value: 13_000_000 };
-    await expect(applySyncMutations(sql, user.id, [reused])).rejects.toThrow(
-      "reused with different content",
+    const bystanderId = "00000000-0000-4000-8000-000000000024";
+    const response = await applySyncMutations(sql, user.id, [
+      reused,
+      {
+        mutationId: bystanderId,
+        planYear: 2034,
+        field: "additionalWageIncomeCents" as const,
+        value: 500_000,
+        updatedAt: "2034-07-24T12:00:00.000Z",
+      },
+    ]);
+    expect(response.acknowledgements).toEqual(
+      expect.arrayContaining([
+        { mutationId: reused.mutationId, applied: false },
+        { mutationId: bystanderId, applied: true },
+      ]),
     );
-    expect((await getPlanByYear(sql, user.id, 2034))?.grossSalaryCents).toBe(
-      12_000_000,
-    );
+    expect(response.acknowledgements).toHaveLength(2);
+
+    const merged = await getPlanByYear(sql, user.id, 2034);
+    expect(merged?.grossSalaryCents).toBe(12_000_000);
+    expect(merged?.additionalWageIncomeCents).toBe(500_000);
+
+    const receipts = await sql<{ mutation_id: string }[]>`
+      SELECT mutation_id FROM applied_mutations
+      WHERE user_id = ${user.id} AND mutation_id = ${bystanderId}
+    `;
+    expect(receipts).toHaveLength(1);
   });
 
   it("merges disjoint properties on one expense and preserves future edit order", async () => {
@@ -556,12 +1136,9 @@ describe("offline mutation reconciliation", () => {
         baseVersion: synced?.fieldVersions.filingStatus ?? null,
       },
     ]);
+    // Refused alone, with a receipt, so the client's outbox can drain.
     expect(noncanonical.acknowledgements).toEqual([
-      {
-        mutationId: "00000000-0000-4000-8000-000000000799",
-        applied: false,
-        rejected: true,
-      },
+      { mutationId: "00000000-0000-4000-8000-000000000799", applied: false },
     ]);
     expect(await getPlanByYear(sql, user.id, 2050)).toMatchObject({
       filingStatus: "mfj",
@@ -665,11 +1242,12 @@ describe("offline mutation reconciliation", () => {
         baseVersion: staleVersions[field] ?? null,
       })),
     );
+    // Each stale field is refused on its own, with a receipt, rather than the
+    // year being rejected receipt-free and pinned in the client's outbox.
     expect(result.acknowledgements).toEqual(
       staleTransition.map((_, index) => ({
         mutationId: `00000000-0000-4000-8000-${String(910 + index).padStart(12, "0")}`,
         applied: false,
-        rejected: true,
       })),
     );
 

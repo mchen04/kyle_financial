@@ -14,6 +14,11 @@ export interface UiTokenAuditInput {
   authoredUi: readonly UiSource[];
   categoryColors: readonly string[];
   pwaBackgroundColor: string;
+  /**
+   * The single authored module allowed to hold a raw color literal, and then
+   * only the PWA background value that `--color-paper-50` must mirror.
+   */
+  colorRegistryFile: string;
 }
 
 export interface UiTokenAuditResult {
@@ -377,10 +382,14 @@ function firstRawColor(value: string): string | undefined {
   return raw;
 }
 
-export function componentStyleNames(
+/**
+ * Every authored stylesheet obeys the token authority, not only CSS modules: a
+ * plain `.css` file imported anywhere would otherwise be a bypass.
+ */
+export function auditedStylesheetNames(
   relativeNames: readonly string[],
 ): string[] {
-  return relativeNames.filter((name) => name.endsWith(".module.css"));
+  return relativeNames.filter((name) => name.endsWith(".css"));
 }
 
 const requiredValues = new Map([
@@ -416,6 +425,7 @@ export function auditUiTokens({
   authoredUi,
   categoryColors,
   pwaBackgroundColor,
+  colorRegistryFile,
 }: UiTokenAuditInput): UiTokenAuditResult {
   const failures: string[] = [];
   const definitions = new Map<string, { file: string; value: string }>();
@@ -466,7 +476,14 @@ export function auditUiTokens({
   }
 
   for (const { file, source } of authoredUi) {
+    let registryLiterals = 0;
     for (const match of source.matchAll(rawAuthoredColorPattern)) {
+      if (
+        file === colorRegistryFile &&
+        match[0] === pwaBackgroundColor &&
+        registryLiterals++ === 0
+      )
+        continue;
       failures.push(`${file}: raw authored UI color ${match[0]}`);
     }
   }
@@ -480,7 +497,7 @@ export function auditUiTokens({
   for (const { file, root } of stylesheets) {
     root.walkDecls((declaration) => {
       const property = normalizedDeclarationProperty(declaration.prop);
-      if (!property.startsWith("--") && file !== global.file) {
+      if (!property.startsWith("--")) {
         const rawColor = firstRawColor(declaration.value);
         if (rawColor) {
           failures.push(
@@ -521,7 +538,6 @@ export function auditUiTokens({
     root.walkAtRules((atRule) => {
       const normalizedName = normalizedCssIdentifier(atRule.name);
       if (
-        file !== global.file &&
         file !== media.file &&
         (atRule.name.includes("\\") || atRule.params.includes("\\"))
       ) {
@@ -529,7 +545,7 @@ export function auditUiTokens({
           `${file}: escaped @${atRule.name} syntax is outside the canonical at-rule contract`,
         );
       }
-      if (file !== global.file && file !== media.file) {
+      if (file !== media.file) {
         const rawColor = firstRawColor(atRule.params);
         if (rawColor) {
           failures.push(
@@ -566,15 +582,11 @@ export function auditUiTokens({
           }
         }
       }
-      if (
-        normalizedName === "media" &&
-        file !== global.file &&
-        file !== media.file
-      ) {
+      if (normalizedName === "media" && file !== media.file) {
         const reference = atRule.params.match(customMediaReferencePattern)?.[1];
         if (!reference) {
           failures.push(
-            `${file}: component @media must contain exactly one canonical custom-media alias`,
+            `${file}: @media must contain exactly one canonical custom-media alias`,
           );
         } else if (!customMedia.has(reference)) {
           failures.push(`${file}: unknown custom media ${reference}`);
