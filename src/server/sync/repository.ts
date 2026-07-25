@@ -210,7 +210,13 @@ async function reconcilePlanYear(
               (candidate) => acceptedFingerprints.has(candidate),
             )
           ) {
-            throw new Error("Mutation ID was reused with different content");
+            // A reused id carrying different content is a client fault, but
+            // throwing aborted the whole plan year and wrote no receipts, so
+            // every innocent mutation in the batch retried forever against a
+            // request that could only ever 500. Refuse this one instead; the
+            // original receipt already records what that id actually did.
+            result.push({ mutationId: mutation.mutationId, applied: false });
+            continue;
           }
           result.push({
             mutationId: mutation.mutationId,
@@ -268,29 +274,20 @@ async function reconcilePlanYear(
           baseMatches || isIncomingVersionNewer(incoming, newestVersion);
 
         if (applied) {
-          const candidatePlan = applyDecodedSyncMutation(
-            projectedPlan,
-            mutation,
-          );
-          // An entity edit stands alone, so an inadmissible one is refused on
-          // its own rather than condemning everything it travelled with.
-          // Scalar plan fields are deliberately cross-coupled — HSA eligibility
-          // and its complementary family allocation are only valid as a pair —
-          // so those are still judged together once the batch is complete.
-          if (
-            mutation.kind !== "scalar" &&
-            !isAdmissibleProjection(candidatePlan)
-          ) {
-            applied = false;
-          } else {
+          // The projection is judged once, after the batch. Judging it per
+          // mutation looks appealing but is wrong: one save legitimately passes
+          // through invalid intermediate states — leaving married-filing-jointly
+          // emits `filingStatus`, `benefit:owner` and `spouseWageIncomeCents`
+          // with no ordering guarantee, so whichever arrives second sees a plan
+          // that is briefly self-contradictory. Checking there rejected valid
+          // edits depending on delivery order.
+          if (mutation.kind !== "scalar") {
             try {
               // A savepoint bounds the blast radius of a constraint the client
               // payload violates: the failing statement rolls back alone and
               // still earns a receipt, so the outbox can drain.
               applied = await transaction.savepoint((savepoint) =>
-                mutation.kind === "scalar"
-                  ? Promise.resolve(true)
-                  : persistDecodedEntityMutation(savepoint, plan.id, mutation),
+                persistDecodedEntityMutation(savepoint, plan.id, mutation),
               );
             } catch (error) {
               if (!isRejectableMutationViolation(error)) throw error;
@@ -298,7 +295,7 @@ async function reconcilePlanYear(
             }
           }
           if (applied) {
-            projectedPlan = candidatePlan;
+            projectedPlan = applyDecodedSyncMutation(projectedPlan, mutation);
             if (mutation.kind !== "scalar" && mutation.property === null) {
               for (const field of Object.keys(versions)) {
                 const target = parseSyncTarget(field);

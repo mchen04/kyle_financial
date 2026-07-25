@@ -566,6 +566,97 @@ describe("offline mutation reconciliation", () => {
     },
   );
 
+  it.each([
+    ["filing status, owner, wages", [0, 1, 2]],
+    ["owner, filing status, wages", [1, 0, 2]],
+    ["wages, owner, filing status", [2, 1, 0]],
+  ])(
+    "applies a married-filing-jointly exit delivered %s",
+    async (label, order) => {
+      // One save emits both of these with the same timestamp and random ids, so
+      // delivery order is a coin flip. The intermediate state after whichever
+      // lands first is self-contradictory — a single filer still owning a
+      // spouse benefit — and the second must not be refused for that.
+      const user = await createUser(
+        sql,
+        `sync-mfj-exit-${order.join("")}@example.com`,
+        "sync mfj exit order password",
+      );
+      const created = await createPlanWithDefaults(sql, user.id, {
+        year: 2026,
+        stateCode: "TX",
+        filingStatus: "mfj",
+        grossSalaryCents: 10_000_000,
+        additionalWageIncomeCents: 0,
+        spouseWageIncomeCents: 4_000_000,
+        otherOrdinaryIncomeCents: 0,
+        hsaCoverage: "self",
+      });
+      const spouseBenefit = created.benefits[0];
+      await applySyncMutations(sql, user.id, [
+        {
+          mutationId: "00000000-0000-4000-8000-0000000014a0",
+          planYear: 2026,
+          field: `benefit:${spouseBenefit.id}:owner`,
+          value: "spouse",
+          updatedAt: "2026-07-24T11:00:00.000Z",
+        },
+      ]);
+
+      const exit = [
+        {
+          mutationId: "00000000-0000-4000-8000-0000000014b0",
+          planYear: 2026,
+          field: "filingStatus" as const,
+          value: "single" as const,
+          updatedAt: "2026-07-24T12:00:00.000Z",
+        },
+        {
+          mutationId: "00000000-0000-4000-8000-0000000014b1",
+          planYear: 2026,
+          field: `benefit:${spouseBenefit.id}:owner` as const,
+          value: "primary" as const,
+          updatedAt: "2026-07-24T12:00:00.000Z",
+        },
+        {
+          mutationId: "00000000-0000-4000-8000-0000000014b2",
+          planYear: 2026,
+          field: "spouseWageIncomeCents" as const,
+          value: 0,
+          updatedAt: "2026-07-24T12:00:00.000Z",
+        },
+      ];
+      const response = await applySyncMutations(
+        sql,
+        user.id,
+        order.map((index) => exit[index]),
+      );
+
+      expect(response.acknowledgements.some(({ rejected }) => rejected)).toBe(
+        false,
+      );
+      expect(response.acknowledgements.every(({ applied }) => applied)).toBe(
+        true,
+      );
+
+      const plan = await getPlanByYear(sql, user.id, 2026);
+      expect(plan?.filingStatus).toBe("single");
+      expect(plan?.spouseWageIncomeCents).toBe(0);
+      expect(
+        plan?.benefits.find(({ id }) => id === spouseBenefit.id)?.owner,
+      ).toBe("primary");
+
+      // Every mutation must leave a receipt, or the outbox cannot drain.
+      const receipts = await sql<{ mutation_id: string }[]>`
+        SELECT mutation_id FROM applied_mutations WHERE user_id = ${user.id}
+      `;
+      const recorded = new Set(receipts.map(({ mutation_id }) => mutation_id));
+      for (const { mutationId } of exit) {
+        expect(recorded.has(mutationId)).toBe(true);
+      }
+    },
+  );
+
   it("merges disjoint expense edits instead of replacing the collection", async () => {
     const user = await createUser(
       sql,
@@ -644,13 +735,39 @@ describe("offline mutation reconciliation", () => {
         .applied,
     ).toBe(true);
 
+    // Reusing an id for different content is a client fault. It must not be
+    // applied, but it also must not abort the batch: throwing here returned a
+    // 500, wrote no receipts, and left every innocent mutation travelling with
+    // it retrying forever against a request that could only ever fail.
     const reused = { ...later, value: 13_000_000 };
-    await expect(applySyncMutations(sql, user.id, [reused])).rejects.toThrow(
-      "reused with different content",
+    const bystanderId = "00000000-0000-4000-8000-000000000024";
+    const response = await applySyncMutations(sql, user.id, [
+      reused,
+      {
+        mutationId: bystanderId,
+        planYear: 2034,
+        field: "additionalWageIncomeCents" as const,
+        value: 500_000,
+        updatedAt: "2034-07-24T12:00:00.000Z",
+      },
+    ]);
+    expect(response.acknowledgements).toEqual(
+      expect.arrayContaining([
+        { mutationId: reused.mutationId, applied: false },
+        { mutationId: bystanderId, applied: true },
+      ]),
     );
-    expect((await getPlanByYear(sql, user.id, 2034))?.grossSalaryCents).toBe(
-      12_000_000,
-    );
+    expect(response.acknowledgements).toHaveLength(2);
+
+    const merged = await getPlanByYear(sql, user.id, 2034);
+    expect(merged?.grossSalaryCents).toBe(12_000_000);
+    expect(merged?.additionalWageIncomeCents).toBe(500_000);
+
+    const receipts = await sql<{ mutation_id: string }[]>`
+      SELECT mutation_id FROM applied_mutations
+      WHERE user_id = ${user.id} AND mutation_id = ${bystanderId}
+    `;
+    expect(receipts).toHaveLength(1);
   });
 
   it("merges disjoint properties on one expense and preserves future edit order", async () => {
