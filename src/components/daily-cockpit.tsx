@@ -100,9 +100,25 @@ export function HomeSurface({
         right.date.localeCompare(left.date) ||
         right.updatedAt.localeCompare(left.updatedAt),
     )
-    // Two rows, not four: Home's job is "correct it while it is fresh", and the
-    // full ledger is one tap away on the Activity tab (HIG-L1, DEN-6).
-    .slice(0, 2);
+    // D4. Home is required to be exactly one screen at 360x740, 390x844 and
+    // 430x932, and those three differ by 192px of scroll region while the rest
+    // of the surface — the answer, the attention rows, the wrap row — is fixed
+    // by what it has to say. Something has to absorb 192px, and until now
+    // nothing did: the surface was sized for 390x844 (632px of content in 635px
+    // of region, which is why that one viewport looked perfect), so 430x932 sat
+    // on a 91px dead band and 360x740 pushed 86px below the fold and cut the
+    // last transaction through its own subtitle.
+    //
+    // The recent list is the only block on Home whose length is a judgement
+    // call rather than a fact — it is a preview of a ledger that is one labelled
+    // tap away on Activity, and it was already an arbitrary two of sixty-one. So
+    // it is the one lever, and the count is chosen per viewport in CSS (a media
+    // query, not a measurement, so there is no second paint and no layout
+    // shift): three rows at 430x932, two at 390x844, and none at 360x740, where
+    // the answer, the three attention rows and the wrap row already use the
+    // whole screen. Three are rendered and the stylesheet reveals as many as fit
+    // (HIG-L1, DEN-6, C7).
+    .slice(0, 3);
   const progress =
     rollup.spendingAllocatedCents === 0
       ? 0
@@ -214,7 +230,7 @@ export function HomeSurface({
         )}
       </section>
 
-      <section className={styles.rowGroup}>
+      <section className={styles.rowGroup} data-home-group="recent">
         <h2 className={styles.groupLabel}>Recent activity</h2>
         {recent.length ? (
           <TransactionRows

@@ -76,6 +76,14 @@ loadLocalEnvironment();
 // ---------------------------------------------------------------------------
 const BAR_CLS = 0.02;
 const MINIMUM_TARGET_PX = 44;
+// HIG-T3. 11pt is the smallest size iOS treats as legible; the mission forbids
+// reducing type below it to buy density.
+const MINIMUM_FONT_SIZE_PX = 11;
+// D4. Dead band a single-screen surface is allowed to leave unused. A compact
+// two-line transaction row is 48px and its group gap is 16px, so anything at or
+// above 64px is room a real row would have fitted in; 64px is therefore the
+// largest band that cannot be blamed on content that could have filled it.
+const BAR_SINGLE_SCREEN_SLACK_PX = 64;
 // The mission's long-list exemption: "Lists that are legitimately long
 // (transaction history, all-category rows) are exempt from the absolute cap for
 // their row region only — but the chrome above the first row must cost <= 0.6 VH,
@@ -196,6 +204,9 @@ const SURFACES = [
     label: "Home",
     account: "fixture",
     bar: VERTICAL_BARS.home,
+    // D4: Home is the one surface the mission requires to be a single screen at
+    // every viewport, so it declares it and is gated on it.
+    fitsWithoutScrolling: true,
     prefix: [clickExact("Plan")],
     nav: [clickExact("Home")],
     expect: `document.querySelector('main h1')?.textContent === "Home"`,
@@ -205,6 +216,7 @@ const SURFACES = [
     label: "Home · cold load",
     account: "fixture",
     bar: VERTICAL_BARS.home,
+    fitsWithoutScrolling: true,
     prefix: [],
     nav: [RELOAD_STEP],
     expect: `document.querySelector('main h1')?.textContent === "Home"`,
@@ -237,7 +249,12 @@ const SURFACES = [
     bar: VERTICAL_BARS.standard,
     prefix: [clickExact("Home")],
     nav: [clickExact("Activity")],
-    expect: `document.querySelector('main h1')?.textContent === "Activity"`,
+    // The heading used to be the literal string "Activity", which asserted only
+    // that a label existed. It now carries the period total, so arrival asserts
+    // the shape of the figure the surface exists to report — strictly more than
+    // the old clause, and it fails if the answer ever stops being painted.
+    expect: `/^\\$[\\d,]+ logged$/.test(document.querySelector('main h1')?.textContent ?? "")
+      && document.querySelector('main header p')?.textContent === "Activity"`,
     // Transaction history — named verbatim by the mission as a legitimately
     // long list. 61 in-period rows at the 44px touch floor is already 3.180 VH
     // at 390x844 with zero chrome, so the 3.0 absolute cap is arithmetically
@@ -327,7 +344,10 @@ const SURFACES = [
     bar: VERTICAL_BARS.standard,
     prefix: [clickExact("Home")],
     nav: [clickExact("Plan")],
-    expect: `/ annual plan$/.test(document.querySelector('main header p')?.textContent ?? "") && /cash savings planned\\.$/.test(document.querySelector('main h1')?.textContent ?? "")`,
+    // The 46.8px sentence is gone; the headline is now the monthly outcome, in
+    // the same eyebrow + figure shape Budget uses. Both clauses still gate, and
+    // the second one now pins a *number* rather than a trailing full stop.
+    expect: `/ annual plan$/.test(document.querySelector('main header p')?.textContent ?? "") && /^\\$[\\d,]+ (saved|short) each month$/.test(document.querySelector('main h1')?.textContent ?? "")`,
   },
   {
     id: "plan-details",
@@ -405,6 +425,7 @@ const SURFACES = [
     account: "fixture",
     bar: VERTICAL_BARS.home,
     singleAnswerPaint: true,
+    fitsWithoutScrolling: true,
     prefix: [
       clickExact("Home"),
       `(() => {
@@ -544,6 +565,33 @@ const FAIL_DEMOS = {
     for (const row of rows) row.removeAttribute('data-density-row');
     return 'listrows: data-density-row stripped from ' + rows.length + ' row(s)';
   })()`,
+  // Puts one 9px string on the surface. Proves the legibility floor is a live
+  // gate and not a column that happens to read zero.
+  tiny: `(() => {
+    const node = document.createElement('p');
+    node.textContent = 'density fail-demo: nine pixel type';
+    node.style.cssText = 'font-size:9px;margin:0';
+    document.querySelector('main').prepend(node);
+    return 'tiny: one 9px paragraph prepended to main';
+  })()`,
+  // Puts one nowrap box on the surface that is narrower than its own text and
+  // clips it without an ellipsis — the DF1 shape exactly.
+  clip: `(() => {
+    const node = document.createElement('div');
+    node.textContent = 'Health and pharmacy';
+    node.style.cssText =
+      'width:40px;white-space:nowrap;overflow:hidden;text-overflow:clip;font-size:16px';
+    document.querySelector('main').prepend(node);
+    return 'clip: one 40px nowrap box holding a 160px string, no ellipsis';
+  })()`,
+  // The other half of the single-screen gate. Removing a real group leaves the
+  // region holding less than it has room for, which is the 430x932 shape of D4
+  // and reads identically to "fits" in every metric except slackPx.
+  deadband: `(() => {
+    const groups = [...document.querySelectorAll('main [data-home-group]')];
+    for (const group of groups) group.style.display = 'none';
+    return 'deadband: ' + groups.length + ' home group(s) hidden, leaving their height unused';
+  })()`,
   overflow: `(() => {
     document.body.style.width = '3000px';
     return 'overflow: document body widened to 3000px';
@@ -669,10 +717,186 @@ const measureExpression = (rowSelector) => `(() => {
     }
   }
 
+  // ---- fit of the inner scroll region --------------------------------------
+  // The app shell pins <html> to 100dvh and scrolls the product content inside
+  // <main>, so documentElement.scrollHeight is identically window.innerHeight
+  // and verticalCost reads exactly 1.000 on any single-screen surface — whether
+  // that surface fits, overflows by 86px, or leaves 97px of dead band. That is
+  // the whole of D4 and the VH bar is structurally blind to it. These two
+  // numbers are the ones that can see it, measured on the region that actually
+  // scrolls: overflow is content the reader must scroll to reach, slack is
+  // reserved height nothing is using.
+  const innerRegion = measured === root ? scope.querySelector('main') : measured;
+  //
+  // slackPx cannot come from scrollHeight: scrollHeight is floored at
+  // clientHeight, so a region holding 626px of content in 723px of space
+  // reports 723 and looks exactly like one that fits perfectly. The real
+  // content extent is the bottom of the last laid-out child plus the region's
+  // own bottom padding, which is the only figure that can tell "fits" from
+  // "fits with 97px to spare".
+  const innerScroll = !innerRegion
+    ? null
+    : (() => {
+        const regionRect = innerRegion.getBoundingClientRect();
+        const contentTop =
+          regionRect.top + innerRegion.clientTop - innerRegion.scrollTop;
+        const paddingBottom =
+          Number.parseFloat(style(innerRegion).paddingBottom) || 0;
+        let contentBottom = contentTop;
+        for (const child of innerRegion.children) {
+          const rect = child.getBoundingClientRect();
+          if (rect.width === 0 && rect.height === 0) continue;
+          if (style(child).position === 'fixed') continue;
+          contentBottom = Math.max(contentBottom, rect.bottom + innerRegion.scrollTop);
+        }
+        const contentHeight =
+          Math.round((contentBottom - contentTop + paddingBottom) * 10) / 10;
+        return {
+          clientHeight: innerRegion.clientHeight,
+          scrollHeight: innerRegion.scrollHeight,
+          contentHeight,
+          overflowPx: Math.max(0, Math.round((contentHeight - innerRegion.clientHeight) * 10) / 10),
+          slackPx: Math.max(0, Math.round((innerRegion.clientHeight - contentHeight) * 10) / 10),
+        };
+      })();
+
+  // ---- legibility sweep (HIG-T3 / 11pt floor) ------------------------------
+  // Every visible element that directly carries non-whitespace text, plus every
+  // form control that shows a value, measured at its own computed font-size.
+  // A relative unit compounding inside a nested scale (a UA-relative <small>
+  // inside a 13px block, for instance) is invisible in source and only appears
+  // here, which is the whole reason this is measured rather than grepped.
+  const textCarriers = [...scope.querySelectorAll('*')].filter((node) => {
+    if (!isVisible(node)) return false;
+    if (['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(node.tagName)) return false;
+    const carriesOwnText = [...node.childNodes].some(
+      (child) => child.nodeType === 3 && child.textContent.trim() !== '',
+    );
+    const carriesValue =
+      (node.tagName === 'INPUT' && !['checkbox', 'radio', 'range', 'hidden'].includes(node.type)) ||
+      node.tagName === 'SELECT' ||
+      node.tagName === 'TEXTAREA';
+    return carriesOwnText || carriesValue;
+  });
+  const tiny = textCarriers
+    .map((node) => ({ node, size: Number.parseFloat(style(node).fontSize) }))
+    .filter((entry) => entry.size < 10.995);
+  const tinyType = {
+    count: tiny.length,
+    minFontSizePx:
+      textCarriers.length === 0
+        ? null
+        : Math.round(
+            Math.min(
+              ...textCarriers.map((node) => Number.parseFloat(style(node).fontSize)),
+            ) * 100,
+          ) / 100,
+    detail: tiny.slice(0, 8).map(({ node, size }) => ({
+      size: Math.round(size * 100) / 100,
+      tag: node.tagName.toLowerCase(),
+      className: typeof node.className === 'string' ? node.className.slice(0, 60) : '',
+      text: (node.textContent || node.value || '').replace(/\\s+/g, ' ').trim().slice(0, 48),
+    })),
+  };
+
+  // ---- clipped-text sweep (DF1 class) --------------------------------------
+  // Any single-line box whose own content is wider than the box it is painted
+  // in. An <input> reports this through scrollWidth directly; a nowrap element
+  // that clips reports it the same way. Truncation is only legitimate when the
+  // box says it is truncating, so text-overflow: ellipsis is what separates a
+  // deliberate truncation from a word cut through its own glyphs.
+  const clipCandidates = [...scope.querySelectorAll('input,textarea,select,[data-density-clip]')]
+    .concat(
+      [...scope.querySelectorAll('*')].filter((node) => {
+        const computed = style(node);
+        return (
+          computed.whiteSpace === 'nowrap' &&
+          ['hidden', 'clip'].includes(computed.overflowX) &&
+          node.children.length === 0
+        );
+      }),
+    )
+    // A visually-hidden label is a 1x1 clipped box by construction and always
+    // "overflows"; it is not a box a reader can be shown a cut word in.
+    .filter(
+      (node) =>
+        isVisible(node) &&
+        node.tagName !== 'SELECT' &&
+        node.clientWidth >= 8 &&
+        node.clientHeight >= 8,
+    );
+  const clipped = [...new Set(clipCandidates)]
+    .map((node) => ({
+      node,
+      overflowPx: Math.round((node.scrollWidth - node.clientWidth) * 10) / 10,
+      ellipsis: style(node).textOverflow === 'ellipsis',
+    }))
+    .filter((entry) => entry.overflowPx > 1 && !entry.ellipsis);
+  const clippedText = {
+    count: clipped.length,
+    detail: clipped.slice(0, 8).map(({ node, overflowPx }) => ({
+      overflowPx,
+      tag: node.tagName.toLowerCase(),
+      label: (node.getAttribute('aria-label') || node.getAttribute('name') || '').slice(0, 40),
+      text: (node.value ?? node.textContent ?? '').replace(/\\s+/g, ' ').trim().slice(0, 48),
+      clientWidth: Math.round(node.clientWidth * 10) / 10,
+      scrollWidth: Math.round(node.scrollWidth * 10) / 10,
+    })),
+  };
+
+  // ---- datum density (the judge's method, reported not gated) --------------
+  // Leaf text nodes lying fully inside the first viewport, per 100px of the
+  // scroll region's own visible height, with the region at scrollTop 0. Form
+  // controls that show a value are counted separately, because a category name
+  // living in an <input> is a datum a reader reads but not a text node.
+  const densityRegion = (() => {
+    const priorScroll = measured === root ? window.scrollY : measured.scrollTop;
+    if (measured === root) window.scrollTo(0, 0); else measured.scrollTop = 0;
+    const regionRect = measured === root
+      ? { top: 0, height: window.innerHeight }
+      : measured.getBoundingClientRect();
+    const top = Math.max(0, regionRect.top);
+    const bottom = Math.min(window.innerHeight, regionRect.top + regionRect.height);
+    const walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT);
+    const range = document.createRange();
+    let textNodes = 0;
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (node.textContent.trim() === '') continue;
+      const parent = node.parentElement;
+      if (!parent || !isVisible(parent)) continue;
+      if (['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(parent.tagName)) continue;
+      range.selectNodeContents(node);
+      const rect = range.getBoundingClientRect();
+      if (rect.height === 0 && rect.width === 0) continue;
+      if (rect.top >= top - 0.5 && rect.bottom <= bottom + 0.5) textNodes += 1;
+    }
+    const valueControls = [...scope.querySelectorAll('input,select,textarea')].filter((node) => {
+      if (!isVisible(node)) return false;
+      if (['checkbox', 'radio', 'hidden'].includes(node.type)) return false;
+      if (!(node.value ?? '').toString().trim()) return false;
+      const rect = node.getBoundingClientRect();
+      return rect.top >= top - 0.5 && rect.bottom <= bottom + 0.5;
+    }).length;
+    const per100 = Math.max(1, bottom - top) / 100;
+    if (measured === root) window.scrollTo(0, priorScroll); else measured.scrollTop = priorScroll;
+    return {
+      regionHeightPx: Math.round((bottom - top) * 10) / 10,
+      textNodes,
+      valueControls,
+      datumPer100px: Math.round((textNodes / per100) * 100) / 100,
+      datumWithControlsPer100px:
+        Math.round(((textNodes + valueControls) / per100) * 100) / 100,
+    };
+  })();
+
   const errors = probe.consoleErrors.filter((entry) => entry.at >= since);
   const headlines = probe.headlines.filter((entry) => entry.at >= since);
   return JSON.stringify({
     listRegion,
+    innerScroll,
+    tinyType,
+    clippedText,
+    densityRegion,
     scrollHeight: contentHeight,
     documentScrollHeight: root.scrollHeight,
     measuredRegion: measured === root
@@ -959,6 +1183,7 @@ async function measureSurface(browser, surface, viewport, failDemo) {
     bar: surface.bar,
     listExemption: surface.listExemption ?? null,
     singleAnswerPaint: surface.singleAnswerPaint === true,
+    fitsWithoutScrolling: surface.fitsWithoutScrolling === true,
     markTime,
     arrivalError,
     injection,
@@ -1013,6 +1238,26 @@ function violations(row, mode) {
         `so a number rendered provisionally and changed meaning: ${JSON.stringify(row.heroPaints)}`,
     );
   }
+  // D4. A surface that declares itself a single screen has to actually be one
+  // on every viewport: nothing below the fold, and no dead band large enough to
+  // have held real content. The VH bar cannot express either (see innerScroll),
+  // so this is the gate that holds Home adaptive rather than tuned to 390x844.
+  if (row.fitsWithoutScrolling && row.innerScroll) {
+    if (row.innerScroll.overflowPx > 0.5) {
+      failures.push(
+        `single-screen surface overflows its scroll region by ${row.innerScroll.overflowPx}px ` +
+          `(content ${row.innerScroll.contentHeight}px in ${row.innerScroll.clientHeight}px), ` +
+          `so a row is cut off below the fold`,
+      );
+    }
+    if (row.innerScroll.slackPx > BAR_SINGLE_SCREEN_SLACK_PX) {
+      failures.push(
+        `single-screen surface leaves ${row.innerScroll.slackPx}px of dead band ` +
+          `(content ${row.innerScroll.contentHeight}px in ${row.innerScroll.clientHeight}px), ` +
+          `over the ${BAR_SINGLE_SCREEN_SLACK_PX}px that would have held another row`,
+      );
+    }
+  }
   if (row.smallTargets > 0) {
     failures.push(
       `${row.smallTargets} interactive target(s) under ${MINIMUM_TARGET_PX}px: ${JSON.stringify(row.smallTargetDetail)}`,
@@ -1021,6 +1266,25 @@ function violations(row, mode) {
   if (row.horizontalOverflow) {
     failures.push(
       `horizontal overflow: clientWidth ${row.clientWidth} !== scrollWidth ${row.scrollWidth}`,
+    );
+  }
+  // HIG-T3: 11pt is the iOS minimum legible size, and the mission forbids
+  // buying pixels by going under it. Measured, not grepped, because the two
+  // instances this gate was written for were a UA-relative scale compounding
+  // inside an already-reduced block and appear nowhere in the source as a
+  // number.
+  if ((row.tinyType?.count ?? 0) > 0) {
+    failures.push(
+      `${row.tinyType.count} element(s) below the ${MINIMUM_FONT_SIZE_PX}px legibility floor ` +
+        `(smallest ${row.tinyType.minFontSizePx}px): ${JSON.stringify(row.tinyType.detail)}`,
+    );
+  }
+  // A box that clips its own text mid-glyph with no ellipsis is unreadable and
+  // does not say it is truncating.
+  if ((row.clippedText?.count ?? 0) > 0) {
+    failures.push(
+      `${row.clippedText.count} box(es) clip their own text with no ellipsis: ` +
+        `${JSON.stringify(row.clippedText.detail)}`,
     );
   }
   if (row.consoleErrors > 0) {
@@ -1034,8 +1298,8 @@ function violations(row, mode) {
 function markdownTable(rows) {
   const cell = (value) => String(value).replace(/\|/g, "\\|");
   const lines = [
-    "| Surface | State | Viewport | VH | CLS | CLS native | CLS geometric | Frames | Headline first paint | Headline settled | Swap | <44px | Overflow | Console errors | Bar | Over bar by | Chrome above list | Row heights |",
-    "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | ---: | --- | ---: | ---: | ---: | ---: | --- |",
+    "| Surface | State | Viewport | VH | Fit | CLS | CLS native | CLS geometric | Frames | Headline first paint | Headline settled | Swap | <44px | <11px | Clipped | Datum/100px | Overflow | Console errors | Bar | Over bar by | Chrome above list | Row heights |",
+    "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | --- |",
   ];
   for (const row of rows) {
     const [surface, ...rest] = row.label.split(" · ");
@@ -1043,6 +1307,14 @@ function markdownTable(rows) {
     const swap =
       row.headlineFirstPaint !== row.headlineSettled ? "**YES**" : "no";
     const region = row.listExemption ? row.listRegion : null;
+    const fitCell = !row.innerScroll
+      ? "—"
+      : row.innerScroll.overflowPx > 0.5
+        ? `${row.fitsWithoutScrolling ? "**" : ""}+${row.innerScroll.overflowPx} over${row.fitsWithoutScrolling ? "**" : ""}`
+        : row.innerScroll.slackPx > BAR_SINGLE_SCREEN_SLACK_PX &&
+            row.fitsWithoutScrolling
+          ? `**${row.innerScroll.slackPx} dead**`
+          : `${row.innerScroll.slackPx} slack`;
     // An exempt surface reports its absolute VH for information only; what
     // gates it is the chrome column beside it.
     const bar = row.listExemption
@@ -1066,7 +1338,7 @@ function markdownTable(rows) {
             .join(", ")
         : "—";
     lines.push(
-      `| ${cell(surface)} | ${cell(state)} | ${row.viewport} | ${row.verticalCost.toFixed(3)} | ${row.cls.toFixed(4)} | ${row.clsNative.toFixed(4)}${row.nativeLayoutShiftLive ? "" : " dead"} | ${row.clsGeometric.toFixed(4)} | ${row.frameTicks} | ${cell(row.headlineFirstPaint ?? "—")} | ${cell(row.headlineSettled ?? "—")} | ${swap} | ${row.smallTargets} | ${row.horizontalOverflow ? "**yes**" : "no"} | ${row.consoleErrors} | ${bar} | ${overCell} | ${cell(chromeCell)} | ${cell(rowsCell)} |`,
+      `| ${cell(surface)} | ${cell(state)} | ${row.viewport} | ${row.verticalCost.toFixed(3)} | ${fitCell} | ${row.cls.toFixed(4)} | ${row.clsNative.toFixed(4)}${row.nativeLayoutShiftLive ? "" : " dead"} | ${row.clsGeometric.toFixed(4)} | ${row.frameTicks} | ${cell(row.headlineFirstPaint ?? "—")} | ${cell(row.headlineSettled ?? "—")} | ${swap} | ${row.smallTargets} | ${row.tinyType?.count ? `**${row.tinyType.count}** (${row.tinyType.minFontSizePx}px)` : "0"} | ${row.clippedText?.count ? `**${row.clippedText.count}**` : "0"} | ${row.densityRegion ? row.densityRegion.datumPer100px.toFixed(2) : "—"} | ${row.horizontalOverflow ? "**yes**" : "no"} | ${row.consoleErrors} | ${bar} | ${overCell} | ${cell(chromeCell)} | ${cell(rowsCell)} |`,
     );
   }
   return lines.join("\n");
@@ -1281,6 +1553,7 @@ async function main() {
       vertical: VERTICAL_BARS,
       cls: BAR_CLS,
       minimumTargetPx: MINIMUM_TARGET_PX,
+      minimumFontSizePx: MINIMUM_FONT_SIZE_PX,
       chromeAboveExemptList: BAR_CHROME_ABOVE_LIST,
     },
     rows,

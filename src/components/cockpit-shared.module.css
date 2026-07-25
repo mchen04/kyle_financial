@@ -1,7 +1,3 @@
-.actionCard {
-  composes: actionCard from "./daily-cockpit.module.css";
-}
-
 .activityGroups {
   composes: activityGroups from "./daily-cockpit.module.css";
 }

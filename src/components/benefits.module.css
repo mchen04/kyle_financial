@@ -53,7 +53,7 @@
 .summaryRows dd {
   margin: 0;
   color: var(--ink);
-  font: 600 var(--text-md)/1 var(--data);
+  font: 600 var(--text-md)/1 var(--body);
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
@@ -281,7 +281,7 @@
   }
   /* Order 6 — a supporting note, not a figure; 13px is what every other
      surface's note line already uses. */
-  .sectionHeading > .muted {
+  .wideCard > .muted {
     font-size: var(--text-sm);
   }
   .moneyInput input {

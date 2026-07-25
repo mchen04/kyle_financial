@@ -32,9 +32,13 @@
     justify-content: center;
   }
 
+  /* Symmetric, and never below the 16px the drawn chevron occupies on the
+     right — the 4px this used to set is what let the label reach the arrow's
+     band at 360px (D2). The label is three characters here, so 16px each side
+     still leaves the control far inside its column. */
   .monthStepper select {
     min-width: 0;
-    padding-inline: var(--space-1);
+    padding-inline: var(--space-4);
   }
 
   .planGrid {
@@ -89,11 +93,28 @@
     font-size: var(--text-4xl);
   }
 
-  .detailMetrics,
   .homeGrid,
   .linkGrid,
   .planOutcome {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* C5 + C1. Three label/value pairs stacked down 197px with the entire right
+     half of the card empty: three facts that are read together, compared
+     against each other, and never acted on individually. Stacking them bought
+     nothing but width. Side by side at 96px per column they still set on one
+     line each — "Left to fund" is the longest label at 13px and "$1,200" the
+     longest value at 18px — and the block costs 64px instead of 197px, which is
+     133px of the first screen handed back to the transaction list the surface
+     exists to show. */
+  .detailMetrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+
+  .detailMetrics dd {
+    font-size: var(--text-lg);
   }
 
   /* Label and value on one line (C1, C4) instead of a stacked metric block. */
@@ -118,6 +139,32 @@
   .mathBreakdown,
   .budgetMath {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* C5. Monthly wrap's "Budget versus actual" holds three metrics in a
+     two-column grid, so "Total remaining +$123" sat alone on its own row with
+     the cell beside it empty — a hole the reader has to read past. Two changes,
+     both from C5's own rationale about card chrome: the odd last cell spans the
+     full width instead of leaving a gap, and each cell puts its label and value
+     on one baseline rather than stacking them, which is what a homogeneous unit
+     that is compared down a column looks like as a row. The three-metric block
+     goes 144px -> 104px and the six-metric one 224px -> 160px, and no cell on
+     either is empty. */
+  .mathBreakdown div {
+    min-height: var(--control-md);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .mathBreakdown dd {
+    margin: 0;
+  }
+
+  .mathBreakdown div:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 
   .panel,
@@ -164,10 +211,15 @@
     min-height: var(--control-md);
   }
 
-  /* C2: the Activity heading names the tab and carries no
-     figure, so it is a label, not a display headline (same reading as Home). */
+  /* The Activity heading now carries the period total, so it is sized like
+     every other tab's answer rather than like a label. Same 24px as Budget's
+     and Plan's, which is the point. */
   .activitySurface .surfaceHeader h1 {
-    font-size: var(--text-lg);
+    font-size: var(--text-xl);
+  }
+
+  .planHub .surfaceHeader h1 {
+    font-size: var(--text-xl);
   }
 
   /* C1/C4: search and category are two 48px controls that fit one row at
@@ -184,6 +236,27 @@
   .emptyHero > svg,
   .emptyHero button {
     display: none;
+  }
+
+  /* D4, rung 2 of 3 — 390x844. Three recent rows are rendered; two are shown,
+     which is what fits beside the answer, the attention rows and the wrap row
+     in a 635px region. */
+  .homeSurface
+    [data-home-group="recent"]
+    [data-density-row="transaction"]:nth-child(n + 3) {
+    display: none;
+  }
+}
+
+/* D4, rung 3 of 3 — 430x932 and taller. The region grows 88px against 390x844
+   while the rest of Home does not, so a third recent row goes in rather than a
+   third recent row's worth of empty space. 54px of the 91px band, leaving 37px,
+   which is under one row and so cannot be filled by another. */
+@media (--tall-shell-900) {
+  .homeSurface
+    [data-home-group="recent"]
+    [data-density-row="transaction"]:nth-child(n + 3) {
+    display: grid;
   }
 }
 
@@ -308,10 +381,6 @@
     display: none;
   }
 
-  .planHub .surfaceHeader h1 {
-    font-size: var(--text-2xl);
-  }
-
   .planHub .surfaceHeader p:last-child:not(:first-child) {
     display: none;
   }
@@ -336,6 +405,17 @@
 
   .budgetSurface .surfaceHeader h1 {
     font-size: var(--text-xl);
+  }
+
+  /* D4, rung 1 of 3 — 360x740. The region is 531px and the answer, its exact
+     qualifier (C7 requires that line), the three over-budget rows and the wrap
+     row already come to 527px of it. The recent preview is what does not fit,
+     and it is the only block here that is a preview: the same rows, all
+     sixty-one of them, are one labelled tap away on the Activity tab, which is
+     also where the two rows that used to be here were cut off mid-subtitle.
+     Nothing that is only available on Home is dropped. */
+  .homeSurface [data-home-group="recent"] {
+    display: none;
   }
 }
 

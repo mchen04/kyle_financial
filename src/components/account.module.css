@@ -28,7 +28,7 @@
   margin: var(--micro-2) 0 var(--space-2);
   overflow-wrap: anywhere;
   color: var(--ink-soft);
-  font: var(--text-sm)/1.4 var(--data);
+  font: var(--text-sm)/1.4 var(--body);
 }
 
 .accountGrid {
@@ -114,7 +114,8 @@
   border-radius: 50%;
   background: var(--sky);
   color: var(--blue-dark);
-  font: 700 var(--text-sm)/1 var(--data);
+  font: 700 var(--text-sm)/1 var(--body);
+  font-variant-numeric: tabular-nums;
 }
 
 @media (--viewport-desktop-compact) {

@@ -121,6 +121,9 @@
   --font-display: ui-rounded, "Avenir Next", Avenir, "Segoe UI", sans-serif;
   --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-data: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  /* The user agent's own `smaller` ratio, named so it can be floored. See the
+     `small` rule below (DF3 / HIG-T3). */
+  --text-scale-smaller: 0.8333em;
   --text-xs: 0.6875rem;
   --text-sm: 0.8125rem;
   --text-md: 1rem;
@@ -295,6 +298,43 @@ input,
 select,
 textarea {
   font-size: var(--text-md);
+}
+
+/* DF1, applied once for the whole app rather than per field. A text input has
+   no wrapping to fall back on: when its value is wider than its content box the
+   browser simply clips, and the default `text-overflow: clip` cuts through the
+   glyph it lands on, so "Health and pharmacy" reads "Health and pharma" with
+   nothing saying it was cut. Blink applies `text-overflow` to an input only
+   while it is *not* focused, which is exactly the wanted behaviour: an unfocused
+   field says it is truncating, and a field being typed into still scrolls its
+   caret into view. Sizing each field to its content is still the real fix
+   wherever it is possible; this is the floor underneath every one of them, so
+   this defect cannot reappear on a field nobody thought to check. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select {
+  text-overflow: ellipsis;
+}
+
+/* HIG-T3 / DF3. `small` has no size of its own in this design system — the user
+   agent gives it the relative `smaller` keyword, which *compounds*: a `small`
+   inside a `--text-sm` (13px) block computes to 10.83px and one inside a
+   `--text-xs` (11px) block to 9.17px, both under the 11pt iOS legibility floor
+   and both invisible in the source, because no stylesheet anywhere names those
+   numbers. Replacing `smaller` with an explicit ratio floored at `--text-xs`
+   fixes the cause rather than the two places it happened to surface:
+   the ratio is the same 0.8333 the UA applies, so a `small` inside body text
+   still sets at 13.33px and every reserved line box that was measured against
+   that (the Home headline's qualifier, C9) is unchanged to the sub-pixel, while
+   no nesting depth can take it below 11px. Anything that needs to be smaller
+   than its parent and is already at the floor simply stays at the floor. */
+small {
+  font-size: max(var(--text-scale-smaller), var(--text-xs));
+}
+
+/* Same class of defect, same treatment: `sub`/`sup` are `smaller` too. */
+sub,
+sup {
+  font-size: max(var(--text-scale-smaller), var(--text-xs));
 }
 
 @media (--reduced-motion) {

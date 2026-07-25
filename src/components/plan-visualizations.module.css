@@ -7,7 +7,8 @@
   justify-content: space-between;
   margin-bottom: var(--space-2);
   color: var(--ink-soft);
-  font: var(--text-xs)/1 var(--data);
+  font: var(--text-xs)/1 var(--body);
+  font-variant-numeric: tabular-nums;
 }
 .flowRail {
   height: var(--space-3);

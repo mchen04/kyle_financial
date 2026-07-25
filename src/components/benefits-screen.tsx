@@ -88,11 +88,13 @@ export function BenefitsScreen({
 
   return (
     <section className={styles.wideCard}>
+      {/* C7/DEN-6. This paragraph used to sit above the summary rows, which put
+          Benefits' first figure at y=323 against 178-190 on its seven sibling
+          detail surfaces — the one screen in the set where the answer is not
+          where the reflex looks for it. Not one word of it is cut: it explains
+          how the benefit rows below are read, so it now sits with them, under
+          the four figures it was delaying. */}
       <div className={styles.sectionHeading}>
-        <p className={styles.muted}>
-          Percentages use the selected person’s salary and bonus/RSU wages.
-          Entered amounts stay visible when a cap applies.
-        </p>
         <label className={styles.addSelect}>
           <Plus size={17} />
           <select
@@ -139,6 +141,10 @@ export function BenefitsScreen({
           />
         )}
       </dl>
+      <p className={styles.muted}>
+        Percentages use the selected person’s salary and bonus/RSU wages.
+        Entered amounts stay visible when a cap applies.
+      </p>
       <BoundedMessages visibleCount={result.warnings.length > 0 ? 1 : 0}>
         {[
           ...result.warnings.map((warning) => (

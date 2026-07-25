@@ -1683,3 +1683,338 @@ deleted or weakened. **500 tests in 61 files pass** (498 before this loop).
   assertion checks the remaining year count.
 - Everything the harness cannot see is unchanged and still listed in
   [`mobile-density-baseline.md`](./mobile-density-baseline.md#what-this-harness-cannot-see).
+
+---
+
+## L8 — the four open defects, and the density floor
+
+Every number below was read out of a live production build.
+BEFORE is [`l8-before.json`](./l8-before.json) (63 rows, capture mode, measured
+on `a4ed534` with the three new instruments added but nothing else changed);
+AFTER is [`l8-after.json`](./l8-after.json) / [`l8-after.md`](./l8-after.md)
+(63 rows, gate mode, exit 0). The red proofs are
+`l8-faildemo-{tiny,clip,vh,deadband}.json`.
+
+```
+pnpm ui:density:measure -- --mode gate --viewports 390x844,360x740,430x932 --session l8-final2
+# 63 measurement(s); 0 violating row(s); mode=gate   EXIT=0
+```
+
+| Signal                               | AFTER                                                         |
+| ------------------------------------ | ------------------------------------------------------------- |
+| rows                                 | 63                                                            |
+| max CLS                              | **0.0106** (bar 0.02)                                         |
+| headline swaps                       | 0                                                             |
+| targets < 44px                       | 0                                                             |
+| computed font-size < 11px            | 0 (smallest measured: **11.00px**)                            |
+| boxes clipping text with no ellipsis | 0                                                             |
+| horizontal overflow                  | 0                                                             |
+| console errors                       | 0                                                             |
+| min `frameTicks`                     | **115** (max 5668); `nativeLayoutShiftLive` true on **63/63** |
+
+---
+
+### 1. Three instruments added, because three of the four defects were invisible to the harness that shipped them
+
+The harness measured six signals and every one of them read green on all four
+defects. That is not the harness being unlucky; each defect lives in a dimension
+it had no column for.
+
+**`tinyType` — smallest computed font-size on the surface.** D3's two runs
+(9.17px on Plan details, 10.83px in Fast Log) appear nowhere in the source as a
+number, so nothing short of a computed-style sweep can find them. It is a gate
+at 11px (HIG-T3), and it also found a third instance the defect report did not
+name: `At least 10 characters.` at 10.83px on both signed-out surfaces.
+
+**`clippedText` — boxes narrower than their own single-line content, without an
+ellipsis.** Reproduced D1 to the tenth of a pixel on first run: `Health and
+pharmacy` +22px, `Phone and internet` +3px, `Brokerage transfer` +2px, against
+the report's +21.7 / +3.5 / +2.1. Visually-hidden labels are excluded by size —
+an `srOnly` span is a 1x1 clipped box by construction and always "overflows".
+
+**`innerScroll` — the real content extent of the scrolling region.** This is the
+one that matters most. The app shell pins `<html>` to `100dvh` and scrolls its
+content inside `<main>`, so `verticalCost` reads **exactly 1.000** on Home at all
+three viewports whether Home fits, overflows by 86px, or leaves 91px of dead
+band. `scrollHeight` cannot see it either, because `scrollHeight` is floored at
+`clientHeight`: a region holding 626px of content in 723px of space reports 723
+and is indistinguishable from a perfect fit. The content extent has to be
+computed from the laid-out children, and once it is, D4 is two numbers:
+
+| Viewport | region | content | verdict                                               |
+| -------- | -----: | ------: | ----------------------------------------------------- |
+| 390x844  |  635px | 632.1px | fits (2.9px slack) — the one viewport it was tuned to |
+| 360x740  |  531px | 616.9px | **86px below the fold**                               |
+| 430x932  |  723px | 632.1px | **91px of dead band**                                 |
+
+A surface may now declare `fitsWithoutScrolling`, which Home's three rows do.
+It gates on zero overflow and on **<= 64px** of slack — a compact two-line
+transaction row is 48px and its group gap 16px, so 64px is the largest band that
+cannot be blamed on a row that would have fitted in it.
+
+All four new gates are proven red on demand and go green again:
+`--fail-demo tiny` (one 9px paragraph), `--fail-demo clip` (a 40px box holding a
+160px string), `--fail-demo vh` (overflow), and `--fail-demo deadband` (hides a
+real group; **fails on slack alone while VH still reads 1.000 and every other
+column stays green**, which is exactly the blind spot it was written for).
+
+The two new static gates are also in `pnpm verify` as
+[`src/app/type-legibility.test.ts`](../../src/app/type-legibility.test.ts) (510
+tests, up from 506), each proven red by removing the rule it pins.
+
+---
+
+### 2. D1 — the ledger cut category names through their own glyphs
+
+`flex: 1` against the fixed money field was **already there**, and was not the
+fix: at 390px the name field still resolves to a ~142px content box and `Health
+and pharmacy` needs 163.7px. An input clips at its content box however the box
+was sized, so the missing floor was the ellipsis, and per-field ellipsis is the
+shape of fix that produced this defect in the first place — the same class was
+fixed on Benefits and missed here.
+
+It is fixed once, globally, in `globals.css`: every non-toggle `input` and
+`select` sets `text-overflow: ellipsis`. Blink applies `text-overflow` to an
+input only while it is **not** focused, which is the wanted behaviour exactly —
+an unfocused field says it is truncating, a field being typed into still scrolls
+its caret into view.
+
+The app-wide sweep is the `clippedText` column: **8 boxes across the catalogue
+before, 0 after**, at all three viewports.
+
+### 3. D2 — the month picker's arrow overlapped its own label
+
+`appearance: auto` lets the platform draw the arrow _inside_ the content box
+after layout has already given that box to the label, so the arrow's space is
+never reserved and a fit at 390 and 430 is a coincidence rather than a
+guarantee. The control now draws its own chevron and reserves it as padding, so
+the label cannot be laid out into it at any width. The year came off the twelve
+option labels as well: all twelve carried the same year, this control only ever
+steps within `period.year`, and the year is on screen on every surface in the
+top bar's own picker.
+
+| Viewport |     box | content box | widest of all 12 options |       slack |    arrow band | height |
+| -------- | ------: | ----------: | -----------------------: | ----------: | ------------: | -----: |
+| 360x740  |  86.4px |      54.4px |                   32.3px | **+22.0px** | 16px reserved |   44px |
+| 390x844  | 116.4px |      84.4px |                   32.3px |     +52.0px | 16px reserved |   44px |
+| 430x932  | 156.4px |     124.4px |                   32.3px |     +92.0px | 16px reserved |   44px |
+
+Before, at 360x740: an 86.4px box, a 78px content box, a 68.5px label and ~9.5px
+left for an arrow wanting ~15 — it rendered `Jul 202⌄6`. The box is the same
+86.4px; what changed is that the arrow is no longer competing for it.
+
+### 4. D3 — illegible type, fixed at the cause
+
+Both runs were the user agent's relative `smaller` keyword on `<small>`
+**compounding** inside a block that was already reduced: 13px x 0.8333 = 10.83,
+11px x 0.8333 = 9.17. No stylesheet names either number, which is why a grep
+finds nothing and a reader of either rule sees only "small". One rule replaces
+the keyword with the same ratio, floored:
+
+```css
+small {
+  font-size: max(var(--text-scale-smaller), var(--text-xs));
+}
+```
+
+The ratio is the UA's own, so a `small` in body text still sets at 13.33px and
+**every reserved line box measured against that (the Home headline's qualifier,
+C9) is unchanged to the sub-pixel** — which the CLS column confirms: Home stays
+at 0.0000 / 0.0001 / 0.0000. `sub` and `sup` get the same treatment for the same
+reason. Measured across all 63 rows: **smallest computed font-size 11.00px**,
+zero elements under the floor, against three before (Plan details 9.17, Fast Log
+10.83, signed-out 10.83).
+
+### 5. D4 — Home is adaptive, not tuned to one viewport
+
+The three viewports differ by 192px of scroll region while the rest of Home is
+fixed by what it has to say. Something has to absorb 192px; nothing did.
+
+The recent-activity list is the one block on Home whose length is a judgement
+call rather than a fact — it is a preview of a ledger one labelled tap away on
+Activity, and it was already an arbitrary two of sixty-one. So it is the single
+lever, chosen per viewport in a media query (not a measurement, so no second
+paint and no layout shift): three rows are rendered and the stylesheet reveals as
+many as fit.
+
+| Viewport | recent rows | region | content | overflow |  slack |    VH |
+| -------- | ----------: | -----: | ------: | -------: | -----: | ----: |
+| 390x844  |           2 |  635px | 632.1px |    **0** |  2.9px | 1.000 |
+| 360x740  |           0 |  531px | 474.9px |    **0** | 56.1px | 1.000 |
+| 430x932  |           3 |  723px | 686.1px |    **0** | 36.9px | 1.000 |
+
+No row is clipped at 360x740, because nothing is below the fold at all. The
+answer, its exact one-line qualifier (C7 — measured present at 360 as one 16px
+line at 13.33px), all three attention rows and the wrap row are the whole
+surface there and come to 474.9px of 531px. At 430x932 the band that was 91px is
+37px, which is under one row and so cannot be filled by another.
+
+---
+
+### 6. The density axis
+
+Method, matching the judge's: **leaf text nodes lying fully inside the first
+viewport, per 100px of the scroll region's own visible height**, region at
+scrollTop 0. Absolute values differ from the judge's (a full-height surface is
+measured against the whole 844px viewport here, a scrolling one against its
+635px region), so the comparison that matters is before-against-after on the
+same instrument. Reported on every row as `datumPer100px`; **not** gated —
+density is a judgement the harness informs, not one it should enforce.
+
+| Surface                       | 390x844                 | 360x740          | 430x932          | VH at 390          |
+| ----------------------------- | ----------------------- | ---------------- | ---------------- | ------------------ |
+| **plan**                      | 2.03 -> **3.91** (+93%) | 2.04 -> **3.75** | 1.80 -> **3.47** | 2.076 -> **1.784** |
+| **manage-categories**         | 2.03 -> **3.47** (+71%) | 1.87 -> **3.41** | 2.05 -> **3.59** | 2.245 -> **1.129** |
+| **category-detail**           | 5.93 -> **7.96** (+34%) | 5.79 -> **7.84** | 6.29 -> **8.15** | 1.214 -> **1.037** |
+| **monthly-wrap**              | 3.47 -> **4.20** (+21%) | 2.56 -> **3.07** | 4.36 -> **4.88** | 2.009 -> **1.912** |
+| benefits                      | 3.91 -> 4.20            | 3.41 -> 3.41     | 4.11 -> 4.36     | 2.634 -> 2.584     |
+| activity                      | 7.40 -> 7.56            | 6.97 -> 7.16     | 7.88 -> 7.47     | 4.660 (exempt)     |
+| budget (benchmark, untouched) | 7.40                    | 6.78             | 7.75             | 1.282              |
+
+**Plan (the least dense primary tab).** Three changes, and the largest was not
+the one the defect report named.
+
+1. The 46.8px two-line _sentence_ `$9,837 cash savings planned.` is now a 13px
+   eyebrow and a 24px headline carrying the monthly outcome — the same shape
+   Budget uses. The header went **~140px -> 42.4px**. The annual figure is not
+   reprinted here at all, so it is now stated exactly once on the surface, in the
+   money-flow legend that computes it (C2, C7).
+2. The four destination **cards** were four homogeneous units scanned down a
+   column with no more than one acted on at a time — a row list by C5's own
+   terms, and a card-test failure on the "no more than 3 on the surface" clause.
+   80px + 16px gap each became a 48px hairline-separated row each: **192px back**.
+3. What actually capped the density was a **90px run-on sentence that is one text
+   node**: `$28,500.00 start + $55,687.39 planned total (cash, payroll/employer,
+allocations) + … spending variance + … funding variance`. It is now the row
+   list this app already gives the identical concept on Monthly wrap — same four
+   terms, same order, **same cents** (`Metric` is not reused precisely because it
+   rounds to the dollar), and the four conditional branches reproduced term for
+   term. The charts moved below the figures and the destinations, so a 300px
+   donut restating one number is no longer what a reader meets first (DEN-6).
+
+**Manage categories (was the worst in the app).** The two-row control grid found
+nowhere else in the app cost 112px per category and showed **5 categories where
+Budget shows 12**. The collapsed row is now the same 48px row every other list
+uses — colour dot, name, type, chevron — and **15 rows are on screen at 360x740**
+(measured: 48.0px each). VH halved, 2.245 -> 1.129.
+
+The editing controls are behind a labelled disclosure on that row, and this is
+the one place the loop did not do literally what was asked. See "What was
+refused" below for the arithmetic.
+
+**Category detail.** Three label/value pairs stacked down 197px with the entire
+right half of the card empty. Side by side at ~96px per column each still sets on
+one line, and the block is 64px: **133px of the first screen** handed back to the
+transaction list the surface exists to show (C5, C1).
+
+**Monthly wrap.** `Total remaining +$123` sat alone on a two-column row with the
+cell beside it empty. The odd last cell now spans the full width, and each cell
+puts its label and value on one baseline rather than stacking them: the
+three-metric block 144px -> 104px, the six-metric one 224px -> 160px, no empty
+cell on either (C5).
+
+---
+
+### 7. Coherence
+
+**One "what screen is this" treatment.** There were three across four tabs. There
+is now one: **a 13px eyebrow naming the screen, a 24px `h1` carrying the figure
+the screen exists to report, and at most one 13px qualifier line.**
+
+| Tab      | Before                                                     | After                                                                                                 |
+| -------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Home     | no title (hero card)                                       | unchanged — the hero card _is_ label + amount + qualifier, the same three parts on an inverse surface |
+| Budget   | eyebrow + 24px `$123 safe to spend`                        | unchanged; it is the pattern the others moved to                                                      |
+| Plan     | 46.8px two-line sentence                                   | eyebrow `2026 annual plan` + 24px `$820 saved each month` + qualifier                                 |
+| Activity | 18px `h1` repeating the tab label, answer demoted below it | eyebrow `Activity` + 24px `$4,478 logged` + count line                                                |
+
+Both arrival assertions in the harness were rewritten to match, and both are
+**stricter** than what they replaced: Activity's used to assert the literal
+string `"Activity"` (that a label existed) and now pins the shape of a figure;
+Plan's used to pin a trailing full stop and now pins a number.
+
+**One numeric voice.** `SFMono-Regular` and `-apple-system + tabular-nums` were
+both in use for figures and the boundary was not clean. The rule now is:
+**every figure is set in the body/display face with `tabular-nums`;
+`--font-data` is the _label_ face and carries no figures.** Applied to the
+Plan-details ledger total, the money inputs and their `$` affixes, Benefits'
+summary values, Compare's card values and deltas, the money-flow legend, the
+account email and the install-step counts.
+
+**Benefits' first datum.** It sat at y=323 against 178-190 for its seven sibling
+detail surfaces, because a two-sentence explainer opened the screen. Not a word
+of it is cut — it explains how the benefit rows are read, so it now sits with
+them, under the four figures it was delaying.
+
+---
+
+### Tap paths walked after the change
+
+Walked at 360x740, the tightest viewport, on the live build:
+
+- **Home -> Budget -> Manage categories** (3 taps, unchanged) -> the row for a
+  category. **15 category rows visible**, each measured at **48.0px**. The
+  collapsed row states its name, its colour (the dot itself), its type, and
+  `· Archived` when it applies. Expanding it exposes `Rent name`, `Rent type`,
+  `Rent color`, `Move Rent up`, `Move Rent down`, `Archive` — all five
+  capabilities the surface owns — with **0 controls under 44px**. Create is
+  still the toolbar's `Add category`, untouched.
+- **Home -> Plan -> {Plan details, Benefits, Compare years, Edit budget}**: all
+  four are still one tap from Plan; only the row's shape changed. Monthly wrap
+  is still reachable from Home and from Activity.
+- Home at 360x740 with no recent-activity preview: the same rows are on the
+  Activity tab, which is one tap from Home, so nothing became unreachable and
+  nothing moved further away.
+
+---
+
+### What was refused
+
+**"Collapse name/type/colour/reorder into one 48px row" — not literally, and the
+arithmetic is why.** At 360px the row has 336px to spend. The controls that
+would have to share it measure: type select ~85px (it has to hold `Saving`),
+colour select ~75px, two 44px reorder buttons = 88px, archive ~80px, colour dot
+12px. That is **340px of fixed controls plus four gaps before the name field
+gets a single pixel** — over budget with the name at zero width, and never-cross
+rule 4 forbids buying the difference by taking any control under 44px.
+
+So the row is 48px and carries what a reader _reads_ — name, colour, type,
+archived state — and the controls open in place on the same surface, one labelled
+control away, in the same field idiom the Plan-details row editor already uses
+(C12: an editing grid is promoted off the row, but this surface _is_ where those
+capabilities live, so it is promoted off the row and not off the screen).
+Nothing moved behind a bare chevron: the disclosure's accessible name is
+`Rename, recolour, reorder, or archive {name}`, and the surface's own toolbar
+line reads `Tap a category to rename, recolour, reorder, or archive it.` — which
+was previously hidden below 740px tall and is now kept at every size, because it
+is load-bearing.
+
+**A two-column `planOutcome` at 390 and 430** was implemented, measured, and
+reverted: it changed the surface height by **1px** (the projection text simply
+re-wrapped to the height the stacking had saved) and improved nothing. It is
+recorded here rather than shipped as an unjustified diff.
+
+---
+
+### Residual risk
+
+- **`datumPer100px` is reported, never gated.** Density is a judgement; a gate on
+  it would be a gate on a number that can be gamed by adding words. What is
+  gated is what makes density possible without crowding — the 44px targets, the
+  11px floor, the ellipsis, and the single-screen fit.
+- **Home shows no recent-activity preview at 360x740.** The rows are one tap away
+  on Activity and nothing is only available on Home, but a 360x740 reader loses
+  the "correct it while it is fresh" glance. The alternative was leaving 86px
+  below the fold with a row cut through its own subtitle.
+- **The 64px dead-band bar is derived, not published.** It is one compact
+  transaction row plus its group gap. A surface whose natural next unit is
+  taller than 64px could pass with a band that unit would have filled.
+- **`account` is now the least dense surface in the catalogue** (1.87 at
+  360x740). It was outside this loop's brief and is untouched; it is the obvious
+  next target.
+- **The manage-categories editor is not gated by the harness.** The catalogue
+  measures the collapsed list; the expanded editor's 44px targets were walked by
+  hand at 360x740 (0 under 44px) rather than by a gated row.
+- **`--text-scale-smaller` is a ratio token, not a size token.** It is the only
+  relative value in the type scale, and it is only safe because the `max()`
+  around it floors it. Using it anywhere without that floor reintroduces D3.

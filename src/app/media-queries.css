@@ -17,3 +17,4 @@
 @custom-media --short-phone-740 (max-height: 740px) and (max-width: 600px);
 @custom-media --short-shell-740 (max-height: 740px) and (max-width: 900px);
 @custom-media --short-phone-896 (max-height: 896px) and (max-width: 600px);
+@custom-media --tall-shell-900 (min-height: 901px) and (max-width: 900px);

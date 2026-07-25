@@ -1,0 +1,5344 @@
+{
+  "generatedAt": "2026-07-25T10:48:05.986Z",
+  "mode": "capture",
+  "failDemo": null,
+  "deviceScaleFactor": 3,
+  "bars": {
+    "vertical": {
+      "home": 1,
+      "standard": 3,
+      "deep": 4,
+      "entry": 1.5
+    },
+    "cls": 0.02,
+    "minimumTargetPx": 44,
+    "minimumFontSizePx": 11,
+    "chromeAboveExemptList": 0.6
+  },
+  "rows": [
+    {
+      "surface": "signed-out-create-account",
+      "label": "Signed out · create account (cold load)",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 1.5,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 0,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 1,
+        "minFontSizePx": 10.83,
+        "detail": [
+          {
+            "size": 10.83,
+            "tag": "small",
+            "className": "",
+            "text": "At least 10 characters."
+          }
+        ]
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 844,
+        "textNodes": 8,
+        "valueControls": 0,
+        "datumPer100px": 0.95,
+        "datumWithControlsPer100px": 0.95
+      },
+      "scrollHeight": 844,
+      "documentScrollHeight": 844,
+      "measuredRegion": "documentElement",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 16,
+      "frameTicks": 137,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "H30House by 30",
+      "headlineSettled": "H30House by 30",
+      "headlineSamples": [
+        {
+          "text": "House by 30",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "H30House by 30",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "signed-out-sign-in",
+      "label": "Signed out · sign in",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 1.5,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 1765.800000011921,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 1,
+        "minFontSizePx": 10.83,
+        "detail": [
+          {
+            "size": 10.83,
+            "tag": "small",
+            "className": "",
+            "text": "At least 10 characters."
+          }
+        ]
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 844,
+        "textNodes": 8,
+        "valueControls": 0,
+        "datumPer100px": 0.95,
+        "datumWithControlsPer100px": 0.95
+      },
+      "scrollHeight": 844,
+      "documentScrollHeight": 844,
+      "measuredRegion": "documentElement",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0.0004803489810916082,
+      "clsNative": 0.0004803489810916082,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.00048,
+          "startTime": 1781,
+          "sources": [
+            {
+              "node": "(detached)",
+              "from": [89, 591, 212, 16],
+              "to": [89, 591, 212, 16]
+            },
+            {
+              "node": "svg",
+              "from": [249, 538, 18, 18],
+              "to": [216, 538, 18, 18]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 34,
+      "frameTicks": 233,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "H30House by 30",
+      "headlineSettled": "H30House by 30",
+      "headlineSamples": [],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "onboarding",
+      "label": "Onboarding · cold load",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 1.5,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 0,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 13,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 844,
+        "textNodes": 11,
+        "valueControls": 3,
+        "datumPer100px": 1.3,
+        "datumWithControlsPer100px": 1.66
+      },
+      "scrollHeight": 844,
+      "documentScrollHeight": 844,
+      "measuredRegion": "documentElement",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 16,
+      "frameTicks": 538,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Create your plan",
+      "headlineSettled": "Create your plan",
+      "headlineSamples": [
+        {
+          "text": "House by 30",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "Create your plan",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "home",
+      "label": "Home",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 1,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 4997.0999999940395,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 844,
+        "textNodes": 51,
+        "valueControls": 2,
+        "datumPer100px": 6.04,
+        "datumWithControlsPer100px": 6.28
+      },
+      "scrollHeight": 844,
+      "documentScrollHeight": 844,
+      "measuredRegion": "documentElement",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0.0005292783720906124,
+      "clsNative": 0.0005292783720906124,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.000529,
+          "startTime": 5013,
+          "sources": [
+            {
+              "node": "span :: Saved",
+              "from": [176, 29, 51, 14],
+              "to": [279, 29, 51, 14]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 66,
+      "frameTicks": 7328,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [
+        {
+          "text": "Home | Left to spend $123",
+          "hero": "Left to spend $123",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Left to spend $123"],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "home-cold-load",
+      "label": "Home · cold load",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 1,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 0,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 844,
+        "textNodes": 51,
+        "valueControls": 2,
+        "datumPer100px": 6.04,
+        "datumWithControlsPer100px": 6.28
+      },
+      "scrollHeight": 844,
+      "documentScrollHeight": 844,
+      "measuredRegion": "documentElement",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0.00003872776258279728,
+      "clsNative": 0.00003872776258279728,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 2,
+      "shiftDetail": [
+        {
+          "value": 0.000019,
+          "startTime": 57,
+          "sources": [
+            {
+              "node": "span :: Saving",
+              "from": [279, 29, 51, 14],
+              "to": [272, 29, 58, 14]
+            }
+          ]
+        },
+        {
+          "value": 0.000019,
+          "startTime": 64,
+          "sources": [
+            {
+              "node": "span :: Saved",
+              "from": [272, 29, 58, 14],
+              "to": [279, 29, 51, 14]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 16,
+      "frameTicks": 897,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [
+        {
+          "text": "House by 30",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "Home | Left to spend $123",
+          "hero": "Left to spend $123",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Left to spend $123"],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "budget",
+      "label": "Budget",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 3405.4000000059605,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 635,
+        "textNodes": 47,
+        "valueControls": 1,
+        "datumPer100px": 7.4,
+        "datumWithControlsPer100px": 7.56
+      },
+      "scrollHeight": 1082,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1.2819905213270142,
+      "cls": 0.007543371926472036,
+      "clsNative": 0.007543371926472036,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.007543,
+          "startTime": 3423,
+          "sources": [
+            {
+              "node": "button",
+              "from": [201, 680, 189, 144],
+              "to": [278, 680, 112, 144]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 50,
+      "frameTicks": 1087,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "$123 safe to spend",
+      "headlineSettled": "$123 safe to spend",
+      "headlineSamples": [
+        {
+          "text": "$123 safe to spend",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "budget-future-month",
+      "label": "Budget · future month",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 7024.5,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 635,
+        "textNodes": 47,
+        "valueControls": 1,
+        "datumPer100px": 7.4,
+        "datumWithControlsPer100px": 7.56
+      },
+      "scrollHeight": 1082,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1.2819905213270142,
+      "cls": 0.0038720581442695723,
+      "clsNative": 0.0038720581442695723,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.003872,
+          "startTime": 7045,
+          "sources": [
+            {
+              "node": "em :: $2,100 remaining",
+              "from": [285, 450, 85, 16],
+              "to": [254, 450, 116, 16]
+            },
+            {
+              "node": "small :: $0 of $2,100",
+              "from": [262, 434, 108, 16],
+              "to": [290, 434, 80, 16]
+            },
+            {
+              "node": "em :: $410 remaining",
+              "from": [285, 594, 85, 16],
+              "to": [268, 594, 102, 16]
+            },
+            {
+              "node": "em :: $185 remaining",
+              "from": [285, 546, 85, 16],
+              "to": [268, 546, 102, 16]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 86,
+      "frameTicks": 1291,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "$4,478 planned spending",
+      "headlineSettled": "$4,478 planned spending",
+      "headlineSamples": [
+        {
+          "text": "$4,478 planned spending",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "activity",
+      "label": "Activity",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 3,
+      "listExemption": {
+        "reason": "transaction history (named by the mission)",
+        "rowSelector": "main [data-density-row=\"transaction\"]"
+      },
+      "singleAnswerPaint": false,
+      "markTime": 10453.80000001192,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": {
+        "rowSelector": "main [data-density-row=\"transaction\"]",
+        "rowCount": 61,
+        "chromeAboveFirstRowPx": 240.89,
+        "chromeAboveFirstRowCost": 0.285415432464455,
+        "rowHeights": [
+          {
+            "height": 54,
+            "count": 46
+          },
+          {
+            "height": 80,
+            "count": 15
+          }
+        ],
+        "rowRegionPx": 3684,
+        "error": null
+      },
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 2,
+        "detail": [
+          {
+            "overflowPx": 106,
+            "tag": "span",
+            "label": "",
+            "text": "Search activity",
+            "clientWidth": 1,
+            "scrollWidth": 107
+          },
+          {
+            "overflowPx": 125,
+            "tag": "span",
+            "label": "",
+            "text": "Filter by category",
+            "clientWidth": 1,
+            "scrollWidth": 126
+          }
+        ]
+      },
+      "densityRegion": {
+        "regionHeightPx": 635,
+        "textNodes": 47,
+        "valueControls": 2,
+        "datumPer100px": 7.4,
+        "datumWithControlsPer100px": 7.72
+      },
+      "scrollHeight": 3933,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 4.659952606635071,
+      "cls": 0.007543371926472036,
+      "clsNative": 0.007543371926472036,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.007543,
+          "startTime": 10475,
+          "sources": [
+            {
+              "node": "button",
+              "from": [201, 680, 189, 144],
+              "to": [278, 680, 112, 144]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 121,
+      "frameTicks": 1482,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Activity",
+      "headlineSettled": "Activity",
+      "headlineSamples": [
+        {
+          "text": "Activity",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "activity-empty-search",
+      "label": "Activity · empty search",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 14080.80000001192,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 3,
+        "detail": [
+          {
+            "overflowPx": 58,
+            "tag": "input",
+            "label": "",
+            "text": "density-no-such-expense",
+            "clientWidth": 149,
+            "scrollWidth": 207
+          },
+          {
+            "overflowPx": 106,
+            "tag": "span",
+            "label": "",
+            "text": "Search activity",
+            "clientWidth": 1,
+            "scrollWidth": 107
+          },
+          {
+            "overflowPx": 125,
+            "tag": "span",
+            "label": "",
+            "text": "Filter by category",
+            "clientWidth": 1,
+            "scrollWidth": 126
+          }
+        ]
+      },
+      "densityRegion": {
+        "regionHeightPx": 844,
+        "textNodes": 20,
+        "valueControls": 4,
+        "datumPer100px": 2.37,
+        "datumWithControlsPer100px": 2.84
+      },
+      "scrollHeight": 844,
+      "documentScrollHeight": 844,
+      "measuredRegion": "documentElement",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 157,
+      "frameTicks": 1685,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Activity",
+      "headlineSettled": "Activity",
+      "headlineSamples": [],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "category-detail",
+      "label": "Category detail · Dining out",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 17690.40000000596,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 691,
+        "textNodes": 41,
+        "valueControls": 0,
+        "datumPer100px": 5.93,
+        "datumWithControlsPer100px": 5.93
+      },
+      "scrollHeight": 1025,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1.2144549763033174,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 193,
+      "frameTicks": 1888,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Dining out",
+      "headlineSettled": "Dining out",
+      "headlineSamples": [
+        {
+          "text": "Dining out",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "edit-budget",
+      "label": "Edit budget",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 21286.90000000596,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 691,
+        "textNodes": 40,
+        "valueControls": 7,
+        "datumPer100px": 5.79,
+        "datumWithControlsPer100px": 6.8
+      },
+      "scrollHeight": 1257,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1.4893364928909953,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 229,
+      "frameTicks": 2089,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Edit monthly budget",
+      "headlineSettled": "Edit monthly budget",
+      "headlineSamples": [
+        {
+          "text": "Edit monthly budget",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "manage-categories",
+      "label": "Manage categories",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 24890.40000000596,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 15,
+        "detail": [
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          }
+        ]
+      },
+      "densityRegion": {
+        "regionHeightPx": 691,
+        "textNodes": 14,
+        "valueControls": 13,
+        "datumPer100px": 2.03,
+        "datumWithControlsPer100px": 3.91
+      },
+      "scrollHeight": 1895,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 2.245260663507109,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 265,
+      "frameTicks": 2292,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Manage categories",
+      "headlineSettled": "Manage categories",
+      "headlineSamples": [
+        {
+          "text": "Manage categories",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "monthly-wrap",
+      "label": "Monthly wrap",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 28520,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 691,
+        "textNodes": 24,
+        "valueControls": 0,
+        "datumPer100px": 3.47,
+        "datumWithControlsPer100px": 3.47
+      },
+      "scrollHeight": 1696,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 2.009478672985782,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 301,
+      "frameTicks": 2495,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "July 2026 wrap | Live preview · currently unspent $123",
+      "headlineSettled": "July 2026 wrap | Live preview · currently unspent $123",
+      "headlineSamples": [
+        {
+          "text": "July 2026 wrap | Live preview · currently unspent $123",
+          "hero": "Live preview · currently unspent $123",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Live preview · currently unspent $123"],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "plan",
+      "label": "Plan",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 31934.40000000596,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 691,
+        "textNodes": 14,
+        "valueControls": 1,
+        "datumPer100px": 2.03,
+        "datumWithControlsPer100px": 2.17
+      },
+      "scrollHeight": 1752,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 2.075829383886256,
+      "cls": 0.0005292783720906124,
+      "clsNative": 0.0005292783720906124,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.000529,
+          "startTime": 31947,
+          "sources": [
+            {
+              "node": "span :: Saved",
+              "from": [279, 29, 51, 14],
+              "to": [176, 29, 51, 14]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 336,
+      "frameTicks": 2686,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "$9,837 cash savings planned.",
+      "headlineSettled": "$9,837 cash savings planned.",
+      "headlineSamples": [
+        {
+          "text": "$9,837 cash savings planned.",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "plan-details",
+      "label": "Plan details",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 35536.90000000596,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 1,
+        "minFontSizePx": 9.17,
+        "detail": [
+          {
+            "size": 9.17,
+            "tag": "small",
+            "className": "",
+            "text": "monthly estimate"
+          }
+        ]
+      },
+      "clippedText": {
+        "count": 3,
+        "detail": [
+          {
+            "overflowPx": 22,
+            "tag": "input",
+            "label": "Expense name",
+            "text": "Health and pharmacy",
+            "clientWidth": 158,
+            "scrollWidth": 180
+          },
+          {
+            "overflowPx": 3,
+            "tag": "input",
+            "label": "Expense name",
+            "text": "Phone and internet",
+            "clientWidth": 158,
+            "scrollWidth": 161
+          },
+          {
+            "overflowPx": 2,
+            "tag": "input",
+            "label": "Expense name",
+            "text": "Brokerage transfer",
+            "clientWidth": 158,
+            "scrollWidth": 160
+          }
+        ]
+      },
+      "densityRegion": {
+        "regionHeightPx": 691,
+        "textNodes": 43,
+        "valueControls": 0,
+        "datumPer100px": 6.22,
+        "datumWithControlsPer100px": 6.22
+      },
+      "scrollHeight": 2297,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 2.721563981042654,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 372,
+      "frameTicks": 2889,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Plan details | Savings / month $819.78",
+      "headlineSettled": "Plan details | Savings / month $819.78",
+      "headlineSamples": [
+        {
+          "text": "Plan details | Savings / month $819.78",
+          "hero": "Savings / month $819.78",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Savings / month $819.78"],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "benefits",
+      "label": "Benefits",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 39162.5,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 691,
+        "textNodes": 27,
+        "valueControls": 0,
+        "datumPer100px": 3.91,
+        "datumWithControlsPer100px": 3.91
+      },
+      "scrollHeight": 2223,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 2.6338862559241707,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 408,
+      "frameTicks": 3091,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Benefits",
+      "headlineSettled": "Benefits",
+      "headlineSamples": [
+        {
+          "text": "Benefits",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "compare",
+      "label": "Compare years",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 42752.90000000596,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 691,
+        "textNodes": 40,
+        "valueControls": 0,
+        "datumPer100px": 5.79,
+        "datumWithControlsPer100px": 5.79
+      },
+      "scrollHeight": 1275,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1.5106635071090047,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 444,
+      "frameTicks": 3292,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Compare years",
+      "headlineSettled": "Compare years",
+      "headlineSamples": [
+        {
+          "text": "Compare years",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "account",
+      "label": "Account",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 46157.5,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 844,
+        "textNodes": 27,
+        "valueControls": 1,
+        "datumPer100px": 3.2,
+        "datumWithControlsPer100px": 3.32
+      },
+      "scrollHeight": 844,
+      "documentScrollHeight": 844,
+      "measuredRegion": "documentElement",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 478,
+      "frameTicks": 3482,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Account and data",
+      "headlineSettled": "Account and data",
+      "headlineSamples": [
+        {
+          "text": "Account and data",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "fast-log-new",
+      "label": "Fast Log · new expense",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 49557.5,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 1,
+        "minFontSizePx": 10.83,
+        "detail": [
+          {
+            "size": 10.83,
+            "tag": "small",
+            "className": "",
+            "text": "Optional"
+          }
+        ]
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 716,
+        "textNodes": 11,
+        "valueControls": 2,
+        "datumPer100px": 1.54,
+        "datumWithControlsPer100px": 1.82
+      },
+      "scrollHeight": 716,
+      "documentScrollHeight": 844,
+      "measuredRegion": "dialog:section",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 0.8483412322274881,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 512,
+      "frameTicks": 3675,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "fast-log-edit",
+      "label": "Fast Log · edit expense",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 53168.40000000596,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 1,
+        "minFontSizePx": 10.83,
+        "detail": [
+          {
+            "size": 10.83,
+            "tag": "small",
+            "className": "",
+            "text": "Optional"
+          }
+        ]
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 660,
+        "textNodes": 11,
+        "valueControls": 4,
+        "datumPer100px": 1.67,
+        "datumWithControlsPer100px": 2.27
+      },
+      "scrollHeight": 660,
+      "documentScrollHeight": 844,
+      "measuredRegion": "dialog:section",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 0.7819905213270142,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 548,
+      "frameTicks": 3880,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Activity",
+      "headlineSettled": "Activity",
+      "headlineSamples": [],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "home-provisional-restore",
+      "label": "Home · cache restore awaiting the server",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 1,
+      "listExemption": null,
+      "singleAnswerPaint": true,
+      "markTime": 0,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 844,
+        "textNodes": 51,
+        "valueControls": 2,
+        "datumPer100px": 6.04,
+        "datumWithControlsPer100px": 6.28
+      },
+      "scrollHeight": 844,
+      "documentScrollHeight": 844,
+      "measuredRegion": "documentElement",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0.00004068052875076527,
+      "clsNative": 0.00004068052875076527,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 2,
+      "shiftDetail": [
+        {
+          "value": 0.000021,
+          "startTime": 46,
+          "sources": [
+            {
+              "node": "span :: Saving",
+              "from": [266, 29, 64, 14],
+              "to": [272, 29, 58, 14]
+            }
+          ]
+        },
+        {
+          "value": 0.000019,
+          "startTime": 89,
+          "sources": [
+            {
+              "node": "span :: Saved",
+              "from": [272, 29, 58, 14],
+              "to": [279, 29, 51, 14]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 16,
+      "frameTicks": 868,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [
+        {
+          "text": "House by 30",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "Home",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "Home | Left to spend $123",
+          "hero": "Left to spend $123",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Left to spend $123"],
+      "blockedRequests": 1,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "signed-out-create-account",
+      "label": "Signed out · create account (cold load)",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 1.5,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 0,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 1,
+        "minFontSizePx": 10.83,
+        "detail": [
+          {
+            "size": 10.83,
+            "tag": "small",
+            "className": "",
+            "text": "At least 10 characters."
+          }
+        ]
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 740,
+        "textNodes": 8,
+        "valueControls": 0,
+        "datumPer100px": 1.08,
+        "datumWithControlsPer100px": 1.08
+      },
+      "scrollHeight": 740,
+      "documentScrollHeight": 740,
+      "measuredRegion": "documentElement",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 16,
+      "frameTicks": 121,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "H30House by 30",
+      "headlineSettled": "H30House by 30",
+      "headlineSamples": [
+        {
+          "text": "House by 30",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "H30House by 30",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "signed-out-sign-in",
+      "label": "Signed out · sign in",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 1.5,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 1745.7000000178814,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 1,
+        "minFontSizePx": 10.83,
+        "detail": [
+          {
+            "size": 10.83,
+            "tag": "small",
+            "className": "",
+            "text": "At least 10 characters."
+          }
+        ]
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 740,
+        "textNodes": 8,
+        "valueControls": 0,
+        "datumPer100px": 1.08,
+        "datumWithControlsPer100px": 1.08
+      },
+      "scrollHeight": 740,
+      "documentScrollHeight": 740,
+      "measuredRegion": "documentElement",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0.0006769248133268403,
+      "clsNative": 0.0006769248133268403,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.000677,
+          "startTime": 1767,
+          "sources": [
+            {
+              "node": "(detached)",
+              "from": [74, 539, 212, 16],
+              "to": [74, 539, 212, 16]
+            },
+            {
+              "node": "svg",
+              "from": [234, 486, 18, 18],
+              "to": [201, 486, 18, 18]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 33,
+      "frameTicks": 218,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "H30House by 30",
+      "headlineSettled": "H30House by 30",
+      "headlineSamples": [],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "onboarding",
+      "label": "Onboarding · cold load",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 1.5,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 0,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 13,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 740,
+        "textNodes": 11,
+        "valueControls": 3,
+        "datumPer100px": 1.49,
+        "datumWithControlsPer100px": 1.89
+      },
+      "scrollHeight": 740,
+      "documentScrollHeight": 740,
+      "measuredRegion": "documentElement",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 16,
+      "frameTicks": 391,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Create your plan",
+      "headlineSettled": "Create your plan",
+      "headlineSamples": [
+        {
+          "text": "House by 30",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "Create your plan",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "home",
+      "label": "Home",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 1,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 4981.5,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 740,
+        "textNodes": 51,
+        "valueControls": 2,
+        "datumPer100px": 6.89,
+        "datumWithControlsPer100px": 7.16
+      },
+      "scrollHeight": 740,
+      "documentScrollHeight": 740,
+      "measuredRegion": "documentElement",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0.0006727614438763088,
+      "clsNative": 0.0006727614438763088,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.000673,
+          "startTime": 4995,
+          "sources": [
+            {
+              "node": "span :: Saved",
+              "from": [156, 29, 51, 14],
+              "to": [249, 29, 51, 14]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 66,
+      "frameTicks": 5900,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [
+        {
+          "text": "Home | Left to spend $123",
+          "hero": "Left to spend $123",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Left to spend $123"],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "home-cold-load",
+      "label": "Home · cold load",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 1,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 0,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 740,
+        "textNodes": 51,
+        "valueControls": 2,
+        "datumPer100px": 6.89,
+        "datumWithControlsPer100px": 7.16
+      },
+      "scrollHeight": 740,
+      "documentScrollHeight": 740,
+      "measuredRegion": "documentElement",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0.000054576535995454916,
+      "clsNative": 0.000054576535995454916,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 2,
+      "shiftDetail": [
+        {
+          "value": 0.000027,
+          "startTime": 67,
+          "sources": [
+            {
+              "node": "span :: Saving",
+              "from": [249, 29, 51, 14],
+              "to": [242, 29, 58, 14]
+            }
+          ]
+        },
+        {
+          "value": 0.000027,
+          "startTime": 74,
+          "sources": [
+            {
+              "node": "span :: Saved",
+              "from": [242, 29, 58, 14],
+              "to": [249, 29, 51, 14]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 16,
+      "frameTicks": 792,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [
+        {
+          "text": "House by 30",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "Home | Left to spend $123",
+          "hero": "Left to spend $123",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Left to spend $123"],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "budget",
+      "label": "Budget",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 3418.699999988079,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 531,
+        "textNodes": 36,
+        "valueControls": 1,
+        "datumPer100px": 6.78,
+        "datumWithControlsPer100px": 6.97
+      },
+      "scrollHeight": 1086,
+      "documentScrollHeight": 740,
+      "measuredRegion": "main",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 1.4675675675675677,
+      "cls": 0.010630387143900659,
+      "clsNative": 0.010630387143900659,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.01063,
+          "startTime": 3430,
+          "sources": [
+            {
+              "node": "button",
+              "from": [171, 576, 189, 144],
+              "to": [248, 576, 112, 144]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 50,
+      "frameTicks": 980,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "$123 safe to spend",
+      "headlineSettled": "$123 safe to spend",
+      "headlineSamples": [
+        {
+          "text": "$123 safe to spend",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "budget-future-month",
+      "label": "Budget · future month",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 7012.5,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 531,
+        "textNodes": 36,
+        "valueControls": 1,
+        "datumPer100px": 6.78,
+        "datumWithControlsPer100px": 6.97
+      },
+      "scrollHeight": 1086,
+      "documentScrollHeight": 740,
+      "measuredRegion": "main",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 1.4675675675675677,
+      "cls": 0.0018187880130975573,
+      "clsNative": 0.0018187880130975573,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.001819,
+          "startTime": 7019,
+          "sources": [
+            {
+              "node": "em :: $2,100 remaining",
+              "from": [255, 450, 85, 16],
+              "to": [224, 450, 116, 16]
+            },
+            {
+              "node": "small :: $0 of $2,100",
+              "from": [232, 434, 108, 16],
+              "to": [260, 434, 80, 16]
+            },
+            {
+              "node": "em :: $185 remaining",
+              "from": [255, 546, 85, 16],
+              "to": [238, 546, 102, 16]
+            },
+            {
+              "node": "em :: $650 remaining",
+              "from": [246, 498, 94, 16],
+              "to": [238, 498, 102, 16]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 86,
+      "frameTicks": 1182,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "$4,478 planned spending",
+      "headlineSettled": "$4,478 planned spending",
+      "headlineSamples": [
+        {
+          "text": "$4,478 planned spending",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "activity",
+      "label": "Activity",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 3,
+      "listExemption": {
+        "reason": "transaction history (named by the mission)",
+        "rowSelector": "main [data-density-row=\"transaction\"]"
+      },
+      "singleAnswerPaint": false,
+      "markTime": 10425.09999999404,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": {
+        "rowSelector": "main [data-density-row=\"transaction\"]",
+        "rowCount": 61,
+        "chromeAboveFirstRowPx": 240.89,
+        "chromeAboveFirstRowCost": 0.3255278716216216,
+        "rowHeights": [
+          {
+            "height": 54,
+            "count": 46
+          },
+          {
+            "height": 80,
+            "count": 15
+          }
+        ],
+        "rowRegionPx": 3684,
+        "error": null
+      },
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 2,
+        "detail": [
+          {
+            "overflowPx": 106,
+            "tag": "span",
+            "label": "",
+            "text": "Search activity",
+            "clientWidth": 1,
+            "scrollWidth": 107
+          },
+          {
+            "overflowPx": 125,
+            "tag": "span",
+            "label": "",
+            "text": "Filter by category",
+            "clientWidth": 1,
+            "scrollWidth": 126
+          }
+        ]
+      },
+      "densityRegion": {
+        "regionHeightPx": 531,
+        "textNodes": 37,
+        "valueControls": 2,
+        "datumPer100px": 6.97,
+        "datumWithControlsPer100px": 7.34
+      },
+      "scrollHeight": 3933,
+      "documentScrollHeight": 740,
+      "measuredRegion": "main",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 5.314864864864865,
+      "cls": 0.010630387143900659,
+      "clsNative": 0.010630387143900659,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.01063,
+          "startTime": 10450,
+          "sources": [
+            {
+              "node": "button",
+              "from": [171, 576, 189, 144],
+              "to": [248, 576, 112, 144]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 120,
+      "frameTicks": 1375,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Activity",
+      "headlineSettled": "Activity",
+      "headlineSamples": [
+        {
+          "text": "Activity",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "activity-empty-search",
+      "label": "Activity · empty search",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 14028.79999998212,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 3,
+        "detail": [
+          {
+            "overflowPx": 75,
+            "tag": "input",
+            "label": "",
+            "text": "density-no-such-expense",
+            "clientWidth": 132,
+            "scrollWidth": 207
+          },
+          {
+            "overflowPx": 106,
+            "tag": "span",
+            "label": "",
+            "text": "Search activity",
+            "clientWidth": 1,
+            "scrollWidth": 107
+          },
+          {
+            "overflowPx": 125,
+            "tag": "span",
+            "label": "",
+            "text": "Filter by category",
+            "clientWidth": 1,
+            "scrollWidth": 126
+          }
+        ]
+      },
+      "densityRegion": {
+        "regionHeightPx": 740,
+        "textNodes": 20,
+        "valueControls": 4,
+        "datumPer100px": 2.7,
+        "datumWithControlsPer100px": 3.24
+      },
+      "scrollHeight": 740,
+      "documentScrollHeight": 740,
+      "measuredRegion": "documentElement",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 156,
+      "frameTicks": 1576,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Activity",
+      "headlineSettled": "Activity",
+      "headlineSamples": [],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "category-detail",
+      "label": "Category detail · Dining out",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 17660.59999999404,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 587,
+        "textNodes": 34,
+        "valueControls": 0,
+        "datumPer100px": 5.79,
+        "datumWithControlsPer100px": 5.79
+      },
+      "scrollHeight": 1017,
+      "documentScrollHeight": 740,
+      "measuredRegion": "main",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 1.3743243243243244,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 193,
+      "frameTicks": 1782,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Dining out",
+      "headlineSettled": "Dining out",
+      "headlineSamples": [
+        {
+          "text": "Dining out",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "edit-budget",
+      "label": "Edit budget",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 21260.69999998808,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 587,
+        "textNodes": 33,
+        "valueControls": 6,
+        "datumPer100px": 5.62,
+        "datumWithControlsPer100px": 6.64
+      },
+      "scrollHeight": 1267,
+      "documentScrollHeight": 740,
+      "measuredRegion": "main",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 1.712162162162162,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 229,
+      "frameTicks": 1983,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Edit monthly budget",
+      "headlineSettled": "Edit monthly budget",
+      "headlineSamples": [
+        {
+          "text": "Edit monthly budget",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "manage-categories",
+      "label": "Manage categories",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 24886.09999999404,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 15,
+        "detail": [
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          }
+        ]
+      },
+      "densityRegion": {
+        "regionHeightPx": 587,
+        "textNodes": 11,
+        "valueControls": 12,
+        "datumPer100px": 1.87,
+        "datumWithControlsPer100px": 3.92
+      },
+      "scrollHeight": 1857,
+      "documentScrollHeight": 740,
+      "measuredRegion": "main",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 2.5094594594594595,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 265,
+      "frameTicks": 2187,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Manage categories",
+      "headlineSettled": "Manage categories",
+      "headlineSamples": [
+        {
+          "text": "Manage categories",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "monthly-wrap",
+      "label": "Monthly wrap",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 28508.40000000596,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 587,
+        "textNodes": 15,
+        "valueControls": 0,
+        "datumPer100px": 2.56,
+        "datumWithControlsPer100px": 2.56
+      },
+      "scrollHeight": 1960,
+      "documentScrollHeight": 740,
+      "measuredRegion": "main",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 2.6486486486486487,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 301,
+      "frameTicks": 2389,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "July 2026 wrap | Live preview · currently unspent $123",
+      "headlineSettled": "July 2026 wrap | Live preview · currently unspent $123",
+      "headlineSamples": [
+        {
+          "text": "July 2026 wrap | Live preview · currently unspent $123",
+          "hero": "Live preview · currently unspent $123",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Live preview · currently unspent $123"],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "plan",
+      "label": "Plan",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 31919.19999998808,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 587,
+        "textNodes": 12,
+        "valueControls": 1,
+        "datumPer100px": 2.04,
+        "datumWithControlsPer100px": 2.21
+      },
+      "scrollHeight": 1731,
+      "documentScrollHeight": 740,
+      "measuredRegion": "main",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 2.3391891891891894,
+      "cls": 0.0006727614438763088,
+      "clsNative": 0.0006727614438763088,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.000673,
+          "startTime": 31943,
+          "sources": [
+            {
+              "node": "span :: Saved",
+              "from": [249, 29, 51, 14],
+              "to": [156, 29, 51, 14]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 335,
+      "frameTicks": 2580,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "$9,837 cash savings planned.",
+      "headlineSettled": "$9,837 cash savings planned.",
+      "headlineSamples": [
+        {
+          "text": "$9,837 cash savings planned.",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "plan-details",
+      "label": "Plan details",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 35517.09999999404,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 1,
+        "minFontSizePx": 9.17,
+        "detail": [
+          {
+            "size": 9.17,
+            "tag": "small",
+            "className": "",
+            "text": "monthly estimate"
+          }
+        ]
+      },
+      "clippedText": {
+        "count": 6,
+        "detail": [
+          {
+            "overflowPx": 7,
+            "tag": "input",
+            "label": "Expense name",
+            "text": "Fuel and transit",
+            "clientWidth": 128,
+            "scrollWidth": 135
+          },
+          {
+            "overflowPx": 52,
+            "tag": "input",
+            "label": "Expense name",
+            "text": "Health and pharmacy",
+            "clientWidth": 128,
+            "scrollWidth": 180
+          },
+          {
+            "overflowPx": 33,
+            "tag": "input",
+            "label": "Expense name",
+            "text": "Phone and internet",
+            "clientWidth": 128,
+            "scrollWidth": 161
+          },
+          {
+            "overflowPx": 2,
+            "tag": "input",
+            "label": "Expense name",
+            "text": "Home supplies",
+            "clientWidth": 128,
+            "scrollWidth": 130
+          },
+          {
+            "overflowPx": 14,
+            "tag": "input",
+            "label": "Expense name",
+            "text": "Emergency fund",
+            "clientWidth": 128,
+            "scrollWidth": 142
+          },
+          {
+            "overflowPx": 32,
+            "tag": "input",
+            "label": "Expense name",
+            "text": "Brokerage transfer",
+            "clientWidth": 128,
+            "scrollWidth": 160
+          }
+        ]
+      },
+      "densityRegion": {
+        "regionHeightPx": 587,
+        "textNodes": 35,
+        "valueControls": 0,
+        "datumPer100px": 5.96,
+        "datumWithControlsPer100px": 5.96
+      },
+      "scrollHeight": 2312,
+      "documentScrollHeight": 740,
+      "measuredRegion": "main",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 3.1243243243243244,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 371,
+      "frameTicks": 2783,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Plan details | Savings / month $819.78",
+      "headlineSettled": "Plan details | Savings / month $819.78",
+      "headlineSamples": [
+        {
+          "text": "Plan details | Savings / month $819.78",
+          "hero": "Savings / month $819.78",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Savings / month $819.78"],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "benefits",
+      "label": "Benefits",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 39121.40000000596,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 587,
+        "textNodes": 20,
+        "valueControls": 0,
+        "datumPer100px": 3.41,
+        "datumWithControlsPer100px": 3.41
+      },
+      "scrollHeight": 2239,
+      "documentScrollHeight": 740,
+      "measuredRegion": "main",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 3.0256756756756755,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 407,
+      "frameTicks": 2984,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Benefits",
+      "headlineSettled": "Benefits",
+      "headlineSamples": [
+        {
+          "text": "Benefits",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "compare",
+      "label": "Compare years",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 42725.19999998808,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 587,
+        "textNodes": 35,
+        "valueControls": 0,
+        "datumPer100px": 5.96,
+        "datumWithControlsPer100px": 5.96
+      },
+      "scrollHeight": 1293,
+      "documentScrollHeight": 740,
+      "measuredRegion": "main",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 1.7472972972972973,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 443,
+      "frameTicks": 3186,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Compare years",
+      "headlineSettled": "Compare years",
+      "headlineSamples": [
+        {
+          "text": "Compare years",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "account",
+      "label": "Account",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 46137.19999998808,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 587,
+        "textNodes": 11,
+        "valueControls": 0,
+        "datumPer100px": 1.87,
+        "datumWithControlsPer100px": 1.87
+      },
+      "scrollHeight": 851,
+      "documentScrollHeight": 740,
+      "measuredRegion": "main",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 1.15,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 477,
+      "frameTicks": 3377,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Account and data",
+      "headlineSettled": "Account and data",
+      "headlineSamples": [
+        {
+          "text": "Account and data",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "fast-log-new",
+      "label": "Fast Log · new expense",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 49548.5,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 1,
+        "minFontSizePx": 10.83,
+        "detail": [
+          {
+            "size": 10.83,
+            "tag": "small",
+            "className": "",
+            "text": "Optional"
+          }
+        ]
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 716,
+        "textNodes": 11,
+        "valueControls": 2,
+        "datumPer100px": 1.54,
+        "datumWithControlsPer100px": 1.82
+      },
+      "scrollHeight": 716,
+      "documentScrollHeight": 740,
+      "measuredRegion": "dialog:section",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 0.9675675675675676,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 511,
+      "frameTicks": 3571,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "fast-log-edit",
+      "label": "Fast Log · edit expense",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 53155.29999998212,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 1,
+        "minFontSizePx": 10.83,
+        "detail": [
+          {
+            "size": 10.83,
+            "tag": "small",
+            "className": "",
+            "text": "Optional"
+          }
+        ]
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 660,
+        "textNodes": 11,
+        "valueControls": 4,
+        "datumPer100px": 1.67,
+        "datumWithControlsPer100px": 2.27
+      },
+      "scrollHeight": 660,
+      "documentScrollHeight": 740,
+      "measuredRegion": "dialog:section",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 0.8918918918918919,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 548,
+      "frameTicks": 3776,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Activity",
+      "headlineSettled": "Activity",
+      "headlineSamples": [],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "home-provisional-restore",
+      "label": "Home · cache restore awaiting the server",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 1,
+      "listExemption": null,
+      "singleAnswerPaint": true,
+      "markTime": 0,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 740,
+        "textNodes": 51,
+        "valueControls": 2,
+        "datumPer100px": 6.89,
+        "datumWithControlsPer100px": 7.16
+      },
+      "scrollHeight": 740,
+      "documentScrollHeight": 740,
+      "measuredRegion": "documentElement",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0.00005732844330817304,
+      "clsNative": 0.00005732844330817304,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 2,
+      "shiftDetail": [
+        {
+          "value": 0.00003,
+          "startTime": 46,
+          "sources": [
+            {
+              "node": "span :: Saving",
+              "from": [236, 29, 64, 14],
+              "to": [242, 29, 58, 14]
+            }
+          ]
+        },
+        {
+          "value": 0.000027,
+          "startTime": 85,
+          "sources": [
+            {
+              "node": "span :: Saved",
+              "from": [242, 29, 58, 14],
+              "to": [249, 29, 51, 14]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 16,
+      "frameTicks": 829,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [
+        {
+          "text": "House by 30",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "Home",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "Home | Left to spend $123",
+          "hero": "Left to spend $123",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Left to spend $123"],
+      "blockedRequests": 1,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "signed-out-create-account",
+      "label": "Signed out · create account (cold load)",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 1.5,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 0,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 1,
+        "minFontSizePx": 10.83,
+        "detail": [
+          {
+            "size": 10.83,
+            "tag": "small",
+            "className": "",
+            "text": "At least 10 characters."
+          }
+        ]
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 932,
+        "textNodes": 8,
+        "valueControls": 0,
+        "datumPer100px": 0.86,
+        "datumWithControlsPer100px": 0.86
+      },
+      "scrollHeight": 932,
+      "documentScrollHeight": 932,
+      "measuredRegion": "documentElement",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 16,
+      "frameTicks": 125,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "H30House by 30",
+      "headlineSettled": "H30House by 30",
+      "headlineSamples": [
+        {
+          "text": "House by 30",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "H30House by 30",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "signed-out-sign-in",
+      "label": "Signed out · sign in",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 1.5,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 1755.2999999821186,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 1,
+        "minFontSizePx": 10.83,
+        "detail": [
+          {
+            "size": 10.83,
+            "tag": "small",
+            "className": "",
+            "text": "At least 10 characters."
+          }
+        ]
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 932,
+        "textNodes": 8,
+        "valueControls": 0,
+        "datumPer100px": 0.86,
+        "datumWithControlsPer100px": 0.86
+      },
+      "scrollHeight": 932,
+      "documentScrollHeight": 932,
+      "measuredRegion": "documentElement",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0.0003572778512671418,
+      "clsNative": 0.0003572778512671418,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.000357,
+          "startTime": 1771,
+          "sources": [
+            {
+              "node": "(detached)",
+              "from": [109, 635, 212, 16],
+              "to": [109, 635, 212, 16]
+            },
+            {
+              "node": "svg",
+              "from": [269, 582, 18, 18],
+              "to": [236, 582, 18, 18]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 34,
+      "frameTicks": 222,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "H30House by 30",
+      "headlineSettled": "H30House by 30",
+      "headlineSamples": [],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "onboarding",
+      "label": "Onboarding · cold load",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 1.5,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 0,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 13,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 932,
+        "textNodes": 11,
+        "valueControls": 3,
+        "datumPer100px": 1.18,
+        "datumWithControlsPer100px": 1.5
+      },
+      "scrollHeight": 932,
+      "documentScrollHeight": 932,
+      "measuredRegion": "documentElement",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 16,
+      "frameTicks": 291,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Create your plan",
+      "headlineSettled": "Create your plan",
+      "headlineSamples": [
+        {
+          "text": "House by 30",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "Create your plan",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "home",
+      "label": "Home",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 1,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 4984.9000000059605,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 932,
+        "textNodes": 51,
+        "valueControls": 2,
+        "datumPer100px": 5.47,
+        "datumWithControlsPer100px": 5.69
+      },
+      "scrollHeight": 932,
+      "documentScrollHeight": 932,
+      "measuredRegion": "documentElement",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0.0004701351097078641,
+      "clsNative": 0.0004701351097078641,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.00047,
+          "startTime": 5011,
+          "sources": [
+            {
+              "node": "span :: Saved",
+              "from": [196, 29, 51, 14],
+              "to": [319, 29, 51, 14]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 66,
+      "frameTicks": 5773,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [
+        {
+          "text": "Home | Left to spend $123",
+          "hero": "Left to spend $123",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Left to spend $123"],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "home-cold-load",
+      "label": "Home · cold load",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 1,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 0,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 932,
+        "textNodes": 51,
+        "valueControls": 2,
+        "datumPer100px": 5.47,
+        "datumWithControlsPer100px": 5.69
+      },
+      "scrollHeight": 932,
+      "documentScrollHeight": 932,
+      "measuredRegion": "documentElement",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0.000028805248568492395,
+      "clsNative": 0.000028805248568492395,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 2,
+      "shiftDetail": [
+        {
+          "value": 0.000014,
+          "startTime": 61,
+          "sources": [
+            {
+              "node": "span :: Saving",
+              "from": [319, 29, 51, 14],
+              "to": [312, 29, 58, 14]
+            }
+          ]
+        },
+        {
+          "value": 0.000014,
+          "startTime": 66,
+          "sources": [
+            {
+              "node": "span :: Saved",
+              "from": [312, 29, 58, 14],
+              "to": [319, 29, 51, 14]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 16,
+      "frameTicks": 772,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [
+        {
+          "text": "House by 30",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "Home | Left to spend $123",
+          "hero": "Left to spend $123",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Left to spend $123"],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "budget",
+      "label": "Budget",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 3385.5999999940395,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 723,
+        "textNodes": 56,
+        "valueControls": 1,
+        "datumPer100px": 7.75,
+        "datumWithControlsPer100px": 7.88
+      },
+      "scrollHeight": 1082,
+      "documentScrollHeight": 932,
+      "measuredRegion": "main",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 1.1609442060085837,
+      "cls": 0.005610670198725427,
+      "clsNative": 0.005610670198725427,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.005611,
+          "startTime": 3407,
+          "sources": [
+            {
+              "node": "button",
+              "from": [241, 768, 189, 144],
+              "to": [318, 768, 112, 144]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 50,
+      "frameTicks": 960,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "$123 safe to spend",
+      "headlineSettled": "$123 safe to spend",
+      "headlineSamples": [
+        {
+          "text": "$123 safe to spend",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "budget-future-month",
+      "label": "Budget · future month",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 6979.4000000059605,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 723,
+        "textNodes": 56,
+        "valueControls": 1,
+        "datumPer100px": 7.75,
+        "datumWithControlsPer100px": 7.88
+      },
+      "scrollHeight": 1082,
+      "documentScrollHeight": 932,
+      "measuredRegion": "main",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 1.1609442060085837,
+      "cls": 0.0036336036303019972,
+      "clsNative": 0.0036336036303019972,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.003634,
+          "startTime": 6997,
+          "sources": [
+            {
+              "node": "(detached)",
+              "from": [226, 147, 128, 18],
+              "to": [226, 147, 128, 18]
+            },
+            {
+              "node": "em :: $2,100 remaining",
+              "from": [325, 450, 85, 16],
+              "to": [294, 450, 116, 16]
+            },
+            {
+              "node": "small :: $0 of $2,100",
+              "from": [302, 434, 108, 16],
+              "to": [330, 434, 80, 16]
+            },
+            {
+              "node": "em :: $185 remaining",
+              "from": [325, 546, 85, 16],
+              "to": [308, 546, 102, 16]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 86,
+      "frameTicks": 1163,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "$4,478 planned spending",
+      "headlineSettled": "$4,478 planned spending",
+      "headlineSamples": [
+        {
+          "text": "$4,478 planned spending",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "activity",
+      "label": "Activity",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 3,
+      "listExemption": {
+        "reason": "transaction history (named by the mission)",
+        "rowSelector": "main [data-density-row=\"transaction\"]"
+      },
+      "singleAnswerPaint": false,
+      "markTime": 10391.80000001192,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": {
+        "rowSelector": "main [data-density-row=\"transaction\"]",
+        "rowCount": 61,
+        "chromeAboveFirstRowPx": 240.89,
+        "chromeAboveFirstRowCost": 0.25846633583690987,
+        "rowHeights": [
+          {
+            "height": 54,
+            "count": 46
+          },
+          {
+            "height": 80,
+            "count": 15
+          }
+        ],
+        "rowRegionPx": 3684,
+        "error": null
+      },
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 2,
+        "detail": [
+          {
+            "overflowPx": 106,
+            "tag": "span",
+            "label": "",
+            "text": "Search activity",
+            "clientWidth": 1,
+            "scrollWidth": 107
+          },
+          {
+            "overflowPx": 125,
+            "tag": "span",
+            "label": "",
+            "text": "Filter by category",
+            "clientWidth": 1,
+            "scrollWidth": 126
+          }
+        ]
+      },
+      "densityRegion": {
+        "regionHeightPx": 723,
+        "textNodes": 57,
+        "valueControls": 2,
+        "datumPer100px": 7.88,
+        "datumWithControlsPer100px": 8.16
+      },
+      "scrollHeight": 3933,
+      "documentScrollHeight": 932,
+      "measuredRegion": "main",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 4.219957081545064,
+      "cls": 0.005610670198725427,
+      "clsNative": 0.005610670198725427,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.005611,
+          "startTime": 10417,
+          "sources": [
+            {
+              "node": "button",
+              "from": [241, 768, 189, 144],
+              "to": [318, 768, 112, 144]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 120,
+      "frameTicks": 1356,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Activity",
+      "headlineSettled": "Activity",
+      "headlineSamples": [
+        {
+          "text": "Activity",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "activity-empty-search",
+      "label": "Activity · empty search",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 14013.90000000596,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 3,
+        "detail": [
+          {
+            "overflowPx": 36,
+            "tag": "input",
+            "label": "",
+            "text": "density-no-such-expense",
+            "clientWidth": 172,
+            "scrollWidth": 208
+          },
+          {
+            "overflowPx": 106,
+            "tag": "span",
+            "label": "",
+            "text": "Search activity",
+            "clientWidth": 1,
+            "scrollWidth": 107
+          },
+          {
+            "overflowPx": 125,
+            "tag": "span",
+            "label": "",
+            "text": "Filter by category",
+            "clientWidth": 1,
+            "scrollWidth": 126
+          }
+        ]
+      },
+      "densityRegion": {
+        "regionHeightPx": 932,
+        "textNodes": 20,
+        "valueControls": 4,
+        "datumPer100px": 2.15,
+        "datumWithControlsPer100px": 2.58
+      },
+      "scrollHeight": 932,
+      "documentScrollHeight": 932,
+      "measuredRegion": "documentElement",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 156,
+      "frameTicks": 1559,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Activity",
+      "headlineSettled": "Activity",
+      "headlineSamples": [],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "category-detail",
+      "label": "Category detail · Dining out",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 17599.30000001192,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 779,
+        "textNodes": 49,
+        "valueControls": 0,
+        "datumPer100px": 6.29,
+        "datumWithControlsPer100px": 6.29
+      },
+      "scrollHeight": 1025,
+      "documentScrollHeight": 932,
+      "measuredRegion": "main",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 1.099785407725322,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 192,
+      "frameTicks": 1761,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Dining out",
+      "headlineSettled": "Dining out",
+      "headlineSamples": [
+        {
+          "text": "Dining out",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "edit-budget",
+      "label": "Edit budget",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 21193.5,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 779,
+        "textNodes": 48,
+        "valueControls": 9,
+        "datumPer100px": 6.16,
+        "datumWithControlsPer100px": 7.32
+      },
+      "scrollHeight": 1248,
+      "documentScrollHeight": 932,
+      "measuredRegion": "main",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 1.3390557939914163,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 228,
+      "frameTicks": 1964,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Edit monthly budget",
+      "headlineSettled": "Edit monthly budget",
+      "headlineSamples": [
+        {
+          "text": "Edit monthly budget",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "manage-categories",
+      "label": "Manage categories",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 24774.30000001192,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 15,
+        "detail": [
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          },
+          {
+            "overflowPx": 110,
+            "tag": "span",
+            "label": "",
+            "text": "Category name",
+            "clientWidth": 1,
+            "scrollWidth": 111
+          }
+        ]
+      },
+      "densityRegion": {
+        "regionHeightPx": 779,
+        "textNodes": 16,
+        "valueControls": 15,
+        "datumPer100px": 2.05,
+        "datumWithControlsPer100px": 3.98
+      },
+      "scrollHeight": 1895,
+      "documentScrollHeight": 932,
+      "measuredRegion": "main",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 2.0332618025751072,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 264,
+      "frameTicks": 2166,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Manage categories",
+      "headlineSettled": "Manage categories",
+      "headlineSamples": [
+        {
+          "text": "Manage categories",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "monthly-wrap",
+      "label": "Monthly wrap",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 28381.59999999404,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 779,
+        "textNodes": 34,
+        "valueControls": 0,
+        "datumPer100px": 4.36,
+        "datumWithControlsPer100px": 4.36
+      },
+      "scrollHeight": 1624,
+      "documentScrollHeight": 932,
+      "measuredRegion": "main",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 1.742489270386266,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 300,
+      "frameTicks": 2368,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "July 2026 wrap | Live preview · currently unspent $123",
+      "headlineSettled": "July 2026 wrap | Live preview · currently unspent $123",
+      "headlineSamples": [
+        {
+          "text": "July 2026 wrap | Live preview · currently unspent $123",
+          "hero": "Live preview · currently unspent $123",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Live preview · currently unspent $123"],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "plan",
+      "label": "Plan",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 31779.40000000596,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 779,
+        "textNodes": 14,
+        "valueControls": 1,
+        "datumPer100px": 1.8,
+        "datumWithControlsPer100px": 1.93
+      },
+      "scrollHeight": 1726,
+      "documentScrollHeight": 932,
+      "measuredRegion": "main",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 1.851931330472103,
+      "cls": 0.0004701351097078641,
+      "clsNative": 0.0004701351097078641,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.00047,
+          "startTime": 31796,
+          "sources": [
+            {
+              "node": "span :: Saved",
+              "from": [319, 29, 51, 14],
+              "to": [196, 29, 51, 14]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 334,
+      "frameTicks": 2559,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "$9,837 cash savings planned.",
+      "headlineSettled": "$9,837 cash savings planned.",
+      "headlineSamples": [
+        {
+          "text": "$9,837 cash savings planned.",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "plan-details",
+      "label": "Plan details",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 35355.69999998808,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 1,
+        "minFontSizePx": 9.17,
+        "detail": [
+          {
+            "size": 9.17,
+            "tag": "small",
+            "className": "",
+            "text": "monthly estimate"
+          }
+        ]
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 779,
+        "textNodes": 52,
+        "valueControls": 0,
+        "datumPer100px": 6.68,
+        "datumWithControlsPer100px": 6.68
+      },
+      "scrollHeight": 2215,
+      "documentScrollHeight": 932,
+      "measuredRegion": "main",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 2.3766094420600856,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 370,
+      "frameTicks": 2761,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Plan details | Savings / month $819.78",
+      "headlineSettled": "Plan details | Savings / month $819.78",
+      "headlineSamples": [
+        {
+          "text": "Plan details | Savings / month $819.78",
+          "hero": "Savings / month $819.78",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Savings / month $819.78"],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "benefits",
+      "label": "Benefits",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 38959.5,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 779,
+        "textNodes": 32,
+        "valueControls": 3,
+        "datumPer100px": 4.11,
+        "datumWithControlsPer100px": 4.49
+      },
+      "scrollHeight": 2158,
+      "documentScrollHeight": 932,
+      "measuredRegion": "main",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 2.315450643776824,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 406,
+      "frameTicks": 2963,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Benefits",
+      "headlineSettled": "Benefits",
+      "headlineSamples": [
+        {
+          "text": "Benefits",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "compare",
+      "label": "Compare years",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 42560.09999999404,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 779,
+        "textNodes": 42,
+        "valueControls": 0,
+        "datumPer100px": 5.39,
+        "datumWithControlsPer100px": 5.39
+      },
+      "scrollHeight": 1275,
+      "documentScrollHeight": 932,
+      "measuredRegion": "main",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 1.3680257510729614,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 442,
+      "frameTicks": 3165,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Compare years",
+      "headlineSettled": "Compare years",
+      "headlineSamples": [
+        {
+          "text": "Compare years",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "account",
+      "label": "Account",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 3,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 45972.19999998808,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 932,
+        "textNodes": 27,
+        "valueControls": 1,
+        "datumPer100px": 2.9,
+        "datumWithControlsPer100px": 3
+      },
+      "scrollHeight": 932,
+      "documentScrollHeight": 932,
+      "measuredRegion": "documentElement",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 476,
+      "frameTicks": 3356,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Account and data",
+      "headlineSettled": "Account and data",
+      "headlineSamples": [
+        {
+          "text": "Account and data",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "fast-log-new",
+      "label": "Fast Log · new expense",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 49384.40000000596,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 1,
+        "minFontSizePx": 10.83,
+        "detail": [
+          {
+            "size": 10.83,
+            "tag": "small",
+            "className": "",
+            "text": "Optional"
+          }
+        ]
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 660,
+        "textNodes": 11,
+        "valueControls": 2,
+        "datumPer100px": 1.67,
+        "datumWithControlsPer100px": 1.97
+      },
+      "scrollHeight": 660,
+      "documentScrollHeight": 932,
+      "measuredRegion": "dialog:section",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 0.7081545064377682,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 510,
+      "frameTicks": 3549,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "fast-log-edit",
+      "label": "Fast Log · edit expense",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "markTime": 52973.40000000596,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 1,
+        "minFontSizePx": 10.83,
+        "detail": [
+          {
+            "size": 10.83,
+            "tag": "small",
+            "className": "",
+            "text": "Optional"
+          }
+        ]
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 660,
+        "textNodes": 11,
+        "valueControls": 4,
+        "datumPer100px": 1.67,
+        "datumWithControlsPer100px": 2.27
+      },
+      "scrollHeight": 660,
+      "documentScrollHeight": 932,
+      "measuredRegion": "dialog:section",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 0.7081545064377682,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 546,
+      "frameTicks": 3754,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Activity",
+      "headlineSettled": "Activity",
+      "headlineSamples": [],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "home-provisional-restore",
+      "label": "Home · cache restore awaiting the server",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 1,
+      "listExemption": null,
+      "singleAnswerPaint": true,
+      "markTime": 0,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 932,
+        "textNodes": 51,
+        "valueControls": 2,
+        "datumPer100px": 5.47,
+        "datumWithControlsPer100px": 5.69
+      },
+      "scrollHeight": 932,
+      "documentScrollHeight": 932,
+      "measuredRegion": "documentElement",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0.000030257692787137914,
+      "clsNative": 0.000030257692787137914,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 2,
+      "shiftDetail": [
+        {
+          "value": 0.000016,
+          "startTime": 51,
+          "sources": [
+            {
+              "node": "span :: Saving",
+              "from": [306, 29, 64, 14],
+              "to": [312, 29, 58, 14]
+            }
+          ]
+        },
+        {
+          "value": 0.000014,
+          "startTime": 88,
+          "sources": [
+            {
+              "node": "span :: Saved",
+              "from": [312, 29, 58, 14],
+              "to": [319, 29, 51, 14]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 16,
+      "frameTicks": 773,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [
+        {
+          "text": "House by 30",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "Home",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "Home | Left to spend $123",
+          "hero": "Left to spend $123",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Left to spend $123"],
+      "blockedRequests": 1,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    }
+  ]
+}

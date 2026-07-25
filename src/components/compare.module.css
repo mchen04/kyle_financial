@@ -125,7 +125,8 @@
 
 .compareCard dd {
   margin: 0;
-  font: 600 var(--text-sm)/1.2 var(--data);
+  font: 600 var(--text-sm)/1.2 var(--body);
+  font-variant-numeric: tabular-nums;
   text-align: right;
 }
 
@@ -191,7 +192,8 @@
     font-size: var(--text-xs);
   }
   .compareDelta b {
-    font: 700 var(--text-sm)/1.2 var(--data);
+    font: 700 var(--text-sm)/1.2 var(--body);
+    font-variant-numeric: tabular-nums;
   }
 }
 

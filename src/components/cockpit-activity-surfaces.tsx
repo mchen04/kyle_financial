@@ -72,15 +72,25 @@ export function ActivitySurface({
   const visibleTransactions = transactions.slice(0, visibleLimit);
   return (
     <div className={`${styles.surfaceStack} ${styles.activitySurface}`}>
+      {/* One header treatment across the four tabs. Budget and Plan each name
+          the screen in a 13px eyebrow and answer it in a 24px `h1`; Activity was
+          the odd one out, an 18px `h1` that repeated the tab's own label and
+          carried no figure at all, with the answer demoted to the line beneath
+          it. It is now the same three parts in the same order and the same
+          sizes: eyebrow names the screen, `h1` is the figure the screen exists
+          to report, one 13px line qualifies it (C2, C7). Home is the same three
+          parts too — label, amount, qualifier — on its inverse hero card. */}
       <header className={styles.surfaceHeader}>
         <div>
-          <h1>Activity</h1>
-          {/* C5: the period total is two facts nobody acts on, so it is one
-              line under the heading rather than a bordered summary card. The
-              period itself is named by the control beside it. */}
+          <p className={styles.eyebrow}>Activity</p>
+          <h1>{money(periodTotalCents)} logged</h1>
+          {/* C5: the count is a fact nobody acts on, so it is one line under
+              the heading rather than a bordered summary card. The period itself
+              is named by the control beside it. */}
           <span className={styles.activityTotal}>
-            {money(periodTotalCents)} · {periodTransactions.length}{" "}
-            {periodTransactions.length === 1 ? "expense" : "expenses"}
+            {periodTransactions.length}{" "}
+            {periodTransactions.length === 1 ? "expense" : "expenses"} in this
+            period
           </span>
         </div>
         <PeriodControl period={period} today={today} onPeriod={onPeriod} />

@@ -100,8 +100,10 @@
   letter-spacing: var(--tracking-tight);
 }
 
+/* A note that sits under the figures it explains rather than above them, so it
+   is separated from what comes next, not pulled up into what came before. */
 .wideCard > .muted {
-  margin: calc(-1 * var(--space-3)) 0 var(--space-6);
+  margin: var(--space-3) 0 0;
 }
 
 .sectionHeading {
@@ -149,7 +151,7 @@
 .moneyInput span {
   padding-left: var(--space-2);
   color: var(--ink-soft);
-  font: var(--text-sm)/1 var(--data);
+  font: var(--text-sm)/1 var(--body);
 }
 
 .moneyInput input {
@@ -162,7 +164,7 @@
   background: var(--color-transparent);
   color: var(--ink);
   text-align: right;
-  font-family: var(--data);
+  font-variant-numeric: tabular-nums;
   font-size: var(--text-md);
 }
 
@@ -209,5 +211,6 @@
   display: block;
   margin-top: var(--space-2);
   color: var(--ink);
-  font: 600 var(--text-md)/1 var(--data);
+  font: 600 var(--text-md)/1 var(--body);
+  font-variant-numeric: tabular-nums;
 }

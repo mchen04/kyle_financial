@@ -220,7 +220,7 @@
 
 .ledgerTotal strong {
   color: var(--ink);
-  font-family: var(--data);
+  font-variant-numeric: tabular-nums;
 }
 
 .expenseList {
@@ -256,9 +256,18 @@
   gap: var(--space-2);
 }
 
+/* DF1. `flex: 1` against the fixed money field was already here and is not
+   enough on its own: at 390px the name field resolves to a 142px content box
+   and "Health and pharmacy" needs 163.7px, so the row rendered "Health and
+   pharma" — cut through a glyph, with nothing saying it had been cut. An input
+   clips at its content box no matter how the box was sized, so the ellipsis is
+   the floor that has to be there whatever the arithmetic works out to. */
 .expenseName {
   flex: 1 1 auto;
   min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   padding: var(--space-2) var(--space-2);
   border: var(--border-hairline) solid var(--color-transparent);
   border-radius: var(--radius-sm);
