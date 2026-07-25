@@ -1242,12 +1242,15 @@ describe("offline mutation reconciliation", () => {
         baseVersion: staleVersions[field] ?? null,
       })),
     );
-    // Each stale field is refused on its own, with a receipt, rather than the
-    // year being rejected receipt-free and pinned in the client's outbox.
+    // These four are only invalid together, so no single removal restores the
+    // plan and the batch cannot name a culprit. It is rejected as a year, which
+    // the owner sees as a sync error — the search deliberately refuses to guess
+    // and discard whichever edits arrived last.
     expect(result.acknowledgements).toEqual(
       staleTransition.map((_, index) => ({
         mutationId: `00000000-0000-4000-8000-${String(910 + index).padStart(12, "0")}`,
         applied: false,
+        rejected: true,
       })),
     );
 

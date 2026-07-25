@@ -322,3 +322,22 @@ describe("distributed authentication throttling", () => {
     expect(rows).toEqual([{ attemptCount: 1, windowStartedAt: now }]);
   });
 });
+
+describe("client address trust", () => {
+  it("skips the address limit rather than pooling every caller into one bucket", async () => {
+    // With no trustworthy address, keying everyone to a shared bucket let one
+    // client spend it and lock all other people out of signing in.
+    const now = new Date("2026-07-13T19:00:00.000Z");
+    const anonymous = () =>
+      new Request("https://example.test/api/auth/login", { headers: {} });
+    for (let attempt = 1; attempt <= 40; attempt += 1) {
+      await expect(
+        consumeAuthenticationIpAttempt(sql, anonymous(), "login", now),
+      ).resolves.toMatchObject({ allowed: true });
+    }
+    const [{ count }] = await sql<{ count: number }[]>`
+      SELECT count(*)::int AS count FROM auth_rate_limits WHERE scope = 'login:ip'
+    `;
+    expect(count).toBe(0);
+  });
+});
