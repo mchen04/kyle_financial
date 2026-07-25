@@ -231,35 +231,6 @@
   padding-bottom: max(var(--space-20), env(safe-area-inset-bottom));
 }
 
-.subPage {
-  display: grid;
-  gap: var(--space-4);
-}
-
-.subPage > button {
-  width: fit-content;
-  min-height: var(--control-sm);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: 0 var(--space-3);
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: var(--color-transparent);
-  color: var(--text-action-strong);
-  font-weight: var(--weight-bold);
-  cursor: pointer;
-}
-
-.subPage > button svg {
-  width: var(--icon-sm);
-}
-
-.subPage > h1 {
-  margin: 0;
-  font: var(--weight-bold) var(--text-2xl) / 1 var(--font-display);
-}
-
 .messageDisclosure {
   grid-column: 1 / -1;
   width: 100%;
@@ -505,10 +476,24 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: var(--space-3);
-    /* C4: the scroll region only has to clear the floating Fast Log button,
-       which sits 48px above the tab bar; the tab bar itself is in flow below
-       this region and needs no reservation. */
-    padding-bottom: calc(var(--space-4) + var(--control-md));
+  }
+
+  /* The Fast Log button is `position: fixed`, so it paints over the last 48px
+     of the scroll region wherever the region happens to be scrolled. Bottom
+     padding cannot fix that: padding sits below the last row, so it moves the
+     row and the scroll extent together and the row's position at scrollTop 0 is
+     `paddingTop + contentHeight` no matter how large the padding is. That is
+     why 64px of it still left Home's Monthly wrap row sitting under the pill
+     with its value and its chevron covered.
+     Reserving the band as margin instead takes it out of the scroll region's
+     box altogether, so the region ends above the button and no row can be under
+     it at any scroll offset on any viewport. Only surfaces that actually show
+     the button pay for it. */
+  .contentClearsFastLog {
+    margin-bottom: calc(var(--control-md) + var(--space-2));
+    /* The reserved band below already separates the last row from the button,
+       so the region's own bottom padding does not have to repeat it. */
+    padding-bottom: var(--space-2);
   }
   .bottomNav {
     position: static;

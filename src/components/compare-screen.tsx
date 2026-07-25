@@ -55,7 +55,7 @@ export function CompareScreen({ plans }: { plans: StoredPlan[] }) {
     <section className={styles.wideCard}>
       <p className={styles.muted}>
         {singleYear
-          ? "Start next year's plan to compare them side by side."
+          ? "Start next year's plan to see both years listed here."
           : "Each year remains a separate, editable plan."}
       </p>
       <p id="comparison-scroll-hint" className={styles.comparisonScrollHint}>

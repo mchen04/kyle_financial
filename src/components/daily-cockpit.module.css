@@ -165,10 +165,6 @@
   letter-spacing: var(--tracking-tighter);
 }
 
-.runwayHeadline > strong[data-negative="true"] {
-  color: var(--color-amber-200);
-}
-
 .runwayHeadline > small {
   color: var(--text-inverse-muted);
 }
@@ -244,6 +240,18 @@
   color: var(--status-warning-text);
 }
 
+/* Every negative figure that sits on an inverse (navy) surface — the Home
+   runway card and the category-detail hero — reads from one role, and it has to
+   be declared after the light-surface rule above because both carry the same
+   specificity. The light-surface amber measures 1.92:1 on navy, which is how
+   the category-detail overage came to be the least readable number on its own
+   screen; this one measures 9.66:1. */
+.runwayHeadline > strong[data-negative="true"],
+.runwayMetrics [data-negative="true"],
+.detailMetrics [data-negative="true"] {
+  color: var(--status-warning-text-inverse);
+}
+
 /* C6: every amount, percentage, count and date figure is tabular so digit
    changes cannot re-measure a line box. */
 .surfaceHeader h1,
@@ -263,10 +271,6 @@
 .navRow em,
 .budgetNote {
   font-variant-numeric: tabular-nums;
-}
-
-.runwayMetrics [data-negative="true"] {
-  color: var(--color-amber-200);
 }
 
 .homeGrid,
@@ -664,12 +668,23 @@
 }
 
 .backHeader > button {
+  flex: 0 0 auto;
   width: auto;
   padding-inline: var(--space-2) var(--space-3);
 }
 
+/* One line, always. The 18ch measure inherited from `.surfaceHeader h1` wrapped
+   "Edit monthly budget" and "Manage categories" onto a second line and pushed
+   the first datum on those surfaces 197px and 184px down the screen, against
+   151px for the ones that happened to fit. */
 .backHeader h1 {
-  font-size: clamp(var(--text-2xl), var(--fluid-5), var(--text-4xl));
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--text-xl);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .detailMetrics {

@@ -31,6 +31,7 @@ import {
   type SaveState,
   type Screen,
   type StoredPlan,
+  type TabScreen,
   type WorkspaceLocation,
   type WorkspaceRoute,
 } from "./plan-types";
@@ -78,9 +79,18 @@ const budgetScreens = new Set<Screen>([
 function activeTabFor(route: WorkspaceRoute): Screen {
   if (route.screen === "wrap")
     return route.returnTo === "activity" ? "activity" : "budget";
+  if (route.screen === "account") return route.returnTo;
   if (budgetScreens.has(route.screen)) return "budget";
   if (planScreens.has(route.screen)) return "plan";
   return route.screen;
+}
+
+/** The tab Account should return to: the one the reader opened it from. */
+function accountReturnFor(route: WorkspaceRoute): TabScreen {
+  const tab = activeTabFor(route);
+  return tab === "budget" || tab === "activity" || tab === "plan"
+    ? tab
+    : "home";
 }
 
 export function PlanWorkspace(props: PlanWorkspaceProps) {
@@ -164,7 +174,9 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
             headline box tells a sighted reader. */}
         <main
           ref={contentRef}
-          className={styles.content}
+          className={`${styles.content} ${
+            showFastLog && canCreateExpense ? styles.contentClearsFastLog : ""
+          }`}
           aria-busy={props.planAwaitingAuthority || undefined}
         >
           {calculationError && (
@@ -441,11 +453,28 @@ function TopBar({
             {screen === "home" && <span>Fast Log</span>}
           </button>
         )}
+        {/* One control, two states. It used to read "Open account" while
+            Account was already open, which is the one thing it could not be
+            doing. */}
         <button
           className={styles.profileButton}
-          aria-label="Open account"
+          aria-label={
+            location.route.screen === "account"
+              ? "Close account"
+              : "Open account"
+          }
           aria-current={screen === "account" ? "page" : undefined}
-          onClick={() => onLocation({ route: { screen: "account" } })}
+          onClick={() =>
+            onLocation({
+              route:
+                location.route.screen === "account"
+                  ? { screen: location.route.returnTo }
+                  : {
+                      screen: "account",
+                      returnTo: accountReturnFor(location.route),
+                    },
+            })
+          }
         >
           <UserRound />
         </button>

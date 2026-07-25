@@ -107,9 +107,13 @@
   display: grid;
 }
 
+/* A name is free text up to 100 characters, so no column width makes clipping
+   impossible. What the column can guarantee is that overflow reads as
+   "continues" rather than as a sliced glyph. */
 .benefitName input {
   min-width: 0;
   width: 100%;
+  text-overflow: ellipsis;
   padding: var(--micro-3) var(--space-1);
   border: var(--border-hairline) solid var(--color-transparent);
   border-radius: var(--radius-sm);
@@ -283,29 +287,29 @@
   .moneyInput input {
     font-size: var(--text-md);
   }
-  /* C1 — the row's five controls fit two 44px lines: the editable name with
-     its computed annual figure in a fixed nowrap column, then the amount kind,
-     the amount and delete. The old layout spent a third line restating the
-     figure and, at ≤360px, five lines stacking every control. */
+  /* C1 — the row's five controls fit two 44px lines. The name spans the first
+     two columns rather than sharing its line with the annual figure: at one
+     column it measured 184px, which is narrower than the default label
+     "Employer 401(k) match" sets in, so the name clipped mid-glyph and the
+     severed edge ran into the figure beside it. The figure moves down beside
+     the amount it is computed from, which is also where it belongs. The third
+     column is `auto` so it is sized by that figure rather than by the 44px
+     delete button, and the button is pushed to its end. */
   .benefitRow {
     min-height: 0;
-    grid-template-columns:
-      minmax(0, 1fr) var(--layout-2xs)
-      var(--control-sm);
+    grid-template-columns: minmax(0, 1fr) var(--layout-2xs) auto;
     grid-template-areas:
-      "name result result"
-      "type amount remove";
+      "name name remove"
+      "type amount result";
     row-gap: var(--space-2);
     column-gap: var(--space-2);
     padding: var(--space-2) 0;
   }
   .benefitRowWithDiscount {
-    grid-template-columns:
-      minmax(0, 1fr) var(--layout-2xs)
-      var(--control-sm);
+    grid-template-columns: minmax(0, 1fr) var(--layout-2xs) auto;
     grid-template-areas:
-      "name result result"
-      "type amount remove"
+      "name name remove"
+      "type amount result"
       "discount discount discount";
   }
   .benefitName {
@@ -322,6 +326,7 @@
   }
   .benefitRow > .iconButton {
     grid-area: remove;
+    justify-self: end;
   }
   .benefitRow > .muted {
     grid-area: result;

@@ -310,7 +310,15 @@ const SURFACES = [
     bar: VERTICAL_BARS.standard,
     prefix: [clickExact("Plan"), clickExact("Home")],
     nav: [clickContains("Monthly wrap")],
-    expect: `/\\swrap$/.test(document.querySelector('main h1')?.textContent ?? "") && document.querySelector('main header p')?.textContent === "Budget"`,
+    // The second clause used to be `main header p === "Budget"`, which pinned a
+    // defect rather than a behaviour: the detail header hardcoded the eyebrow
+    // "Budget" while its back control was already dynamic, so this same surface
+    // reached from Activity showed "Activity" beside "Budget". The eyebrow is
+    // gone and the back control is now the only thing naming a destination, so
+    // arrival asserts that it names the one this row actually came from —
+    // strictly more than the old clause checked, and it fails if the header
+    // ever goes back to answering "where am I?" twice.
+    expect: `/\\swrap$/.test(document.querySelector('main h1')?.textContent ?? "") && document.querySelector('main header button[aria-label="Back to Home"]') !== null`,
   },
   {
     id: "plan",

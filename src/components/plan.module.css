@@ -564,12 +564,11 @@
   .sectionHeading h1 {
     font-size: var(--text-xl);
   }
-  .sectionHeading .addButton {
-    width: var(--control-sm);
-    overflow: hidden;
-    color: var(--color-transparent);
-    gap: var(--space-5);
-  }
+  /* The heading stacks at this width, so the add control gets its own line and
+     there is no reason to strip its label. It used to collapse to a bare 44px
+     "+" whose only name was an aria-label, while the same action on Manage
+     categories read "Add category" — an unlabeled affordance next to an empty
+     band. */
   .sectionHeading .addButton svg {
     color: var(--blue);
     flex: 0 0 auto;

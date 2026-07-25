@@ -72,6 +72,12 @@
   --status-positive: var(--color-teal-700);
   --status-warning: var(--color-amber-500);
   --status-warning-text: var(--color-amber-700);
+  /* The same "over / negative" role on an inverse surface. The light-surface
+     amber is a 1.92:1 hairline against --color-navy-950 and fails WCAG AA for
+     any text size; this one measures 9.66:1 against it, so an overage stays the
+     most readable figure on a dark hero card rather than the least. Any
+     dark-surface negative figure uses this and never --status-warning-text. */
+  --status-warning-text-inverse: var(--color-amber-200);
   --status-danger-text: var(--color-amber-600);
   --border-default: var(--color-line-300);
   --border-subtle: var(--color-line-100);

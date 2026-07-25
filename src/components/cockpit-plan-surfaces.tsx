@@ -239,22 +239,18 @@ export function PlanHub({
         <div>
           <p className={styles.eyebrow}>{plan.year} annual plan</p>
           <h1>{money(result.cashSavingsAnnualCents)} cash savings planned.</h1>
-          <p>
-            {money(result.savingsMonthlyCents)} each month after tax, benefits,
-            and planned allocations.
-          </p>
         </div>
       </header>
+      {/* Each figure once. The annual total was the 48px headline above and an
+          "Annual outcome" row here, 400px apart, and the monthly total was both
+          a sub-heading and a "Monthly outcome" row, each with "cash savings"
+          under it — four rows restating two numbers before the first fact the
+          headline does not already carry. */}
       <section className={styles.planOutcome}>
-        <div>
-          <p className={styles.eyebrow}>Annual outcome</p>
-          <strong>{money(result.cashSavingsAnnualCents)}</strong>
-          <span>cash savings</span>
-        </div>
         <div>
           <p className={styles.eyebrow}>Monthly outcome</p>
           <strong>{money(result.savingsMonthlyCents)}</strong>
-          <span>cash savings</span>
+          <span>cash savings after tax, benefits, and allocations</span>
         </div>
         <label>
           Starting savings
@@ -346,7 +342,7 @@ export function PlanHub({
         />
         <PlanLink
           label="Compare years"
-          detail="See plans side by side"
+          detail="Each saved year's totals, one after another"
           onClick={() => onScreen("compare")}
         />
         <PlanLink

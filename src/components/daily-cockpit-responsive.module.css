@@ -44,7 +44,7 @@
 
 @media (--viewport-compact) {
   .surfaceStack {
-    gap: var(--space-4);
+    gap: var(--space-3);
   }
 
   .surfaceHeader h1 {
@@ -52,8 +52,22 @@
     font-size: clamp(var(--text-2xl), var(--fluid-12), var(--text-4xl));
   }
 
-  /* C2: the Home heading names the tab and carries no figure,
-     so it is a label, not a display headline. */
+  /* C2: the Home heading names the tab and carries no figure. On a phone the
+     tab bar names it too, and it is the highlighted tab, so the word costs 31px
+     of the one screen Home is allowed to be and tells a sighted reader nothing
+     the chrome around it is not already saying. It stays in the accessibility
+     tree — this is the app's own `.srOnly` treatment, not `display: none` —
+     because a screen-reader user has no highlighted tab to read. */
+  .homeSurface .surfaceHeader > div:first-child {
+    position: absolute;
+    width: var(--border-hairline);
+    height: var(--border-hairline);
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
   .homeSurface .surfaceHeader h1 {
     margin: 0;
     font-size: var(--text-lg);
@@ -67,7 +81,7 @@
   }
 
   .runwayCard {
-    gap: var(--space-3);
+    gap: var(--space-2);
     padding: var(--space-4);
   }
 
@@ -141,6 +155,15 @@
     font-size: var(--text-sm);
   }
 
+  /* A two-line transaction sets 18px + 4px + 16px = 38px, which with the row's
+     8px padding is 54px — the 64px desktop rung was 10px of dead band per row,
+     and it is what put the whole 61-row Activity list and the tail of Home's
+     Recent activity further down the screen than their content needed. The
+     three-line rung is unchanged. */
+  .transactionRow:not([data-lines="3"]) {
+    min-height: var(--control-md);
+  }
+
   /* C2: the Activity heading names the tab and carries no
      figure, so it is a label, not a display headline (same reading as Home). */
   .activitySurface .surfaceHeader h1 {
@@ -197,7 +220,10 @@
     letter-spacing: var(--tracking-snug);
   }
 
-  .surfaceHeader p:last-child {
+  /* The supporting line under a headline, never the eyebrow above it: on
+     surfaces whose header carries only an eyebrow and an h1, the eyebrow is
+     also the last p. */
+  .surfaceHeader p:last-child:not(:first-child) {
     display: none;
   }
 
@@ -230,8 +256,16 @@
 }
 
 @media (--short-shell-740) {
+  /* Same reading as the compact rule above, and the same treatment: the title
+     leaves the layout but stays announced. */
   .surfaceStack:has(.runwayCard) .surfaceHeader > div:first-child {
-    display: none;
+    position: absolute;
+    width: var(--border-hairline);
+    height: var(--border-hairline);
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   .surfaceStack:has(.runwayCard) .surfaceHeader {
@@ -278,7 +312,7 @@
     font-size: var(--text-2xl);
   }
 
-  .planHub .surfaceHeader p:last-child {
+  .planHub .surfaceHeader p:last-child:not(:first-child) {
     display: none;
   }
 

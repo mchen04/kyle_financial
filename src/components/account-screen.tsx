@@ -106,7 +106,8 @@ export function AccountScreen({
   return (
     <section className={styles.accountGrid}>
       <div className={styles.wideCard}>
-        <h1>Account and data</h1>
+        {/* The surface is titled by its own back header; repeating it here was
+            a second, competing h1. */}
         <p className={styles.accountEmail}>{user.email}</p>
         <p className={styles.accountPrivacy}>
           Plans remain on the server until you delete this account; deletion
