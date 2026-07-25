@@ -1,0 +1,140 @@
+{
+  "generatedAt": "2026-07-25T18:53:25.335Z",
+  "mode": "gate",
+  "failDemo": "chrome",
+  "deviceScaleFactor": 3,
+  "engines": [
+    {
+      "engine": "chromium",
+      "gates": "all"
+    }
+  ],
+  "bars": {
+    "vertical": {
+      "home": 1,
+      "standard": 3,
+      "deep": 4,
+      "entry": 1.5
+    },
+    "cls": 0.02,
+    "minimumTargetPx": 44,
+    "minimumFontSizePx": 11,
+    "chromeAboveExemptList": 0.6
+  },
+  "rows": [
+    {
+      "surface": "activity",
+      "label": "Activity",
+      "engine": "chromium",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 3,
+      "listExemption": {
+        "reason": "transaction history (named by the mission)",
+        "rowSelector": "main [data-density-row=\"transaction\"]"
+      },
+      "singleAnswerPaint": false,
+      "fitsWithoutScrolling": false,
+      "markTime": 4973.100000000093,
+      "arrivalError": null,
+      "injection": "chrome: 400px block prepended above the list on the scrolling region",
+      "screenshot": null,
+      "listRegion": {
+        "rowSelector": "main [data-density-row=\"transaction\"]",
+        "rowCount": 61,
+        "chromeAboveFirstRowPx": 660.38,
+        "chromeAboveFirstRowCost": 0.7824348341232228,
+        "rowHeights": [
+          {
+            "height": 54,
+            "count": 46
+          },
+          {
+            "height": 80,
+            "count": 15
+          }
+        ],
+        "rowRegionPx": 3684,
+        "error": null
+      },
+      "innerScroll": {
+        "clientHeight": 635,
+        "scrollHeight": 4352,
+        "contentHeight": 4352.4,
+        "overflowPx": 3717.4,
+        "slackPx": 0
+      },
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 635,
+        "textNodes": 11,
+        "valueControls": 1,
+        "datumPer100px": 1.73,
+        "datumWithControlsPer100px": 1.89
+      },
+      "scrollHeight": 4352,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 5.156398104265403,
+      "cls": 0.32830660725362104,
+      "clsNative": 0.32830660725362104,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 1,
+      "shiftDetail": [
+        {
+          "value": 0.328307,
+          "startTime": 5060,
+          "sources": [
+            {
+              "node": "div :: Activity$5,255 logged61 expenses in this periodMonthYTDYearJ",
+              "from": [12, 84, 366, 623],
+              "to": [12, 484, 366, 223]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 66,
+      "frameTicks": 5567,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "$5,255 logged",
+      "headlineSettled": "$5,255 logged",
+      "headlineSamples": [
+        {
+          "text": "$5,255 logged",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": [
+        "chrome above the first list row 660.38px = 0.782 VH exceeds 0.60 VH (row region 3684px over 61 rows is exempt: transaction history (named by the mission))",
+        "CLS 0.3283 exceeds 0.02: [{\"value\":0.328307,\"startTime\":5060,\"sources\":[{\"node\":\"div :: Activity$5,255 logged61 expenses in this periodMonthYTDYearJ\",\"from\":[12,84,366,623],\"to\":[12,484,366,223]}]}]"
+      ]
+    }
+  ]
+}

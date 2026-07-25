@@ -2018,3 +2018,208 @@ recorded here rather than shipped as an unjustified diff.
 - **`--text-scale-smaller` is a ratio token, not a size token.** It is the only
   relative value in the type scale, and it is only safe because the `max()`
   around it floors it. Using it anywhere without that floor reintroduces D3.
+
+---
+
+## L9 — the harness was measuring the wrong browser
+
+Every number below was read out of a live production build. AFTER is
+[`l9/full-green1.json`](./l9/full-green1.json) /
+[`l9/full-green1.md`](./l9/full-green1.md) — **126 rows, gate mode, exit 0**,
+the first run of this catalogue on two engines.
+
+```
+pnpm ui:density:measure -- --mode gate --viewports 390x844,360x740,430x932 --session l9-green1
+# 126 measurement(s) across chromium + webkit; 0 violating row(s); mode=gate   EXIT=0
+```
+
+| Signal                               | AFTER (126 rows)                                     |
+| ------------------------------------ | ---------------------------------------------------- |
+| rows                                 | 126 (21 surface states x 3 viewports x 2 engines)    |
+| max CLS                              | **0.0039** (bar 0.02; was 0.0106 at L8)              |
+| headline swaps                       | 0                                                    |
+| targets < 44px                       | **0** — on both engines, for the first time          |
+| computed font-size < 11px            | 0 (smallest measured: **11.00px**)                   |
+| boxes clipping text with no ellipsis | 0                                                    |
+| horizontal overflow                  | 0                                                    |
+| console errors                       | 0                                                    |
+| arrival failures                     | 0                                                    |
+| Chromium `frameTicks`                | **106** min, 5858 max; `nativeLayoutShiftLive` 63/63 |
+
+---
+
+### 1. The Chromium zero was true about Chromium and false about the product
+
+Nine waves of this mission reported `smallTargets: 0`. The harness's target-size
+filter was never wrong — it was pointed at the wrong engine.
+
+The divergence is real and it is in the one place never-cross rule 4 lives,
+native form controls. Same DOM, same stylesheet, 390x844:
+
+| `<select>` as authored   | Chromium |    WebKit |
+| ------------------------ | -------: | --------: |
+| `min-height:44px`        |    75x44 |     75x44 |
+| `+ padding:0 32px 0 8px` |   115x44 |    115x44 |
+| `+ border:1px solid`     |   104x44 | **73x23** |
+| `+ border-radius:6px`    |   104x44 | **73x23** |
+| `+ background:#fff`      |   104x44 | **73x23** |
+| `+ appearance:none`      |    41x44 |     41x44 |
+
+The moment an author paints a `<select>` — any border, any radius, any
+background — WebKit leaves the native menulist theme for its **styled-menulist**
+path, and that path's user-agent rules beat the author's:
+`getComputedStyle(select).minHeight` reads **18px** on a control the stylesheet
+sets to 44px, and author padding computes to **0**. Chromium honours the author
+value in every case. Every select in this app is painted, so the app's real
+`select[aria-label="Plan year"]` measured **104x44 in Chromium and 76x23 in
+WebKit** on the same run.
+
+**How big the hole was, measured rather than argued.** `--fail-demo
+menulist-real` puts `appearance: auto` back on every select in the document and
+runs the whole catalogue:
+
+| Engine       | Surface states red | Sub-44px control instances | Evidence                                  |
+| ------------ | -----------------: | -------------------------: | ----------------------------------------- |
+| **webkit**   |       **19 of 21** |                     **49** | `l9/faildemo-menulist-real-webkit.json`   |
+| **chromium** |        **0 of 21** |                      **0** | `l9/faildemo-menulist-real-chromium.json` |
+
+One injection, two answers, and the answer the product ships on is the red one.
+The worst surface was **Benefits at 13 instances** (its seven benefit-type
+selects, its `Add benefit` control and its `Modeling notes` summary); Fast Log
+edit had 4, Plan details 4, Activity 3.
+
+The fix is **one rule in `globals.css`**, not 49 patches: `appearance: none` —
+the one setting both engines agree on — plus an author-drawn chevron and its
+reserved `padding-inline-end`, because turning the native appearance off also
+removes the platform's disclosure arrow. A rule that sets its own horizontal
+padding on a select must therefore leave `padding-inline-end` alone or reserve
+the chevron itself, which is why the six per-surface select rules moved from
+`padding` shorthand to `padding-block` + `padding-inline-start`. `<summary>`
+got the same treatment for the same reason: it is the only way to reach what its
+`<details>` holds, so it is a touch target, and two of them shipped at 32px.
+
+### 2. What the second engine is allowed to gate, and what it is not
+
+WebKit does not implement the Layout Instability API, so gating a CLS bar on it
+would be gating an instrument that is not there. The split is declared in the
+harness and printed on every row:
+
+- **Chromium (`gates: "all"`)** keeps every measurement it had — CLS, frame
+  liveness, headline swaps, the answer-paint gate, the vertical bars, the
+  long-list exemption.
+- **WebKit (`gates: "geometry"`)** runs the same catalogue and gates the four
+  checks whose answer depends on which engine laid the page out: **target size,
+  the 11px legibility floor, text fit, and horizontal overflow.**
+
+This adds coverage and removes none: a control that is 44px in Chromium and 23px
+in WebKit now fails, and one that is small in Chromium still fails there. Every
+row carries `engine` and the markdown table prints it, so no number is ambiguous
+about where it came from. The run also states its own instrument condition:
+`NOTE: 63 row(s) came from an engine with no Layout Instability API.`
+
+### 3. The rest of the wave: seven defects the judge panel raised
+
+| ID      | Surface                     | What a reader saw                                                                                                                                                            | Fix                                                                                                                                                    |
+| ------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **D3**  | Plan details ledger         | `Health and pharmacy` in a 158px box needing 182px — an ellipsis over 42% of the name                                                                                        | The row spans the card's own 24px padding at phone widths and the money field steps to 96px at 360px; **none of it comes out of the name**             |
+| **D4**  | Budget / Home / wrap        | One quantity under four names: `safe to spend`, `Left to spend`, `currently unspent`, `Total remaining`                                                                      | One name — **`left to spend`** — everywhere the same cents are printed                                                                                 |
+| **D5**  | Budget, Activity            | Fast Log rendered a labelled pill on Home and a bare 48px circle on two other tabs, named only by aria-label                                                                 | One labelled treatment on every tab (rule 2: no capability behind an unlabelled affordance)                                                            |
+| **D7**  | Plan details, wrap, compare | Section `<h2>`s set at 24px/700 — identical to the page `<h1>`, so there was no hierarchy step at all                                                                        | Section headings step one rung down to `--text-lg`/1.2; Plan details' second `<h1>` became an `<h2>`                                                   |
+| **C5**  | Monthly wrap                | An eyebrow and a heading saying the same thing twice, the heading spending 55px and two lines on it                                                                          | One heading, `Budget versus actual`                                                                                                                    |
+| **C6**  | everywhere                  | 16 per-component `tabular-nums` declarations covering ~115 numeric runs and **missing 50**, including the two largest figures in the product and Plan's 15-row dollar column | **One inherited `font-variant-numeric: tabular-nums` on `body`** — it reaches every amount, percentage, count and date, including ones not written yet |
+| **C12** | Category detail             | The category name printed on all 11 rows, repeating what the `<h1>` had already said                                                                                         | `showCategory={false}` on that surface only; Activity mixes categories and still names them                                                            |
+
+One further defect was found by the CLS instrument rather than by a judge: the
+top-bar sync status was right-anchored with `margin-left: auto`, so it absorbed
+the header's free space and **slid 111px left the moment the `Start 2027`
+control mounted** on arrival at a Plan screen. It now grows instead of being
+pushed. That single change is why **Budget and Activity moved from 0.0075 /
+0.0106 / 0.0056 CLS to 0.0000 at all three viewports.**
+
+### 4. No surface regressed
+
+Comparing all 63 Chromium rows against `l8-after.json`: **13 rows moved on
+vertical cost, none by more than 0.108 VH, and every one of them stayed inside
+its bar.** The other 50 are identical to three decimals.
+
+| Surface      | Viewport | L8 VH | L9 VH | Bar | Why                                    |
+| ------------ | -------- | ----: | ----: | --: | -------------------------------------- |
+| Monthly wrap | 390x844  | 1.912 | 1.818 | 3.0 | C5 removed a two-line restatement      |
+| Monthly wrap | 360x740  | 2.478 | 2.370 | 3.0 | same                                   |
+| Monthly wrap | 430x932  | 1.672 | 1.616 | 3.0 | same                                   |
+| Compare      | 390x844  | 1.534 | 1.519 | 4.0 | D7 stepped the card heading down       |
+| Compare      | 360x740  | 1.774 | 1.757 | 4.0 | same                                   |
+| Compare      | 430x932  | 1.389 | 1.376 | 4.0 | same                                   |
+| Plan         | 390x844  | 1.782 | 1.807 | 3.0 | the drawn chevron reserves its own box |
+| Plan details | 390x844  | 2.724 | 2.757 | 4.0 | same                                   |
+| Plan details | 360x740  | 3.127 | 3.141 | 4.0 | same                                   |
+| Plan details | 430x932  | 2.379 | 2.388 | 4.0 | same                                   |
+| Benefits     | 390x844  | 2.584 | 2.598 | 4.0 | same, x7 selects                       |
+| Benefits     | 360x740  | 2.969 | 2.985 | 4.0 | same                                   |
+| Benefits     | 430x932  | 2.270 | 2.283 | 4.0 | same                                   |
+
+The chevron costs **0.009-0.033 VH** on the four surfaces that carry selects.
+That is the price of the control being the size it claims to be, and it is paid
+inside every bar.
+
+### FAIL-DEMO — all 14 gates red on this build, control green
+
+Injection only; no application source was touched. Each row is the gate's own
+message, and the intended gate fired on every one of them (several also tripped
+Home's single-screen gate, since prepending any node to a surface that fits
+exactly makes it stop fitting — that is the gate working, and both failures are
+printed).
+
+| Demo            | Engine   | Gate it proves                  | Message (truncated)                                                            | Exit |
+| --------------- | -------- | ------------------------------- | ------------------------------------------------------------------------------ | ---: |
+| `vh`            | chromium | vertical bar                    | vertical cost 5.479 VH exceeds 1.0 VH                                          |    1 |
+| `cls`           | chromium | CLS bar                         | CLS 0.2203 exceeds 0.02                                                        |    1 |
+| `headline`      | chromium | headline swap (**D2**)          | `"$123 left to spend" -> "$0 planned spending"`                                |    1 |
+| `answer`        | chromium | provisional answer repaint      | the primary answer was painted 2 times with different values                   |    1 |
+| `touch`         | chromium | 44px targets                    | 1 interactive target(s) under 44px: 20x20                                      |    1 |
+| `menulist`      | webkit   | 44px targets, WebKit            | 1 target under 44px: 74x23 on a control declared 44px                          |    1 |
+| `menulist-real` | webkit   | 44px targets, **real controls** | 19 of 21 surfaces red, 49 instances                                            |    1 |
+| `menulist-real` | chromium | (contrast)                      | **0 of 21 — same injection, same DOM**                                         |    0 |
+| `chrome`        | chromium | long-list chrome sub-bar        | chrome above the first list row 0.782 VH exceeds 0.60 VH                       |    1 |
+| `listrows`      | chromium | exemption earned                | long-list exemption claimed but not earned                                     |    1 |
+| `tiny`          | chromium | 11px legibility floor           | 1 element below the 11px floor (smallest 9px)                                  |    1 |
+| `clip`          | chromium | text fit                        | 1 box narrower than its own text (`ellipsis: false`)                           |    1 |
+| `fit`           | chromium | text fit, ellipsised            | 1 box narrower than its own text (`ellipsis: true` — an ellipsis is not a fit) |    1 |
+| `deadband`      | chromium | single-screen dead band         | 144.9px of dead band, over the 64px that would have held another row           |    1 |
+| `overflow`      | chromium | horizontal overflow             | clientWidth 390 !== scrollWidth 3000                                           |    1 |
+| `console`       | chromium | console errors                  | 1 console error(s)                                                             |    1 |
+| **control**     | both     | (no injection)                  | 6 rows, 0 violating                                                            |    0 |
+
+The `headline` demo is worth naming: it reproduces **D2 exactly as the mission
+describes it** — a Budget headline that reads `$123 left to spend` at first paint
+and `$0 planned spending` when settled — and the gate catches it. D2 is fixed at
+the root (L5 §2); this is the trap that would catch it coming back.
+
+### What was refused
+
+**Patching the 49 controls individually.** Each one would have needed a
+`min-height` WebKit ignores, so the patch would have measured green in Chromium
+and shipped broken anyway. The defect is not in 49 declarations, it is in one
+missing one.
+
+**Gating CLS on WebKit.** The engine has no Layout Instability API. The harness
+would have had to fall back to its own geometric figure and call it CLS, which
+is exactly the "dead instrument reporting green" failure L4 and L5 were spent
+curing. WebKit rows print a geometry-derived CLS column that explicitly does not
+gate, and the run says so in its own output.
+
+### Residual risk
+
+- **`--fail-demo menulist-real` is the only product-wide demo.** The other
+  thirteen inject one synthetic node. A gate whose demo is synthetic is proven
+  to fire; it is not proven to fire on the shapes this product actually builds.
+- **WebKit here is Playwright's WebKit, not iPhone Safari.** It is the same
+  engine family and it reproduced the styled-menulist divergence exactly, but it
+  is not the shipping browser on the shipping hardware. The real-device pass
+  remains a residual risk for the human, unchanged.
+- **The chevron is drawn in CSS gradients.** It is two linear-gradients sized in
+  `--space-1`, so it scales with the token scale and not with the font. At a
+  much larger accessibility text size the arrow stays 4px.
+- **Only 390x844 was measured under `menulist-real`.** The count at 360x740 and
+  430x932 is unmeasured; the fix is viewport-independent, but the number 49 is
+  specific to the primary viewport.

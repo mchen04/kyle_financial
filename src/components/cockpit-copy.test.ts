@@ -11,7 +11,7 @@ describe("Monthly Wrap balance copy", () => {
 
   it("distinguishes live remaining money from a completed-month win", () => {
     expect(wrapBalanceCopy(4_500, "current").label).toBe(
-      "Live preview · currently unspent",
+      "Live preview · left to spend",
     );
     expect(wrapBalanceCopy(4_500, "past").label).toBe("Under budget");
   });

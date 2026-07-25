@@ -260,6 +260,15 @@ body {
     ),
     var(--surface-canvas);
   font-family: var(--font-body);
+  /* C6, as one inherited rule rather than the 16 per-component declarations it
+     had grown into. Those covered ~115 numeric runs and missed 50, including
+     the app's two largest figures (Plan's $87,905 at 32px and Monthly wrap's
+     $123 at 56px) and Plan's 15-row stacked dollar column, where proportional
+     digits meant the column did not align. `font-variant-numeric` inherits, and
+     the four control types below take `font: inherit`, so declaring it once on
+     the body reaches every amount, percentage, count and date in the product —
+     including the ones nobody has written yet. */
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -298,6 +307,70 @@ input,
 select,
 textarea {
   font-size: var(--text-md);
+}
+
+/* L9 / rule 4, applied once for every <select> in the app rather than to the
+   controls that happened to be found first.
+
+   How big the hole was, measured rather than estimated: `--fail-demo
+   menulist-real` puts `appearance: auto` back on every select in the document
+   and runs the whole catalogue. On WebKit that is **19 of 21 surface states red
+   and 49 sub-44px control instances** at 390x844; the identical injection on
+   Chromium is **0 of 21**. Both JSONs are in docs/evidence/l9/.
+
+   Measured, both engines, same DOM, same stylesheet, 390x844:
+
+     <select style="min-height:44px">                 chromium 75x44   webkit 75x44
+     <select style="min-height:44px;padding:0 32px">  chromium 115x44  webkit 115x44
+     <select style="min-height:44px;border:1px solid">chromium 104x44  webkit  73x23
+     <select style="min-height:44px;border-radius:6px">chromium 104x44 webkit  73x23
+     <select style="min-height:44px;background:#fff"> chromium 104x44  webkit  73x23
+     <select style="min-height:44px;appearance:none"> chromium  41x44  webkit  41x44
+
+   The moment a select is painted — any border, any radius, any background —
+   WebKit leaves the native menulist theme for its styled-menulist path, whose
+   user-agent rules beat the author's: `getComputedStyle(select).minHeight`
+   reads 18px on a control this stylesheet sets to 44px, and author padding
+   computes to 0. Every select in this app is painted, so every one of them
+   shipped at ~23px to iPhone Safari while measuring 44px in Chromium.
+   `appearance: none` is the one setting the two engines agree on.
+
+   Turning the native appearance off also takes the platform's disclosure arrow
+   with it, so the arrow is drawn here — the same two-gradient chevron and the
+   same reserved padding DF2 proved on the Month select, where the point is that
+   the space the arrow needs is part of the box model and the label can never be
+   laid out into it. A rule that sets its own horizontal padding on a select
+   must therefore leave `padding-inline-end` alone, or reserve the chevron
+   itself. */
+select {
+  appearance: none;
+  min-height: var(--control-sm);
+  padding-inline-end: var(--space-5);
+  background-image:
+    linear-gradient(
+      45deg,
+      var(--color-transparent) 50%,
+      var(--text-primary) 50%
+    ),
+    linear-gradient(
+      135deg,
+      var(--text-primary) 50%,
+      var(--color-transparent) 50%
+    );
+  background-repeat: no-repeat;
+  background-position:
+    right var(--space-2) top 50%,
+    right var(--space-1) top 50%;
+  background-size:
+    var(--space-1) var(--space-1),
+    var(--space-1) var(--space-1);
+}
+
+/* Same rule, same reason: a <summary> is the only way to reach what its
+   <details> holds, so it is a touch target. Two of them ("Modeling notes", on
+   Plan details and on Benefits) shipped at 32px. */
+summary {
+  min-height: var(--control-sm);
 }
 
 /* DF1, applied once for the whole app rather than per field. A text input has

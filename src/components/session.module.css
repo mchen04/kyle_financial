@@ -116,11 +116,17 @@
 .onboardingForm select {
   width: 100%;
   min-height: var(--control-md);
-  padding: var(--space-2) var(--space-3);
+  padding-block: var(--space-2);
+  padding-inline-start: var(--space-3);
   border: var(--border-hairline) solid var(--line);
   border-radius: var(--radius-sm);
-  background: var(--surface-panel);
+  background-color: var(--surface-panel);
   color: var(--ink);
+}
+
+.authForm input,
+.onboardingForm input {
+  padding-inline-end: var(--space-3);
 }
 
 .authForm small {

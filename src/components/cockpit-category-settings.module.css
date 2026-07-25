@@ -180,11 +180,15 @@
 .manageEditor select {
   width: 100%;
   min-height: var(--control-sm);
-  padding: 0 var(--space-2);
+  padding-inline-start: var(--space-2);
   border: var(--border-hairline) solid var(--border-default);
   border-radius: var(--radius-sm);
-  background: var(--surface-panel);
+  background-color: var(--surface-panel);
   color: var(--text-primary);
+}
+
+.manageEditor input {
+  padding-inline-end: var(--space-2);
 }
 
 .reorderButtons {

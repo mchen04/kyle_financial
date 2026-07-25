@@ -328,10 +328,14 @@
   margin-bottom: var(--space-4);
 }
 
+/* D7. 24px/700 is exactly what the page <h1> sets to at phone widths, so a
+   section heading at that size announced itself as a peer of the surface title
+   and there was no hierarchy step anywhere on Compare or Monthly wrap. One
+   rung down is a step a reader can see, and it returns 6px a section. */
 .sectionHeading h2,
 .emptyHero h2 {
   margin: var(--space-1) 0 0;
-  font: var(--weight-bold) var(--text-xl) / 1.15 var(--font-display);
+  font: var(--weight-bold) var(--text-lg) / 1.2 var(--font-display);
 }
 
 /* C4: rows inside a group sit at 0px with a hairline between them; the 8px
@@ -629,7 +633,7 @@
   width: 100%;
   min-height: var(--control-sm);
   border: 0;
-  background: var(--color-transparent);
+  background-color: var(--color-transparent);
   color: var(--text-primary);
 }
 

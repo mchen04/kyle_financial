@@ -226,14 +226,16 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
         </main>
         {showFastLog && canCreateExpense && (
           <button
-            className={`${styles.fastLogButton} ${
-              screen === "home" ? styles.fastLogLabeled : ""
-            }`}
+            /* D5 / rule 2. Home rendered a labelled "+ Fast Log" pill and
+               Budget and Activity rendered a bare 48px circle whose only name
+               was an aria-label, so the same capability was visually unlabelled
+               on two of the four tabs. One treatment, everywhere. */
+            className={`${styles.fastLogButton} ${styles.fastLogLabeled}`}
             aria-label="Fast Log expense"
             onClick={() => fastLog.open()}
           >
             <Plus />
-            {screen === "home" && <span>Fast Log</span>}
+            <span>Fast Log</span>
           </button>
         )}
         <nav
@@ -450,7 +452,7 @@ function TopBar({
             onClick={onFastLog}
           >
             <Plus />
-            {screen === "home" && <span>Fast Log</span>}
+            <span>Fast Log</span>
           </button>
         )}
         {/* One control, two states. It used to read "Open account" while

@@ -700,9 +700,38 @@ export async function seedDensityFixture(databaseUrl: string): Promise<{
   }
 }
 
+/**
+ * Clear only the login rate-limit buckets, without touching the fixture data.
+ *
+ * The harness signs each fixture account in twice per viewport, and it now runs
+ * the whole catalogue once per engine, so a three-viewport two-engine run makes
+ * twelve logins per identity against a limiter that allows ten. That is the
+ * limiter working exactly as designed on traffic that is not a user; clearing
+ * the bucket between engine passes is the harness paying its own cost rather
+ * than the limiter being loosened. `assertLocalDatabase` still gates it, so
+ * this can only ever run against a localhost development database, and no
+ * limiter rule, window or count is changed anywhere.
+ */
+export async function clearLoginRateLimits(databaseUrl: string): Promise<void> {
+  assertLocalDatabase(databaseUrl);
+  const sql = postgres(databaseUrl, { max: 1, onnotice: () => undefined });
+  try {
+    await sql`
+      DELETE FROM auth_rate_limits WHERE scope IN ('login:ip', 'login:identity')
+    `;
+  } finally {
+    await sql.end();
+  }
+}
+
 async function main(): Promise<void> {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error("DATABASE_URL is required");
+  if (process.argv.includes("--login-buckets-only")) {
+    await clearLoginRateLimits(databaseUrl);
+    console.log("Login rate-limit buckets cleared.");
+    return;
+  }
   const result = await seedDensityFixture(databaseUrl);
   console.log(
     [

@@ -113,10 +113,14 @@
   gap: var(--space-4);
 }
 
-.sectionHeading h1 {
+/* D7. This used to size an <h1>, and Plan details carried two of them: the
+   page title from the detail header and "Monthly expense ledger" from the card
+   inside it, both 24px and 50 points of weight apart. The card heading is a
+   section within the page, so it is an <h2>, and it steps down from the page
+   title rather than matching it. */
+.sectionHeading h2 {
   margin: 0;
-  font: 650 clamp(var(--text-xl), var(--fluid-3), var(--text-2xl))/1
-    var(--display);
+  font: 650 var(--text-lg) / 1.2 var(--display);
   letter-spacing: var(--tracking-tight);
 }
 

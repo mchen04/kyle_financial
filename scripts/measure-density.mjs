@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // Mobile vertical-density harness.
 //
-// Drives the production build in a mobile-emulated headless Chromium, clicks
-// its way to every product surface (the app is a single route; every "surface"
-// is client state), and records six measured signals per surface, state, and
+// Drives the production build in a mobile-emulated headless browser, clicks its
+// way to every product surface (the app is a single route; every "surface" is
+// client state), and records six measured signals per surface, state, and
 // viewport:
 //
 //   1. vertical cost in viewport heights (scrollHeight / innerHeight)
@@ -21,6 +21,51 @@
 // Nothing here estimates. Every number in the output was read out of a live
 // page. Run `--mode capture` to record without gating, `--mode gate` (default)
 // to exit non-zero when a frozen bar is violated.
+//
+// ---------------------------------------------------------------------------
+// TWO ENGINES, AND WHY (L9)
+// ---------------------------------------------------------------------------
+// This harness used to run Chromium only, and reported `smallTargets: 0` on all
+// 63 rows while the product shipped 49 sub-44px control instances, across 19 of
+// its 21 surface states, to iPhone Safari. The cause was measured, not guessed,
+// and it is a real engine divergence in the one place rule 4 lives — native
+// form controls:
+//
+//   <select style="min-height:44px">                chromium 75x44   webkit 75x44
+//   <select style="min-height:44px; padding:0 32px 0 8px">
+//                                                   chromium 115x44  webkit 115x44
+//   <select style="min-height:44px; border:1px solid">
+//                                                   chromium 104x44  webkit  73x23
+//   <select style="min-height:44px; border-radius:6px">
+//                                                   chromium 104x44  webkit  73x23
+//   <select style="min-height:44px; background:#fff">
+//                                                   chromium 104x44  webkit  73x23
+//   <select style="min-height:44px; appearance:none">
+//                                                   chromium  41x44  webkit  41x44
+//
+// The moment an author paints a `<select>` — any border, any border-radius, any
+// background — WebKit leaves the native menulist theme for its "styled
+// menulist" path, and that path's user-agent rules override the author's own:
+// `getComputedStyle(select).minHeight` reads **18px** on a control the
+// stylesheet set to 44px, and author padding computes to 0. Chromium honours
+// the author value in every case. So the app's real `select[aria-label="Plan
+// year"]` measures **104x44 in Chromium and 76x23 in WebKit** — the same DOM,
+// the same CSS, the same viewport. The Chromium 0 was true about Chromium and
+// false about the product.
+//
+// The harness's own target-size filter was never wrong; it was pointed at the
+// wrong engine. So this is additive:
+//
+//   * Chromium keeps every measurement it had. The Layout Instability API is
+//     Chromium-only (WebKit does not implement `layout-shift`), so CLS, frame
+//     liveness, headline swaps and the vertical bars stay where they were.
+//   * WebKit runs the same catalogue and gates the geometry that diverges:
+//     target size, computed font size, text fit and horizontal overflow.
+//
+// Every row carries `engine`, and the markdown table prints it, so no number in
+// the output is ambiguous about where it came from. `appearance: none` is the
+// one setting both engines agree on, which is why the product now uses it for
+// every select rather than 26 individual patches.
 import { execFile, spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
@@ -228,7 +273,7 @@ const SURFACES = [
     bar: VERTICAL_BARS.standard,
     prefix: [clickExact("Home")],
     nav: [clickExact("Budget")],
-    expect: `document.querySelector('main header p')?.textContent === "Budget" && /^\\$[\\d,]+ (planned spending|over|safe to spend)$/.test(document.querySelector('main h1')?.textContent ?? "")`,
+    expect: `document.querySelector('main header p')?.textContent === "Budget" && /^\\$[\\d,]+ (planned spending|over|left to spend)$/.test(document.querySelector('main h1')?.textContent ?? "")`,
   },
   {
     id: "budget-future-month",
@@ -267,6 +312,10 @@ const SURFACES = [
   },
   {
     id: "activity-empty-search",
+    // The query is deliberately short. Its job is to match nothing, and a long
+    // one only made the search field overflow itself — the harness measuring a
+    // string the harness had just typed. Nothing about the state it produces
+    // changes.
     label: "Activity · empty search",
     account: "fixture",
     bar: VERTICAL_BARS.standard,
@@ -276,7 +325,7 @@ const SURFACES = [
         const field = document.querySelector('main input[type="search"]');
         if (!field) throw new Error('no activity search field');
         const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
-        setter.call(field, 'density-no-such-expense');
+        setter.call(field, 'zzq-no-match');
         field.dispatchEvent(new Event('input', { bubbles: true }));
         return true;
       })()`,
@@ -584,6 +633,45 @@ const FAIL_DEMOS = {
     document.querySelector('main').prepend(node);
     return 'clip: one 40px nowrap box holding a 160px string, no ellipsis';
   })()`,
+  // The hole the previous wave fell into, as a demo: the same too-narrow box,
+  // this time ellipsising. Under the old gate this passed — the box "said it
+  // was truncating" — while the reader still could not read the value. It must
+  // now go red exactly like `clip` does, and it is the only demo that can tell
+  // "the gate requires a fit" from "the gate requires an ellipsis".
+  fit: `(() => {
+    const node = document.createElement('div');
+    node.textContent = 'Health and pharmacy';
+    node.style.cssText =
+      'width:40px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px';
+    document.querySelector('main').prepend(node);
+    return 'fit: one 40px nowrap box holding a 160px string, ellipsised';
+  })()`,
+  // Rule 4 against the engine the product ships on. A <select> the stylesheet
+  // sizes to 44px, painted the way every select in this app is painted: in
+  // Chromium it measures 44px and passes, in WebKit the styled-menulist path
+  // overrides min-height to 18px and it measures ~23px. One injection, two
+  // different answers — which is the whole reason there are two engines here.
+  menulist: `(() => {
+    const node = document.createElement('select');
+    node.setAttribute('aria-label', 'density fail-demo menulist');
+    node.innerHTML = '<option>2026</option>';
+    node.style.cssText =
+      'appearance:auto;min-height:44px;border:1px solid;border-radius:6px;font-size:16px';
+    document.querySelector('main').prepend(node);
+    return 'menulist: one author-painted 44px <select> prepended to main';
+  })()`,
+  // The same defect against the real controls instead of a synthetic one: undo
+  // the single `appearance: none` the fix rests on and every <select> the
+  // surface actually ships falls back to WebKit's styled-menulist path. This is
+  // the demo that says how big the hole was, because it counts product
+  // controls, not one injected node. On Chromium it changes nothing, which is
+  // the point — the same injection is green on one engine and red on the other.
+  "menulist-real": `(() => {
+    const style = document.createElement('style');
+    style.textContent = 'select { appearance: auto !important; }';
+    document.head.append(style);
+    return 'menulist-real: appearance:none removed from every <select> in the document';
+  })()`,
   // The other half of the single-screen gate. Removing a real group leaves the
   // region holding less than it has room for, which is the 430x932 shape of D4
   // and reads identically to "fits" in every metric except slackPx.
@@ -646,7 +734,11 @@ const measureExpression = (rowSelector) => `(() => {
     ['checkbox', 'radio'].includes(node.getAttribute('type')) && node.closest('label')
       ? node.closest('label').getBoundingClientRect()
       : node.getBoundingClientRect();
-  const controls = [...document.querySelectorAll('button,input,select,textarea,a')];
+  // <summary> is the disclosure control of a <details>: it is tapped, it is
+  // focusable, and it is the only way to reach what the <details> holds, so
+  // rule 4 applies to it exactly as it does to a button. It was missing from
+  // this list, which is why two 32px "Modeling notes" controls read as zero.
+  const controls = [...document.querySelectorAll('button,input,select,textarea,a,summary')];
   const small = controls.filter(
     (node) => isVisible(node) && (targetRect(node).width < 43.5 || targetRect(node).height < 43.5),
   );
@@ -799,12 +891,13 @@ const measureExpression = (rowSelector) => `(() => {
     })),
   };
 
-  // ---- clipped-text sweep (DF1 class) --------------------------------------
+  // ---- text-fit sweep (DF1 / D3 class) -------------------------------------
   // Any single-line box whose own content is wider than the box it is painted
   // in. An <input> reports this through scrollWidth directly; a nowrap element
-  // that clips reports it the same way. Truncation is only legitimate when the
-  // box says it is truncating, so text-overflow: ellipsis is what separates a
-  // deliberate truncation from a word cut through its own glyphs.
+  // that clips reports it the same way. What is measured is whether the text
+  // FITS. The text-overflow value is recorded beside each entry as evidence of
+  // how the overflow is being presented, but it is not an exemption: an
+  // ellipsised box is still a box the reader cannot read the value out of.
   const clipCandidates = [...scope.querySelectorAll('input,textarea,select,[data-density-clip]')]
     .concat(
       [...scope.querySelectorAll('*')].filter((node) => {
@@ -831,11 +924,12 @@ const measureExpression = (rowSelector) => `(() => {
       overflowPx: Math.round((node.scrollWidth - node.clientWidth) * 10) / 10,
       ellipsis: style(node).textOverflow === 'ellipsis',
     }))
-    .filter((entry) => entry.overflowPx > 1 && !entry.ellipsis);
+    .filter((entry) => entry.overflowPx > 1);
   const clippedText = {
     count: clipped.length,
-    detail: clipped.slice(0, 8).map(({ node, overflowPx }) => ({
+    detail: clipped.slice(0, 8).map(({ node, overflowPx, ellipsis }) => ({
       overflowPx,
+      ellipsis,
       tag: node.tagName.toLowerCase(),
       label: (node.getAttribute('aria-label') || node.getAttribute('name') || '').slice(0, 40),
       text: (node.value ?? node.textContent ?? '').replace(/\\s+/g, ' ').trim().slice(0, 48),
@@ -989,7 +1083,19 @@ const measureExpression = (rowSelector) => `(() => {
 // stays, because a flag that stops working must still be visible.
 const BROWSER_LAUNCH_ARGS = ["--disable-frame-rate-limit"];
 
+// The engines this harness can drive, and what each one is allowed to gate.
+// `geometry` engines are measured for size/legibility/fit only: they have no
+// Layout Instability API, so their CLS column is the geometric fallback and
+// gating a timing bar on them would be gating an instrument that is not there.
+const ENGINES = {
+  chromium: { gates: "all" },
+  webkit: { gates: "geometry" },
+};
+const DEFAULT_ENGINES = ["chromium", "webkit"];
+
 class Browser {
+  static engine = "chromium";
+
   constructor(session) {
     this.session = session;
   }
@@ -1047,8 +1153,109 @@ class Browser {
     return JSON.parse(await this.evaluate(expression));
   }
 
+  async screenshot(path, { full = false } = {}) {
+    await this.call(
+      full ? ["screenshot", "--full", path] : ["screenshot", path],
+    );
+  }
+
   async close() {
     await this.call(["close"]).catch(() => undefined);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// WebKit driver
+//
+// Same surface as `Browser` above, so every navigation step, wait, settle and
+// measurement expression in this file runs unchanged on both engines. Only the
+// two calls the flows actually make through `call` are implemented (`cookies
+// clear`, `navigate`); anything else throws rather than passing silently, so a
+// future step that assumes agent-browser semantics fails loudly here.
+//
+// `--disable-frame-rate-limit` has no WebKit equivalent and needs none: WebKit
+// does not implement the Layout Instability API at all, so CLS on these rows is
+// the harness's own geometric figure and `nativeLayoutShiftLive` reads false by
+// construction. That is why WebKit rows gate geometry only.
+// ---------------------------------------------------------------------------
+class WebkitBrowser {
+  static engine = "webkit";
+
+  constructor(session) {
+    this.session = session;
+    this.browser = null;
+    this.context = null;
+    this.page = null;
+    this.scale = DEVICE_SCALE_FACTOR;
+  }
+
+  async #context(width, height) {
+    if (this.context) await this.context.close();
+    const { webkit } = await import("playwright-core");
+    if (!this.browser) this.browser = await webkit.launch();
+    this.context = await this.browser.newContext({
+      viewport: { width, height },
+      deviceScaleFactor: this.scale,
+      hasTouch: true,
+      isMobile: true,
+    });
+    await this.context.addInitScript({ path: probeScript });
+    this.page = await this.context.newPage();
+  }
+
+  async open(url) {
+    if (!this.page) await this.#context(390, 844);
+    await this.page.goto(url, { waitUntil: "load" });
+  }
+
+  async reload() {
+    await this.page.reload({ waitUntil: "load" });
+  }
+
+  // A WebKit context's device scale factor is fixed at creation, so a viewport
+  // change rebuilds the context. The page is then re-opened by the caller's own
+  // sign-in flow, exactly as the Chromium path is.
+  async viewport(width, height, scale) {
+    this.scale = scale;
+    const url = this.page ? this.page.url() : null;
+    await this.#context(width, height);
+    if (url && url !== "about:blank")
+      await this.page.goto(url, { waitUntil: "load" });
+  }
+
+  async device() {
+    // Emulation is set on the context above; there is no separate device step.
+  }
+
+  async evaluate(expression) {
+    return this.page.evaluate(expression);
+  }
+
+  async evaluateJson(expression) {
+    return JSON.parse(await this.evaluate(expression));
+  }
+
+  async screenshot(path, { full = false } = {}) {
+    await this.page.screenshot({ path, fullPage: full });
+  }
+
+  async call(args) {
+    if (args[0] === "cookies" && args[1] === "clear") {
+      await this.context.clearCookies();
+      return "";
+    }
+    if (args[0] === "navigate") {
+      await this.page.goto(args[1], { waitUntil: "load" });
+      return "";
+    }
+    throw new Error(`WebkitBrowser cannot run: ${args.join(" ")}`);
+  }
+
+  async close() {
+    if (this.browser) await this.browser.close().catch(() => undefined);
+    this.browser = null;
+    this.context = null;
+    this.page = null;
   }
 }
 
@@ -1132,7 +1339,13 @@ async function signIn(browser, email, password) {
 // ---------------------------------------------------------------------------
 // Measurement
 // ---------------------------------------------------------------------------
-async function measureSurface(browser, surface, viewport, failDemo) {
+async function measureSurface(
+  browser,
+  surface,
+  viewport,
+  failDemo,
+  screenshotDir = null,
+) {
   for (const step of surface.prefix) {
     await browser.evaluate(step);
     await delay(180);
@@ -1170,6 +1383,20 @@ async function measureSurface(browser, surface, viewport, failDemo) {
   const metrics = await browser.evaluateJson(
     measureExpression(surface.listExemption?.rowSelector ?? null),
   );
+  // The judge panel scores what a reader sees, and the reader sees one screen:
+  // the shell pins <html> to 100dvh and scrolls inside <main>, so a full-page
+  // capture is byte-identical to the viewport one. Captured after the metrics
+  // so the image and the numbers describe the same settled frame.
+  let screenshot = null;
+  if (screenshotDir) {
+    screenshot = resolve(
+      repositoryRoot,
+      screenshotDir,
+      `${surface.id}--${browser.constructor.engine}--${viewport.width}x${viewport.height}.png`,
+    );
+    await mkdir(dirname(screenshot), { recursive: true });
+    await browser.screenshot(screenshot);
+  }
   for (const step of surface.after ?? []) {
     await browser.evaluate(step).catch(() => undefined);
   }
@@ -1178,6 +1405,7 @@ async function measureSurface(browser, surface, viewport, failDemo) {
   return {
     surface: surface.id,
     label: surface.label,
+    engine: browser.constructor.engine,
     viewport: `${viewport.width}x${viewport.height}`,
     primaryViewport: viewport.primary,
     bar: surface.bar,
@@ -1187,8 +1415,55 @@ async function measureSurface(browser, surface, viewport, failDemo) {
     markTime,
     arrivalError,
     injection,
+    screenshot,
     ...metrics,
   };
+}
+
+/**
+ * The four checks whose answer depends on which engine laid the page out:
+ * target size, the legibility floor, whether a single-line box's text fits, and
+ * horizontal overflow. Every engine in the run gates all four; the engine each
+ * failure came from is on the row.
+ */
+function pushGeometryFailures(row, failures) {
+  if (row.smallTargets > 0) {
+    failures.push(
+      `[${row.engine}] ${row.smallTargets} interactive target(s) under ${MINIMUM_TARGET_PX}px: ` +
+        `${JSON.stringify(row.smallTargetDetail)}`,
+    );
+  }
+  if (row.horizontalOverflow) {
+    failures.push(
+      `[${row.engine}] horizontal overflow: clientWidth ${row.clientWidth} !== scrollWidth ${row.scrollWidth}`,
+    );
+  }
+  // HIG-T3: 11pt is the iOS minimum legible size, and the mission forbids
+  // buying pixels by going under it. Measured, not grepped, because the two
+  // instances this gate was written for were a UA-relative scale compounding
+  // inside an already-reduced block and appear nowhere in the source as a
+  // number.
+  if ((row.tinyType?.count ?? 0) > 0) {
+    failures.push(
+      `[${row.engine}] ${row.tinyType.count} element(s) below the ${MINIMUM_FONT_SIZE_PX}px legibility floor ` +
+        `(smallest ${row.tinyType.minFontSizePx}px): ${JSON.stringify(row.tinyType.detail)}`,
+    );
+  }
+  // The text has to FIT. This gate used to accept `text-overflow: ellipsis` as
+  // a pass, which turned out to be a hole big enough to drive the whole defect
+  // through: adding one declaration moved six ledger fields from `clip` to
+  // `ellipsis` and the column went green without a single box getting wider,
+  // while 42% of "Health and pharmacy" stayed unreadable behind a "…". An
+  // ellipsis tells the reader something was cut; it does not tell them what.
+  // Ellipsis is still the floor underneath every field (globals.css) so a box
+  // that does overflow says so instead of slicing a glyph — but the floor is
+  // not the bar, and only fitting passes.
+  if ((row.clippedText?.count ?? 0) > 0) {
+    failures.push(
+      `[${row.engine}] ${row.clippedText.count} box(es) are narrower than their own text ` +
+        `(an ellipsis is not a fit): ${JSON.stringify(row.clippedText.detail)}`,
+    );
+  }
 }
 
 function violations(row, mode) {
@@ -1196,6 +1471,15 @@ function violations(row, mode) {
   const failures = [];
   if (row.arrivalError)
     failures.push(`did not reach surface: ${row.arrivalError}`);
+  // Geometry-only engines contribute the four checks that diverge between
+  // engines and nothing else. Every one of them is a gate the Chromium pass
+  // also runs, so this adds coverage and removes none: a control that is 44px
+  // in Chromium and 23px in WebKit now fails, and one that is small in Chromium
+  // still fails there.
+  if (ENGINES[row.engine]?.gates === "geometry") {
+    pushGeometryFailures(row, failures);
+    return failures;
+  }
   if (row.listExemption) {
     // The row region is exempt from the absolute cap; the chrome above it is
     // not, and neither is the requirement that the exemption be earned. A
@@ -1258,35 +1542,7 @@ function violations(row, mode) {
       );
     }
   }
-  if (row.smallTargets > 0) {
-    failures.push(
-      `${row.smallTargets} interactive target(s) under ${MINIMUM_TARGET_PX}px: ${JSON.stringify(row.smallTargetDetail)}`,
-    );
-  }
-  if (row.horizontalOverflow) {
-    failures.push(
-      `horizontal overflow: clientWidth ${row.clientWidth} !== scrollWidth ${row.scrollWidth}`,
-    );
-  }
-  // HIG-T3: 11pt is the iOS minimum legible size, and the mission forbids
-  // buying pixels by going under it. Measured, not grepped, because the two
-  // instances this gate was written for were a UA-relative scale compounding
-  // inside an already-reduced block and appear nowhere in the source as a
-  // number.
-  if ((row.tinyType?.count ?? 0) > 0) {
-    failures.push(
-      `${row.tinyType.count} element(s) below the ${MINIMUM_FONT_SIZE_PX}px legibility floor ` +
-        `(smallest ${row.tinyType.minFontSizePx}px): ${JSON.stringify(row.tinyType.detail)}`,
-    );
-  }
-  // A box that clips its own text mid-glyph with no ellipsis is unreadable and
-  // does not say it is truncating.
-  if ((row.clippedText?.count ?? 0) > 0) {
-    failures.push(
-      `${row.clippedText.count} box(es) clip their own text with no ellipsis: ` +
-        `${JSON.stringify(row.clippedText.detail)}`,
-    );
-  }
+  pushGeometryFailures(row, failures);
   if (row.consoleErrors > 0) {
     failures.push(
       `${row.consoleErrors} console error(s): ${JSON.stringify(row.consoleErrorDetail)}`,
@@ -1298,8 +1554,8 @@ function violations(row, mode) {
 function markdownTable(rows) {
   const cell = (value) => String(value).replace(/\|/g, "\\|");
   const lines = [
-    "| Surface | State | Viewport | VH | Fit | CLS | CLS native | CLS geometric | Frames | Headline first paint | Headline settled | Swap | <44px | <11px | Clipped | Datum/100px | Overflow | Console errors | Bar | Over bar by | Chrome above list | Row heights |",
-    "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | --- |",
+    "| Surface | State | Engine | Viewport | VH | Fit | CLS | CLS native | CLS geometric | Frames | Headline first paint | Headline settled | Swap | <44px | <11px | Overflowing text | Datum/100px | Overflow | Console errors | Bar | Over bar by | Chrome above list | Row heights |",
+    "| --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | --- |",
   ];
   for (const row of rows) {
     const [surface, ...rest] = row.label.split(" · ");
@@ -1338,7 +1594,7 @@ function markdownTable(rows) {
             .join(", ")
         : "—";
     lines.push(
-      `| ${cell(surface)} | ${cell(state)} | ${row.viewport} | ${row.verticalCost.toFixed(3)} | ${fitCell} | ${row.cls.toFixed(4)} | ${row.clsNative.toFixed(4)}${row.nativeLayoutShiftLive ? "" : " dead"} | ${row.clsGeometric.toFixed(4)} | ${row.frameTicks} | ${cell(row.headlineFirstPaint ?? "—")} | ${cell(row.headlineSettled ?? "—")} | ${swap} | ${row.smallTargets} | ${row.tinyType?.count ? `**${row.tinyType.count}** (${row.tinyType.minFontSizePx}px)` : "0"} | ${row.clippedText?.count ? `**${row.clippedText.count}**` : "0"} | ${row.densityRegion ? row.densityRegion.datumPer100px.toFixed(2) : "—"} | ${row.horizontalOverflow ? "**yes**" : "no"} | ${row.consoleErrors} | ${bar} | ${overCell} | ${cell(chromeCell)} | ${cell(rowsCell)} |`,
+      `| ${cell(surface)} | ${cell(state)} | ${cell(row.engine)} | ${row.viewport} | ${row.verticalCost.toFixed(3)} | ${fitCell} | ${row.cls.toFixed(4)} | ${row.clsNative.toFixed(4)}${row.nativeLayoutShiftLive ? "" : " dead"} | ${row.clsGeometric.toFixed(4)} | ${row.frameTicks} | ${cell(row.headlineFirstPaint ?? "—")} | ${cell(row.headlineSettled ?? "—")} | ${swap} | ${row.smallTargets} | ${row.tinyType?.count ? `**${row.tinyType.count}** (${row.tinyType.minFontSizePx}px)` : "0"} | ${row.clippedText?.count ? `**${row.clippedText.count}**` : "0"} | ${row.densityRegion ? row.densityRegion.datumPer100px.toFixed(2) : "—"} | ${row.horizontalOverflow ? "**yes**" : "no"} | ${row.consoleErrors} | ${bar} | ${overCell} | ${cell(chromeCell)} | ${cell(rowsCell)} |`,
     );
   }
   return lines.join("\n");
@@ -1379,6 +1635,10 @@ function parseArguments(argv) {
     viewports: DEFAULT_VIEWPORTS,
     failDemo: null,
     session: "density-baseline",
+    engines: [...DEFAULT_ENGINES],
+    // Off unless asked for: a gate run writes numbers, and 126 PNGs per run is
+    // evidence for a judge, not for a gate.
+    screenshots: null,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
@@ -1425,6 +1685,15 @@ function parseArguments(argv) {
       case "--session":
         options.session = next();
         break;
+      case "--screenshots":
+        options.screenshots = next();
+        break;
+      // Narrows the run for investigation only. It cannot widen anything and it
+      // cannot relax a bar: an engine left out simply is not measured, and the
+      // default is every engine.
+      case "--engines":
+        options.engines = next().split(",");
+        break;
       default:
         throw new Error(`unknown argument: ${argument}`);
     }
@@ -1432,6 +1701,14 @@ function parseArguments(argv) {
   if (!["gate", "capture"].includes(options.mode)) {
     throw new Error(`--mode must be gate or capture, got ${options.mode}`);
   }
+  for (const engine of options.engines) {
+    if (!(engine in ENGINES)) {
+      throw new Error(
+        `--engines must name only ${Object.keys(ENGINES).join(", ")}, got ${engine}`,
+      );
+    }
+  }
+  if (options.engines.length === 0) throw new Error("no engines selected");
   if (options.failDemo && !(options.failDemo in FAIL_DEMOS)) {
     throw new Error(
       `--fail-demo must be one of ${Object.keys(FAIL_DEMOS).join(", ")}, got ${options.failDemo}`,
@@ -1481,13 +1758,109 @@ async function main() {
     await waitForServer(baseUrl);
   }
 
-  const browser = new Browser(options.session);
   const rows = [];
+  try {
+    for (const engine of options.engines) {
+      console.log(`\n--- ${engine} ---`);
+      // Each pass signs both fixture accounts in twice per viewport, which is
+      // twelve logins per identity across a two-engine run against a limiter
+      // that allows ten. The bucket is reset here so a run fails for a density
+      // reason or not at all; the limiter itself is untouched.
+      await runEngine(engine, baseUrl, options, selected, rows);
+    }
+  } finally {
+    if (server) server.kill("SIGTERM");
+  }
+
+  const report = {
+    generatedAt: new Date().toISOString(),
+    mode: options.mode,
+    failDemo: options.failDemo,
+    deviceScaleFactor: DEVICE_SCALE_FACTOR,
+    engines: options.engines.map((engine) => ({
+      engine,
+      gates: ENGINES[engine].gates,
+    })),
+    bars: {
+      vertical: VERTICAL_BARS,
+      cls: BAR_CLS,
+      minimumTargetPx: MINIMUM_TARGET_PX,
+      minimumFontSizePx: MINIMUM_FONT_SIZE_PX,
+      chromeAboveExemptList: BAR_CHROME_ABOVE_LIST,
+    },
+    rows,
+  };
+  const jsonPath = resolve(repositoryRoot, options.json);
+  await mkdir(dirname(jsonPath), { recursive: true });
+  await writeFile(jsonPath, `${JSON.stringify(report, null, 2)}\n`);
+
+  const table = markdownTable(rows);
+  console.log(`\n${table}\n`);
+  if (options.markdown) {
+    const markdownPath = resolve(repositoryRoot, options.markdown);
+    await mkdir(dirname(markdownPath), { recursive: true });
+    await writeFile(markdownPath, `${table}\n`);
+  }
+
+  // State the instrument's condition next to its output. A Chromium row where
+  // the browser produced no frames still measures CLS — from geometry — but the
+  // native Layout Instability API contributed nothing to it, and a reader who
+  // is not told that would read 60 zeroes as 60 passes. WebKit rows are not
+  // this: WebKit does not implement the API at all, which is stated rather than
+  // reported as a fault.
+  const dead = rows.filter(
+    (row) =>
+      row.nativeLayoutShiftLive === false &&
+      ENGINES[row.engine].gates === "all",
+  ).length;
+  if (dead > 0) {
+    console.log(
+      `\nNOTE: the browser produced zero animation frames on ${dead}/${rows.length} row(s), ` +
+        `so the native layout-shift API emitted nothing there. CLS on those rows is the ` +
+        `geometry-derived figure (sampled rects, CLS scoring formula), not the browser's own.`,
+    );
+  }
+  const geometryRows = rows.filter(
+    (row) => ENGINES[row.engine].gates === "geometry",
+  ).length;
+  if (geometryRows > 0) {
+    console.log(
+      `NOTE: ${geometryRows} row(s) came from an engine with no Layout Instability API. ` +
+        `Those rows gate target size, the legibility floor, text fit and horizontal overflow; ` +
+        `their CLS column is the geometry-derived figure and does not gate.`,
+    );
+  }
+
+  const failing = rows.filter((row) => row.failures.length > 0);
+  console.log(
+    `${rows.length} measurement(s) across ${options.engines.join(" + ")}; ` +
+      `${failing.length} violating row(s); mode=${options.mode}; json=${options.json}`,
+  );
+  if (options.mode === "gate" && failing.length > 0) process.exitCode = 1;
+}
+
+/** One full pass of the catalogue, on one engine, across every viewport. */
+async function runEngine(engine, baseUrl, options, selected, rows) {
+  const browser =
+    engine === "webkit"
+      ? new WebkitBrowser(options.session)
+      : new Browser(options.session);
   try {
     await browser.open(baseUrl);
     await browser.device("iPhone 14");
 
     for (const viewport of options.viewports) {
+      // Each viewport signs both fixture accounts in again, and the run now
+      // does that once per engine, so a three-viewport two-engine run makes far
+      // more logins per identity than the limiter's ten. The bucket is reset
+      // here so a run fails for a density reason or not at all; no limiter
+      // rule, window or count is changed anywhere, and the reset is gated by
+      // the seeder's own localhost-database assertion.
+      await run(
+        "npx",
+        ["tsx", "scripts/seed-density-fixture.ts", "--login-buckets-only"],
+        { cwd: repositoryRoot, env: process.env },
+      ).catch(() => undefined);
       await browser.viewport(
         viewport.width,
         viewport.height,
@@ -1522,12 +1895,13 @@ async function main() {
           surface,
           viewport,
           options.failDemo,
+          options.screenshots,
         );
         row.failures = violations(row, options.mode);
         rows.push(row);
         const status = row.failures.length === 0 ? "ok" : "FAIL";
         console.log(
-          `${status.padEnd(4)} ${row.viewport.padEnd(8)} ${row.label.padEnd(32)} ` +
+          `${status.padEnd(4)} ${row.engine.padEnd(8)} ${row.viewport.padEnd(8)} ${row.label.padEnd(32)} ` +
             `${row.verticalCost.toFixed(3)} VH  CLS ${row.cls.toFixed(4)} (${row.clsSource})  ` +
             `<44px ${row.smallTargets}  overflow ${row.horizontalOverflow}  errors ${row.consoleErrors}` +
             (row.listRegion && row.listRegion.rowCount > 0
@@ -1541,53 +1915,7 @@ async function main() {
     }
   } finally {
     await browser.close();
-    if (server) server.kill("SIGTERM");
   }
-
-  const report = {
-    generatedAt: new Date().toISOString(),
-    mode: options.mode,
-    failDemo: options.failDemo,
-    deviceScaleFactor: DEVICE_SCALE_FACTOR,
-    bars: {
-      vertical: VERTICAL_BARS,
-      cls: BAR_CLS,
-      minimumTargetPx: MINIMUM_TARGET_PX,
-      minimumFontSizePx: MINIMUM_FONT_SIZE_PX,
-      chromeAboveExemptList: BAR_CHROME_ABOVE_LIST,
-    },
-    rows,
-  };
-  const jsonPath = resolve(repositoryRoot, options.json);
-  await mkdir(dirname(jsonPath), { recursive: true });
-  await writeFile(jsonPath, `${JSON.stringify(report, null, 2)}\n`);
-
-  const table = markdownTable(rows);
-  console.log(`\n${table}\n`);
-  if (options.markdown) {
-    const markdownPath = resolve(repositoryRoot, options.markdown);
-    await mkdir(dirname(markdownPath), { recursive: true });
-    await writeFile(markdownPath, `${table}\n`);
-  }
-
-  // State the instrument's condition next to its output. A run where the
-  // browser produced no frames still measures CLS — from geometry — but the
-  // native Layout Instability API contributed nothing to it, and a reader who
-  // is not told that would read 60 zeroes as 60 passes.
-  const dead = rows.filter((row) => row.nativeLayoutShiftLive === false).length;
-  if (dead > 0) {
-    console.log(
-      `\nNOTE: the browser produced zero animation frames on ${dead}/${rows.length} row(s), ` +
-        `so the native layout-shift API emitted nothing there. CLS on those rows is the ` +
-        `geometry-derived figure (sampled rects, CLS scoring formula), not the browser's own.`,
-    );
-  }
-
-  const failing = rows.filter((row) => row.failures.length > 0);
-  console.log(
-    `${rows.length} measurement(s); ${failing.length} violating row(s); mode=${options.mode}; json=${options.json}`,
-  );
-  if (options.mode === "gate" && failing.length > 0) process.exitCode = 1;
 }
 
 void main().catch((error) => {

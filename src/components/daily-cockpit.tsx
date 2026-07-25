@@ -303,8 +303,12 @@ export function BudgetSurface({
               ? RESERVED_LINE
               : unstarted
                 ? `${money(rollup.spendingAllocatedCents)} planned spending`
-                : `${money(Math.abs(rollup.safeToSpendCents))} ${
-                    rollup.safeToSpendCents < 0 ? "over" : "safe to spend"
+                : /* D4. One quantity, one name. This figure is the same
+                     cents Home prints under "Left to spend" and Monthly wrap
+                     printed as both "currently unspent" and "Total remaining":
+                     four names for one number, which reads as four numbers. */
+                  `${money(Math.abs(rollup.safeToSpendCents))} ${
+                    rollup.safeToSpendCents < 0 ? "over" : "left to spend"
                   }`}
           </h1>
         </div>

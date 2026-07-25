@@ -96,9 +96,16 @@
 }
 
 .addSelect select {
+  /* The pill the reader sees is this <label>; the control inside it used to be
+     311x21 inside a 340x44 box, so the top and bottom 11px of the affordance
+     did nothing. Stretching the select to the pill makes the hit area and the
+     visible control the same rectangle. */
+  flex: 1 1 auto;
+  align-self: stretch;
+  min-width: 0;
   min-height: var(--control-sm);
   border: 0;
-  background: var(--surface-panel);
+  background-color: var(--surface-panel);
   color: var(--blue);
   font-weight: 700;
 }
@@ -163,20 +170,20 @@
   width: 100%;
   min-height: var(--control-sm);
   margin-top: var(--space-2);
-  padding: 0 var(--space-2);
+  padding-inline-start: var(--space-2);
   border: var(--border-hairline) solid var(--line);
   border-radius: var(--radius-sm);
-  background: var(--surface-panel);
+  background-color: var(--surface-panel);
   color: var(--ink);
   font-size: var(--text-md);
 }
 
 .benefitRow > select {
   min-height: var(--control-sm);
-  padding: 0 var(--space-7) 0 var(--space-2);
+  padding-inline-start: var(--space-2);
   border: var(--border-hairline) solid var(--line);
   border-radius: var(--radius-sm);
-  background: var(--surface-panel);
+  background-color: var(--surface-panel);
   font-size: var(--text-md);
 }
 

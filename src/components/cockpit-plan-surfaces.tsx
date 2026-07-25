@@ -106,15 +106,17 @@ export function MonthlyWrapSurface({
       <section className={styles.panel}>
         <div className={styles.sectionHeading}>
           <div>
-            <p className={styles.eyebrow}>Budget versus actual</p>
-            <h2>Total allocated, spent, and funded</h2>
+            {/* C5. The eyebrow and the heading said the same thing twice, and
+                the heading spent 55px and two lines doing it. One of them is
+                the subject of the section; the other was a restatement. */}
+            <h2>Budget versus actual</h2>
           </div>
         </div>
         <dl className={styles.mathBreakdown}>
           <Metric label="Total budget" value={wrap.budget.allocatedCents} />
           <Metric label="Spent & funded" value={wrap.budget.actualCents} />
           <Metric
-            label="Total remaining"
+            label="Left to spend"
             value={wrap.budget.remainingCents}
             signed
           />

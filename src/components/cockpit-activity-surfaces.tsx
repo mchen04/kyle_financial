@@ -243,6 +243,7 @@ export function CategoryDetailSurface({
             transactions={transactions}
             categories={[item.category]}
             onEdit={onEdit}
+            showCategory={false}
           />
         ) : (
           <p className={styles.emptyState}>No activity in this period.</p>

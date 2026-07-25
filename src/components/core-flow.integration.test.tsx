@@ -338,9 +338,7 @@ describe("daily cockpit integration contract", () => {
       )!,
     );
     expect(container.textContent).toContain("July 2026 wrap");
-    expect(container.textContent).toContain(
-      "Total allocated, spent, and funded",
-    );
+    expect(container.textContent).toContain("Budget versus actual");
     expect(container.textContent).toContain("$1,000");
     expect(container.textContent).toContain("$262");
     expect(container.textContent).toContain("+$738");
@@ -619,7 +617,7 @@ describe("daily cockpit integration contract", () => {
     expect(container.querySelector("main header p")?.textContent).toBe(
       "Budget",
     );
-    expect(container.textContent).not.toContain("safe to spend");
+    expect(container.textContent).not.toContain("left to spend");
     click(button(container, "Home"));
 
     releaseRefresh();

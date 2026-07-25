@@ -122,10 +122,16 @@ export function TransactionRows({
   transactions,
   categories,
   onEdit,
+  // C12. On Category detail every row belongs to the category the page is
+  // named after, so printing it on all 11 of them repeated a fact the <h1> had
+  // already given and left the date — the one thing that varies row to row —
+  // behind a separator. Activity mixes categories and still names them.
+  showCategory = true,
 }: {
   transactions: readonly TransactionEntry[];
   categories: readonly BudgetCategory[];
   onEdit: (id: string) => void;
+  showCategory?: boolean;
 }) {
   const byId = new Map(categories.map((category) => [category.id, category]));
   return (
@@ -154,7 +160,9 @@ export function TransactionRows({
             <span>
               <strong>{transaction.title}</strong>
               <small>
-                {category?.name ?? "Archived category"} ·{" "}
+                {showCategory && (
+                  <>{category?.name ?? "Archived category"} · </>
+                )}
                 {DAY_FORMAT.format(new Date(`${transaction.date}T00:00:00Z`))}
               </small>
               {transaction.note && (
