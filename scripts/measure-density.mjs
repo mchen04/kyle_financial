@@ -776,7 +776,11 @@ function parseArguments(argv) {
     baseUrl: null,
     build: true,
     seed: true,
-    json: "docs/evidence/mobile-density-baseline.json",
+    // Never default to the frozen BEFORE evidence. That file is the baseline
+    // the whole mission is measured against, and a bare `pnpm ui:density:measure`
+    // used to silently overwrite it with whatever subset of surfaces was being
+    // spot-checked. Writing the baseline is now an explicit `--json` opt-in.
+    json: "docs/evidence/mobile-density-latest.json",
     markdown: null,
     surfaces: null,
     viewports: DEFAULT_VIEWPORTS,
