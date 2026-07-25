@@ -28,6 +28,8 @@
     "tax:longevity-drill": "node scripts/longevity-drill.mjs",
     "tax:import-states": "tsx scripts/import-state-tax-table.mjs",
     "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed:density": "tsx scripts/seed-density-fixture.ts",
+    "ui:density:measure": "node scripts/measure-density.mjs",
     "preverify": "pnpm generated-assets:build",
     "verify": "pnpm format:check && pnpm ui:tokens:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
