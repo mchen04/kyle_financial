@@ -4,8 +4,9 @@ Judged against `7d1312b`, the production build, 21 surface states captured at
 390x844 / devicePixelRatio 3 by
 `pnpm ui:density:measure -- --mode capture --screenshots docs/evidence/l5-judge-cycle4`.
 Four independent fresh-context reviewers, one axis each, no implementation
-context, no access to the source — images only. PNGs are retained on disk beside
-this file and are gitignored.
+context, no access to the source — images only. The captures themselves were
+gitignored working artifacts and have been deleted; the measurements they were
+taken alongside are in `measurements.json` beside this file.
 
 ## Scores
 
