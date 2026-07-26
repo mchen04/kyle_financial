@@ -28,6 +28,8 @@
     "tax:longevity-drill": "node scripts/longevity-drill.mjs",
     "tax:import-states": "tsx scripts/import-state-tax-table.mjs",
     "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed:density": "tsx scripts/seed-density-fixture.ts",
+    "ui:density:measure": "node scripts/measure-density.mjs",
     "preverify": "pnpm generated-assets:build",
     "verify": "pnpm format:check && pnpm ui:tokens:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
@@ -54,6 +56,7 @@
     "fake-indexeddb": "^6.2.5",
     "fast-check": "^4.9.0",
     "jsdom": "26.1.0",
+    "playwright-core": "1.62.0",
     "postcss": "8.5.19",
     "postcss-custom-media": "12.0.1",
     "postcss-flexbugs-fixes": "5.0.2",

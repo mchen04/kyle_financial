@@ -153,7 +153,7 @@ export function Guidance({ result }: { result: PlanResult }) {
   );
   return (
     <div className={styles.guidance}>
-      <p className={styles.eyebrow}>50 / 30 / 20 lens</p>
+      <p className={styles.groupLabel}>50 / 30 / 20 lens</p>
       <p>One denominator: take-home plus employee payroll saving.</p>
       <div>
         <span>

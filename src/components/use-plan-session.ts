@@ -22,6 +22,13 @@ interface SessionState {
   saveState: SaveState;
   localSaveRetry: number;
   authNotice: string;
+  // True only while the displayed plans came from the device cache *and* an
+  // authoritative refresh is still in flight. Nothing about sync, the outbox or
+  // what the device stores depends on it: it exists so the surfaces can reserve
+  // the headline box instead of painting a number that is about to change
+  // meaning (C9, never-cross rule 3). It is never set when the device cannot
+  // reach the server, because then the cached plan *is* the settled value.
+  planAwaitingAuthority: boolean;
 }
 
 type SessionAction =
@@ -32,6 +39,7 @@ type SessionAction =
   | { type: "location"; value: WorkspaceLocation }
   | { type: "save"; value: SaveState }
   | { type: "retry"; value: SetStateAction<number> }
+  | { type: "awaiting-authority" }
   | { type: "account-transition"; accountGeneration: number }
   | {
       type: "signed-out";
@@ -74,6 +82,7 @@ const initialState: SessionState = {
   saveState: "saved",
   localSaveRetry: 0,
   authNotice: "",
+  planAwaitingAuthority: false,
 };
 
 function sessionReducer(
@@ -84,7 +93,10 @@ function sessionReducer(
     case "user":
       return { ...state, user: action.value };
     case "plans":
-      return { ...state, plans: action.value };
+      // A new plan set is the authoritative answer the reserved box was waiting
+      // for (or the user's own edit, which they made deliberately). Either way
+      // what is on screen is now settled.
+      return { ...state, plans: action.value, planAwaitingAuthority: false };
     case "draft":
       return {
         ...state,
@@ -98,7 +110,16 @@ function sessionReducer(
     case "location":
       return { ...state, location: action.value };
     case "save":
-      return { ...state, saveState: action.value };
+      // "saving" is the reconciler still working, so the refresh is still in
+      // flight. Every other save state is a resolution — including a failed
+      // one — and a refresh that will not arrive must never hold the box
+      // reserved: the cached plan becomes the settled value at that point.
+      return {
+        ...state,
+        saveState: action.value,
+        planAwaitingAuthority:
+          state.planAwaitingAuthority && action.value === "saving",
+      };
     case "retry":
       return {
         ...state,
@@ -107,6 +128,8 @@ function sessionReducer(
             ? action.value(state.localSaveRetry)
             : action.value,
       };
+    case "awaiting-authority":
+      return { ...state, planAwaitingAuthority: true };
     case "account-transition":
       return {
         ...state,
@@ -118,6 +141,7 @@ function sessionReducer(
         saveState: "saved",
         localSaveRetry: 0,
         authNotice: "",
+        planAwaitingAuthority: false,
       };
     case "signed-out":
       return {
@@ -131,6 +155,7 @@ function sessionReducer(
         saveState: "saved",
         localSaveRetry: 0,
         authNotice: action.notice,
+        planAwaitingAuthority: false,
       };
   }
 }
@@ -255,6 +280,10 @@ export function usePlanSession() {
     (value: SetStateAction<number>) => dispatch({ type: "retry", value }),
     [],
   );
+  const markPlanAwaitingAuthority = useCallback(
+    () => dispatch({ type: "awaiting-authority" }),
+    [],
+  );
   const beginPlanIntent = useCallback(
     () => ++runtimeRef.current.intentRevision,
     [],
@@ -306,6 +335,7 @@ export function usePlanSession() {
     setLocation,
     setSaveState,
     setLocalSaveRetry,
+    markPlanAwaitingAuthority,
     beginPlanIntent,
     getOwnerSignal,
     beginAccount,

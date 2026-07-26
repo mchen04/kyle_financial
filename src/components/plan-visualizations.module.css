@@ -7,7 +7,8 @@
   justify-content: space-between;
   margin-bottom: var(--space-2);
   color: var(--ink-soft);
-  font: var(--text-xs)/1 var(--data);
+  font: var(--text-xs)/1 var(--body);
+  font-variant-numeric: tabular-nums;
 }
 .flowRail {
   height: var(--space-3);
@@ -44,6 +45,10 @@
 .eyebrow {
   composes: eyebrow from "./surface-primitives.module.css";
 }
+.groupLabel {
+  composes: groupLabel from "./surface-primitives.module.css";
+}
+
 .guidance {
   margin-top: var(--space-6);
   padding-top: var(--space-5);

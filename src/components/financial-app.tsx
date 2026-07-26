@@ -39,6 +39,7 @@ export function FinancialApp() {
     location,
     saveState,
     authNotice,
+    planAwaitingAuthority,
     runtimeRef,
     beginPlanIntent,
     getOwnerSignal,
@@ -95,6 +96,7 @@ export function FinancialApp() {
       draft={activeDraft}
       location={activeLocation}
       saveState={saveState}
+      planAwaitingAuthority={planAwaitingAuthority}
       onRetryLocalSave={() => void sync.retryDeviceSave()}
       onRetrySync={() => void sync.retrySync()}
       onLocation={(nextLocation) => {

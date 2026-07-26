@@ -1,11 +1,3 @@
-.eyebrow {
-  composes: eyebrow from "./surface-primitives.module.css";
-}
-
-.muted {
-  composes: muted from "./surface-primitives.module.css";
-}
-
 .wideCard {
   composes: wideCard from "./surface-primitives.module.css";
 }
@@ -36,11 +28,7 @@
   margin: var(--micro-2) 0 var(--space-2);
   overflow-wrap: anywhere;
   color: var(--ink-soft);
-  font: var(--text-sm)/1.4 var(--data);
-}
-
-.accountEmail + .muted {
-  margin-top: 0;
+  font: var(--text-sm)/1.4 var(--body);
 }
 
 .accountGrid {
@@ -53,10 +41,20 @@
   min-height: 0;
 }
 
+/* HIG-A2. Three 44px targets sat 8px apart, and the two secondary ones sat 8px
+   apart from each other on the same line — a thumb aiming at "Export this
+   device" was one edge-strike from "Log out". The gap between adjacent targets
+   is now 12px, and the primary action is separated from the secondary row by
+   more than the row's own internal gap so the hierarchy is visible rather than
+   inferred. */
 .accountActions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-3);
+}
+
+.accountActions .primaryButton {
+  margin-bottom: var(--space-1);
 }
 
 .accountPrivacy {
@@ -80,6 +78,18 @@
 .deleteAccountRow div {
   display: grid;
   gap: var(--space-1);
+}
+
+/* A section title on a screen whose other section title is "Install on iPhone".
+   It was plain <strong> at body size, so two peers announced themselves at two
+   ranks. It now carries the product's one section treatment. The destructive
+   button beside it keeps body size deliberately: a delete control should not be
+   the loudest type on its own card. */
+.deleteAccountRow strong {
+  color: var(--ink-soft);
+  font: var(--weight-bold) var(--text-sm) / 1.38 var(--data);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
 }
 
 .deleteAccountRow span {
@@ -126,7 +136,8 @@
   border-radius: 50%;
   background: var(--sky);
   color: var(--blue-dark);
-  font: 700 var(--text-sm)/1 var(--data);
+  font: 700 var(--text-sm)/1 var(--body);
+  font-variant-numeric: tabular-nums;
 }
 
 @media (--viewport-desktop-compact) {
@@ -161,9 +172,6 @@
     padding-block: var(--space-4);
   }
   .accountGrid > .wideCard:first-child h1 {
-    margin-bottom: var(--space-3);
-  }
-  .accountGrid > .wideCard:first-child .accountEmail + .muted {
     margin-bottom: var(--space-3);
   }
 }

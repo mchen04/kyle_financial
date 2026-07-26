@@ -156,6 +156,7 @@ function WorkspaceHarness({
       draft={plan}
       location={location}
       saveState="saved"
+      planAwaitingAuthority={false}
       onLocation={setLocation}
       onDraft={accept}
       onYear={vi.fn()}
@@ -193,6 +194,7 @@ function LifecycleHarness({
       draft={session.draft}
       location={session.location}
       saveState={session.saveState}
+      planAwaitingAuthority={session.planAwaitingAuthority}
       onLocation={session.setLocation}
       onDraft={(change) => {
         const current =
@@ -296,7 +298,7 @@ describe("daily cockpit integration contract", () => {
       );
     });
 
-    expect(container.textContent).toContain("Your money, right now.");
+    expect(container.querySelector("main h1")?.textContent).toBe("Home");
     expect(container.textContent).toContain(
       "exact: $1,000.00 − $250.00 = $750.00",
     );
@@ -336,14 +338,15 @@ describe("daily cockpit integration contract", () => {
       )!,
     );
     expect(container.textContent).toContain("July 2026 wrap");
-    expect(container.textContent).toContain(
-      "Total allocated, spent, and funded",
-    );
+    expect(container.textContent).toContain("Budget versus actual");
     expect(container.textContent).toContain("$1,000");
     expect(container.textContent).toContain("$262");
     expect(container.textContent).toContain("+$738");
 
-    click(button(container, "Back to Budget"));
+    // The wrap was opened from Home, so its single back control names Home and
+    // returns there. It is also reachable from Activity, which returns there.
+    click(button(container, "Back to Home"));
+    expect(container.querySelector("main h1")?.textContent).toBe("Home");
     click(button(container, "Budget"));
     click(button(container, "Edit budget"));
     const rentAmount = container.querySelector<HTMLInputElement>(
@@ -439,7 +442,7 @@ describe("daily cockpit integration contract", () => {
       input.closest("label")?.textContent?.includes("What was it?"),
     )!;
     fill(title, "Offline coffee");
-    click(button(container, "Create category without losing this expense"));
+    click(button(container, "Create category"));
     const categoryName = [
       ...container.querySelectorAll<HTMLInputElement>("input"),
     ].find((input) =>
@@ -527,5 +530,164 @@ describe("daily cockpit integration contract", () => {
     expect(mounted!.session.draft?.transactions).toContainEqual(
       expect.objectContaining({ title: "Offline coffee" }),
     );
+  });
+
+  it("reserves the headline while a cache restore waits for the server, and never paints the stale figure", async () => {
+    Object.defineProperty(navigator, "onLine", {
+      configurable: true,
+      value: true,
+    });
+    let mounted: MountedSync | undefined;
+    let bootstrapAvailable = true;
+    let releaseRefresh = () => undefined as void;
+    const refreshGate = new Promise<void>((resolve) => {
+      releaseRefresh = resolve;
+    });
+    // The same plan year with a different allocation, so the cached answer
+    // ($750 left to spend) and the authoritative answer ($1,750) are different
+    // numbers under the identical label — D2's exact shape.
+    const authoritative: StoredPlan = {
+      ...baseline,
+      expenses: [{ ...baseline.expenses[0], amountCents: 200_000 }],
+    };
+
+    jsonRequest.mockImplementation(async (url: string) => {
+      if (url === "/api/bootstrap") {
+        if (!bootstrapAvailable) throw new Error("Network unavailable");
+        return { user, plans: [baseline] };
+      }
+      if (url === "/api/auth/session") return { user };
+      if (url === "/api/plans" && !bootstrapAvailable) {
+        await refreshGate;
+        return { plans: [authoritative] };
+      }
+      return { plans: [baseline] };
+    });
+
+    const mount = async () => {
+      act(() => {
+        root.render(
+          <LifecycleHarness
+            expose={(value) => {
+              mounted = value;
+            }}
+          />,
+        );
+      });
+      await settleUntil(
+        () => mounted?.session.phase === "ready",
+        "ready account lifecycle",
+      );
+    };
+
+    await mount();
+    expect(container.textContent).toContain("$750");
+    expect(mounted!.session.planAwaitingAuthority).toBe(false);
+
+    bootstrapAvailable = false;
+    act(() => root.unmount());
+    root = createRoot(container);
+    mounted = undefined;
+    await mount();
+
+    // The restore happened and the cached plan is in state, but the reserved
+    // box is what is painted: no figure, and the label that would have given a
+    // figure its meaning is inside the reservation too.
+    expect(mounted!.session.planAwaitingAuthority).toBe(true);
+    expect(mounted!.session.draft?.expenses[0].amountCents).toBe(100_000);
+    expect(container.querySelector("main")?.getAttribute("aria-busy")).toBe(
+      "true",
+    );
+    expect(container.querySelector("[data-reserved]")).not.toBeNull();
+    expect(container.textContent).not.toContain("$750");
+    expect(container.textContent).not.toContain("Left to spend");
+    // The device is online and fetching, so it does not claim to be offline for
+    // the length of the fetch and then take it back.
+    expect(container.textContent).not.toContain(
+      "Showing the latest copy saved on this device",
+    );
+
+    // Budget reserves the same way. Its whole `h1` is the reservation, because
+    // the figure and the phrase that gives it meaning are one string.
+    click(button(container, "Budget"));
+    expect(
+      container.querySelector("main h1")?.hasAttribute("data-reserved"),
+    ).toBe(true);
+    expect(container.querySelector("main h1")?.textContent?.trim()).toBe("");
+    expect(container.querySelector("main header p")?.textContent).toBe(
+      "Budget",
+    );
+    expect(container.textContent).not.toContain("left to spend");
+    click(button(container, "Home"));
+
+    releaseRefresh();
+    await settleUntil(
+      () => mounted?.session.planAwaitingAuthority === false,
+      "authoritative plan refresh",
+    );
+
+    // One step from the reservation to the settled value, with no third state
+    // in between.
+    expect(container.querySelector("[data-reserved]")).toBeNull();
+    expect(
+      container.querySelector("main")?.getAttribute("aria-busy"),
+    ).toBeNull();
+    expect(container.textContent).toContain("Left to spend");
+    expect(container.textContent).toContain("$1,750");
+    expect(container.textContent).not.toContain("$750 ");
+  });
+
+  it("keeps a genuinely offline cached plan rendering its own value", async () => {
+    let mounted: MountedSync | undefined;
+    let bootstrapAvailable = true;
+    jsonRequest.mockImplementation(async (url: string) => {
+      if (url === "/api/bootstrap") {
+        if (!bootstrapAvailable) throw new Error("Network unavailable");
+        return { user, plans: [baseline] };
+      }
+      if (url === "/api/auth/session") return { user };
+      return { plans: [baseline] };
+    });
+    const mount = async () => {
+      act(() => {
+        root.render(
+          <LifecycleHarness
+            expose={(value) => {
+              mounted = value;
+            }}
+          />,
+        );
+      });
+      await settleUntil(
+        () => mounted?.session.phase === "ready",
+        "ready account lifecycle",
+      );
+    };
+
+    await mount();
+    bootstrapAvailable = false;
+    act(() => root.unmount());
+    root = createRoot(container);
+    mounted = undefined;
+    await mount();
+
+    // `navigator.onLine` is false for the whole suite unless a test opts in, so
+    // there is no authoritative refresh to wait for. The cached plan *is* the
+    // settled value and it renders as one, with no reservation and no busy
+    // region.
+    expect(mounted!.session.saveState).toBe("offline");
+    expect(mounted!.session.planAwaitingAuthority).toBe(false);
+    expect(container.querySelector("[data-reserved]")).toBeNull();
+    expect(
+      container.querySelector("main")?.getAttribute("aria-busy"),
+    ).toBeNull();
+    expect(container.textContent).toContain("Left to spend");
+    expect(container.textContent).toContain("$750");
+    // Rule 5's boundary, asserted rather than claimed: a genuinely offline
+    // device still gets the offline notice and the retry control it always had.
+    expect(container.textContent).toContain(
+      "Showing the latest copy saved on this device",
+    );
+    expect(button(container, "Retry sync")).toBeTruthy();
   });
 });

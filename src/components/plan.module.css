@@ -2,6 +2,10 @@
   composes: eyebrow from "./surface-primitives.module.css";
 }
 
+.groupLabel {
+  composes: groupLabel from "./surface-primitives.module.css";
+}
+
 .muted {
   composes: muted from "./surface-primitives.module.css";
 }
@@ -44,11 +48,16 @@
 .assumptionFields select {
   width: 100%;
   min-height: var(--control-md);
-  padding: var(--space-2) var(--space-3);
+  padding-block: var(--space-2);
+  padding-inline-start: var(--space-3);
   border: var(--border-hairline) solid var(--line);
   border-radius: var(--radius-sm);
-  background: var(--surface-panel);
+  background-color: var(--surface-panel);
   color: var(--ink);
+}
+
+.assumptionFields input {
+  padding-inline-end: var(--space-3);
 }
 
 .addButton {
@@ -220,7 +229,7 @@
 
 .ledgerTotal strong {
   color: var(--ink);
-  font-family: var(--data);
+  font-variant-numeric: tabular-nums;
 }
 
 .expenseList {
@@ -253,13 +262,29 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
 
+/* DF1 / D3. `flex: 1` against the fixed money field was already here and is not
+   enough on its own: at 390px the name field resolved to a 158px content box
+   and "Health and pharmacy" needs 182px, so the row rendered an ellipsis over
+   42% of the name. The previous wave added `text-overflow: ellipsis` and the
+   clip gate went green without a single box getting wider — which is why the
+   gate now requires the text to fit and treats the ellipsis as the floor
+   underneath it, not as a pass.
+
+   An input clips at its content box no matter how the box was sized, so the
+   name is made to fit by giving the row back the space the layout was holding:
+   the gap between the three controls, this field's own inner padding, and (on a
+   phone) the ledger card's horizontal padding, which the expense list now
+   spans. None of it comes out of the name. */
 .expenseName {
   flex: 1 1 auto;
   min-width: 0;
-  padding: var(--space-2) var(--space-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: var(--space-2) var(--space-1);
   border: var(--border-hairline) solid var(--color-transparent);
   border-radius: var(--radius-sm);
   background: var(--color-transparent);
@@ -370,10 +395,11 @@
 .expenseSecondary select {
   width: 100%;
   min-width: 0;
-  padding: var(--space-1) var(--space-2);
+  padding-block: var(--space-1);
+  padding-inline-start: var(--space-2);
   border: var(--border-hairline) solid var(--line);
   border-radius: var(--radius-sm);
-  background: var(--surface-panel);
+  background-color: var(--surface-panel);
   color: var(--ink);
   font-size: var(--text-md);
   min-height: var(--control-sm);
@@ -549,6 +575,13 @@
   }
   .ledgerCard .expenseList {
     order: 4;
+    /* The ledger rows span the card's own horizontal padding, which is 24px the
+       name field can have instead. The row keeps 4px so nothing sits flush
+       against the card edge. */
+    margin-inline: calc(-1 * var(--space-3));
+  }
+  .ledgerCard .expenseRow {
+    padding-inline: var(--space-1);
   }
   .ledgerCard .unusedExpensesButton {
     order: 5;
@@ -561,21 +594,33 @@
     min-width: 0;
     width: 100%;
   }
-  .sectionHeading h1 {
-    font-size: var(--text-xl);
+  .sectionHeading h2 {
+    font-size: var(--text-lg);
   }
-  .sectionHeading .addButton {
-    width: var(--control-sm);
-    overflow: hidden;
-    color: var(--color-transparent);
-    gap: var(--space-5);
-  }
+  /* The heading stacks at this width, so the add control gets its own line and
+     there is no reason to strip its label. It used to collapse to a bare 44px
+     "+" whose only name was an aria-label, while the same action on Manage
+     categories read "Add category" — an unlabeled affordance next to an empty
+     band. */
   .sectionHeading .addButton svg {
     color: var(--blue);
     flex: 0 0 auto;
   }
   .benefitSummary {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (--viewport-narrow) {
+  /* 360px is the width where the arithmetic runs out: a 182px name, a 120px
+     money field, a 44px disclosure and three gaps do not fit in 336px at any
+     padding. The money field is the one of the three whose content is bounded —
+     it holds a currency figure, never a free-text name — so at this width alone
+     it drops to the 96px step. Measured after: "Health and pharmacy" fits with
+     room to spare, and the amount is unchanged. */
+  .expensePrimary .moneyInput {
+    flex-basis: var(--layout-2xs);
+    width: var(--layout-2xs);
   }
 }
 

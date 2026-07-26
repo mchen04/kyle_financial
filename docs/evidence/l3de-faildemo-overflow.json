@@ -1,0 +1,94 @@
+{
+  "generatedAt": "2026-07-25T07:05:23.137Z",
+  "mode": "gate",
+  "failDemo": "overflow",
+  "deviceScaleFactor": 3,
+  "bars": {
+    "vertical": {
+      "home": 1,
+      "standard": 3,
+      "deep": 4,
+      "entry": 1.5
+    },
+    "cls": 0.02,
+    "minimumTargetPx": 44
+  },
+  "rows": [
+    {
+      "surface": "manage-categories",
+      "label": "Manage categories",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 4,
+      "markTime": 5029.399999991059,
+      "arrivalError": null,
+      "injection": "overflow: document body widened to 3000px",
+      "scrollHeight": 1962,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 2.324644549763033,
+      "cls": 0.0019388673322701649,
+      "shiftCount": 1,
+      "headlineFirstPaint": "Manage categories",
+      "headlineSettled": "Manage categories",
+      "headlineSamples": [
+        {
+          "text": "Manage categories",
+          "busy": false
+        }
+      ],
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": true,
+      "clientWidth": 390,
+      "scrollWidth": 3000,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": ["horizontal overflow: clientWidth 390 !== scrollWidth 3000"]
+    },
+    {
+      "surface": "benefits",
+      "label": "Benefits",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 4,
+      "markTime": 8597.199999988079,
+      "arrivalError": null,
+      "injection": "overflow: document body widened to 3000px",
+      "scrollHeight": 2194,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 2.5995260663507107,
+      "cls": 0,
+      "shiftCount": 0,
+      "headlineFirstPaint": "Benefits",
+      "headlineSettled": "Benefits",
+      "headlineSamples": [
+        {
+          "text": "Benefits",
+          "busy": false
+        }
+      ],
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": true,
+      "clientWidth": 390,
+      "scrollWidth": 3000,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": ["horizontal overflow: clientWidth 390 !== scrollWidth 3000"]
+    }
+  ]
+}

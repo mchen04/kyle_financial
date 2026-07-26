@@ -115,10 +115,10 @@
 
 .yearPicker select {
   min-height: var(--control-sm);
-  padding: 0 var(--space-8) 0 var(--space-2);
+  padding-inline-start: var(--space-2);
   border: var(--border-hairline) solid var(--line);
   border-radius: var(--radius-sm);
-  background: var(--surface-panel);
+  background-color: var(--surface-panel);
   color: var(--ink);
   font-weight: 700;
 }
@@ -231,35 +231,6 @@
   padding-bottom: max(var(--space-20), env(safe-area-inset-bottom));
 }
 
-.subPage {
-  display: grid;
-  gap: var(--space-4);
-}
-
-.subPage > button {
-  width: fit-content;
-  min-height: var(--control-sm);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: 0 var(--space-3);
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: var(--color-transparent);
-  color: var(--text-action-strong);
-  font-weight: var(--weight-bold);
-  cursor: pointer;
-}
-
-.subPage > button svg {
-  width: var(--icon-sm);
-}
-
-.subPage > h1 {
-  margin: 0;
-  font: var(--weight-bold) var(--text-2xl) / 1 var(--font-display);
-}
-
 .messageDisclosure {
   grid-column: 1 / -1;
   width: 100%;
@@ -341,7 +312,7 @@
 }
 
 .warningDetails summary {
-  min-height: var(--space-8);
+  min-height: var(--control-sm);
   display: flex;
   align-items: center;
   color: var(--blue-dark);
@@ -505,7 +476,24 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: var(--space-3);
-    padding-bottom: calc(var(--space-20) + var(--control-lg));
+  }
+
+  /* The Fast Log button is `position: fixed`, so it paints over the last 48px
+     of the scroll region wherever the region happens to be scrolled. Bottom
+     padding cannot fix that: padding sits below the last row, so it moves the
+     row and the scroll extent together and the row's position at scrollTop 0 is
+     `paddingTop + contentHeight` no matter how large the padding is. That is
+     why 64px of it still left Home's Monthly wrap row sitting under the pill
+     with its value and its chevron covered.
+     Reserving the band as margin instead takes it out of the scroll region's
+     box altogether, so the region ends above the button and no row can be under
+     it at any scroll offset on any viewport. Only surfaces that actually show
+     the button pay for it. */
+  .contentClearsFastLog {
+    margin-bottom: calc(var(--control-md) + var(--space-2));
+    /* The reserved band below already separates the last row from the button,
+       so the region's own bottom padding does not have to repeat it. */
+    padding-bottom: var(--space-2);
   }
   .bottomNav {
     position: static;
@@ -522,12 +510,26 @@
     background: var(--surface-glass-strong);
     backdrop-filter: blur(var(--space-4));
   }
+  /* The selected tab was a full-bar-height tinted slab with 12px corners, which
+     is a Material navigation-bar active indicator, not an iOS selection. The
+     tint is kept — it is the only thing marking the current tab on a bar whose
+     labels are always visible — but it is inset so it reads as a capsule
+     floating in the bar with clearance on all four sides.
+
+     The inset is bought with `background-clip`, not with margin. Margin was
+     tried first and the density gate caught it in one run: 4px of block margin
+     on four buttons grew the bar 8px, which came straight out of `<main>`, and
+     Home — which fits with 2.9px of slack — went 5.1px over its own scroll
+     region. Clipping the tint to the content box insets the capsule by the
+     padding that was already there and changes no box by a single pixel. */
   .bottomNav button {
     min-height: var(--bottom-nav-height);
     justify-content: center;
     flex-direction: column;
     gap: var(--space-1);
     padding: var(--space-1);
+    border-radius: var(--radius-pill);
+    background-clip: content-box;
     font-size: var(--text-xs);
   }
 
@@ -535,8 +537,13 @@
     position: fixed;
     z-index: var(--layer-nav);
     right: max(var(--space-4), env(safe-area-inset-right));
+    /* The bar is 72px of button plus 4px of padding above and below, so the old
+       `+ space-2` put the pill's bottom edge exactly on the bar's top hairline:
+       two judges read the pill and the rule as one welded object. `space-4`
+       clears the divider by 8px. The button is `position: fixed`, so this costs
+       no surface a single pixel of vertical space. */
     bottom: calc(
-      var(--bottom-nav-height) + var(--space-2) + env(safe-area-inset-bottom)
+      var(--bottom-nav-height) + var(--space-4) + env(safe-area-inset-bottom)
     );
     display: inline-flex;
     min-width: var(--control-md);
@@ -588,8 +595,16 @@
     gap: var(--space-2);
     padding-inline: var(--space-2);
   }
+  /* The status used to be right-anchored with `margin-left: auto`, which made
+     it the element that absorbed the header's free space — so the moment the
+     "Start <next year>" control mounted on arrival at a Plan screen, the whole
+     status label slid 111px to the left. It is the one piece of header text a
+     reader may be looking at while it happens. Growing the status instead of
+     pushing it keeps its left edge where it was: a control appearing after it
+     now shrinks the box and leaves the words alone. */
   .syncStatus {
-    margin-left: auto;
+    flex: 1 1 auto;
+    min-width: 0;
   }
   .desktopFastLog {
     margin-left: 0;

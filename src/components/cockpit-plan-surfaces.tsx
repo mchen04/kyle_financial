@@ -30,14 +30,17 @@ export function MonthlyWrapSurface({
   plan,
   result,
   period,
+  backTo,
   onBack,
 }: {
   today: string;
   plan: StoredPlan;
   result: PlanResult;
   period: SelectedPeriod;
+  backTo: "home" | "activity";
   onBack: () => void;
 }) {
+  const backLabel = backTo === "activity" ? "Activity" : "Home";
   const month =
     period.kind === "month"
       ? period
@@ -49,9 +52,13 @@ export function MonthlyWrapSurface({
   const phase = monthlyWrapPhase(month.year, month.month, today);
   if (phase === "future") {
     return (
-      <BackPage title={`${periodLabel(month)} wrap`} onBack={onBack}>
+      <BackPage
+        title={`${periodLabel(month)} wrap`}
+        backLabel={backLabel}
+        onBack={onBack}
+      >
         <section className={styles.panel}>
-          <p className={styles.eyebrow}>Forecast not started</p>
+          <p className={styles.groupLabel}>Forecast not started</p>
           <h2>This month has not begun.</h2>
           <p className={styles.emptyState}>
             Return when the month begins to see live spending variance and
@@ -71,7 +78,11 @@ export function MonthlyWrapSurface({
   const livePreview = phase === "current";
   const balance = wrapBalanceCopy(wrap.budget.safeToSpendCents, phase);
   return (
-    <BackPage title={`${periodLabel(month)} wrap`} onBack={onBack}>
+    <BackPage
+      title={`${periodLabel(month)} wrap`}
+      backLabel={backLabel}
+      onBack={onBack}
+    >
       <section className={styles.wrapHero}>
         <p>{balance.label}</p>
         <strong>{money(balance.valueCents)}</strong>
@@ -95,15 +106,17 @@ export function MonthlyWrapSurface({
       <section className={styles.panel}>
         <div className={styles.sectionHeading}>
           <div>
-            <p className={styles.eyebrow}>Budget versus actual</p>
-            <h2>Total allocated, spent, and funded</h2>
+            {/* C5. The eyebrow and the heading said the same thing twice, and
+                the heading spent 55px and two lines doing it. One of them is
+                the subject of the section; the other was a restatement. */}
+            <h2>Budget versus actual</h2>
           </div>
         </div>
         <dl className={styles.mathBreakdown}>
           <Metric label="Total budget" value={wrap.budget.allocatedCents} />
           <Metric label="Spent & funded" value={wrap.budget.actualCents} />
           <Metric
-            label="Total remaining"
+            label="Left to spend"
             value={wrap.budget.remainingCents}
             signed
           />
@@ -111,7 +124,7 @@ export function MonthlyWrapSurface({
       </section>
       <div className={styles.homeGrid}>
         <WrapList
-          title={livePreview ? "Currently unspent" : "Wins"}
+          title={livePreview ? "Currently unspent" : "Under budget"}
           items={wrap.underBudget}
         />
         <WrapList title="Overruns" items={wrap.overBudget} />
@@ -119,8 +132,7 @@ export function MonthlyWrapSurface({
       <section className={styles.panel}>
         <div className={styles.sectionHeading}>
           <div>
-            <p className={styles.eyebrow}>How the impact is built</p>
-            <h2>Every contribution and variance, counted once</h2>
+            <h2>How the savings impact is built</h2>
           </div>
         </div>
         <dl className={styles.mathBreakdown}>
@@ -170,7 +182,7 @@ function WrapList({
 }) {
   return (
     <section className={styles.panel}>
-      <p className={styles.eyebrow}>{title}</p>
+      <p className={styles.groupLabel}>{title}</p>
       {items.length ? (
         <div className={styles.categoryRows}>
           {items.map((item) => (
@@ -223,29 +235,44 @@ export function PlanHub({
     savingsSources(result),
     plan.startingSavingsCents,
   );
+  // The two branches that used to print a "… start +" term, kept exactly: a
+  // future plan showed it when a starting balance had been entered, and a
+  // current one whenever the projection had an ending balance to be measured
+  // from (in which case it printed `?? 0`, which is what the fallback is).
+  const showStartingBalance = futurePlan
+    ? plan.startingSavingsCents !== undefined
+    : annualProjection.projectedEndingSavingsCents !== undefined;
   return (
     <div className={`${styles.surfaceStack} ${styles.planHub}`}>
+      {/* C2/C7. This was a 46.8px two-line *sentence* — "$9,837 cash savings
+          planned." — which cost 98px of the one screen that decides whether the
+          reader has to scroll, restated a figure the money-flow legend already
+          prints in full below, and was not the number this surface exists to
+          answer. It is now the same shape Budget uses: a 13px eyebrow naming
+          the screen and a 24px headline carrying the answer and nothing else,
+          with its one-line qualifier under it (C7). The annual figure is not
+          reprinted here at all, so it is stated exactly once on the surface, in
+          the money-flow legend that computes it. */}
       <header className={styles.surfaceHeader}>
         <div>
           <p className={styles.eyebrow}>{plan.year} annual plan</p>
-          <h1>{money(result.cashSavingsAnnualCents)} cash savings planned.</h1>
-          <p>
-            {money(result.savingsMonthlyCents)} each month after tax, benefits,
-            and planned allocations.
-          </p>
+          <h1>
+            {money(Math.abs(result.savingsMonthlyCents))}{" "}
+            {result.savingsMonthlyCents < 0
+              ? "short each month"
+              : "saved each month"}
+          </h1>
         </div>
       </header>
+      <p className={styles.budgetNote}>
+        Cash left after tax, benefits, and every planned allocation.
+      </p>
+      {/* Each figure once. The monthly total used to be both this section's
+          "Monthly outcome" cell and, in words, the headline above; it is now
+          only the headline, so this section carries the two facts the headline
+          does not: what the year is projected to end at, and the starting
+          balance that projection is measured from. */}
       <section className={styles.planOutcome}>
-        <div>
-          <p className={styles.eyebrow}>Annual outcome</p>
-          <strong>{money(result.cashSavingsAnnualCents)}</strong>
-          <span>cash savings</span>
-        </div>
-        <div>
-          <p className={styles.eyebrow}>Monthly outcome</p>
-          <strong>{money(result.savingsMonthlyCents)}</strong>
-          <span>cash savings</span>
-        </div>
         <label>
           Starting savings
           <span>
@@ -269,7 +296,7 @@ export function PlanHub({
           </span>
         </label>
         <div>
-          <p className={styles.eyebrow}>
+          <p className={styles.groupLabel}>
             {futurePlan
               ? annualProjection.projectedEndingSavingsCents === undefined
                 ? "Planned savings change"
@@ -284,67 +311,108 @@ export function PlanHub({
                 annualProjection.projectedSavingsChangeCents,
             )}
           </strong>
-          <span>
-            {futurePlan
-              ? plan.startingSavingsCents === undefined
-                ? `${money(
-                    annualProjection.plannedSavingsChangeCents,
-                    2,
-                  )} planned total (cash, payroll/employer, allocations); observed variance begins when the year starts`
-                : `${money(plan.startingSavingsCents, 2)} start + ${money(
-                    annualProjection.plannedSavingsChangeCents,
-                    2,
-                  )} planned total (cash, payroll/employer, allocations); observed variance begins when the year starts`
-              : annualProjection.projectedEndingSavingsCents === undefined
-                ? `${money(
-                    annualProjection.plannedSavingsChangeCents,
-                    2,
-                  )} planned total (cash, payroll/employer, allocations) + ${money(
-                    annualProjection.observedSpendingVarianceCents,
-                    2,
-                  )} spending variance + ${money(
-                    annualProjection.observedSavingFundingVarianceCents,
-                    2,
-                  )} funding variance`
-                : `${money(plan.startingSavingsCents ?? 0, 2)} start + ${money(
-                    annualProjection.plannedSavingsChangeCents,
-                    2,
-                  )} planned total (cash, payroll/employer, allocations) + ${money(
-                    annualProjection.observedSpendingVarianceCents,
-                    2,
-                  )} spending variance + ${money(
-                    annualProjection.observedSavingFundingVarianceCents,
-                    2,
-                  )} funding variance`}
-          </span>
         </div>
       </section>
-      <div className={styles.planGrid}>
-        <PlanAllocationChart plan={plan} />
-        <MoneyFlow result={result} expenses={plan.expenses} />
-      </div>
+      {/* The same four terms, to the same cent, in the same order — as the row
+          list this app already gives the identical concept on Monthly wrap
+          ("How the savings impact is built") instead of as one run-on sentence.
+          It was a single 90px paragraph, which is one datum per 90px on the
+          least dense primary tab in the app, and it read as prose rather than
+          as the arithmetic it is. Nothing is added, removed or rounded: the
+          conditions below are the four branches the sentence had, term for
+          term. C1/C5/C6. */}
+      <dl className={styles.mathBreakdown}>
+        {showStartingBalance && (
+          <ProjectionTerm
+            label="Starting balance"
+            valueCents={plan.startingSavingsCents ?? 0}
+          />
+        )}
+        <ProjectionTerm
+          label="Planned total"
+          valueCents={annualProjection.plannedSavingsChangeCents}
+        />
+        {!futurePlan && (
+          <ProjectionTerm
+            label="Spending variance"
+            valueCents={annualProjection.observedSpendingVarianceCents}
+            signed
+          />
+        )}
+        {!futurePlan && (
+          <ProjectionTerm
+            label="Funding variance"
+            valueCents={annualProjection.observedSavingFundingVarianceCents}
+            signed
+          />
+        )}
+      </dl>
+      <p className={styles.budgetNote}>
+        Planned total is cash, payroll/employer, and allocations.
+        {futurePlan ? " Observed variance begins when the year starts." : ""}
+      </p>
+      {/* C5. Four homogeneous units, scanned down a column, acted on one at a
+          time — that is a row list by the rule's own terms, and it fails the
+          card test on the "no more than 3 on the surface" clause outright. Each
+          was an 80px card plus a 16px gap; each is now a 48px row separated by a
+          hairline (C1, C4), which is 192px back and the same row the Monthly
+          wrap link already uses everywhere else in the app. */}
       <div className={styles.linkGrid}>
         <PlanLink
           label="Plan details"
-          detail="Income, tax, and allocation inputs"
+          detail="Income, tax, allocations"
           onClick={() => onScreen("plan-details")}
         />
         <PlanLink
           label="Benefits"
-          detail="Payroll and employer contributions"
+          detail="Payroll and employer"
           onClick={() => onScreen("benefits")}
         />
         <PlanLink
           label="Compare years"
-          detail="See plans side by side"
+          detail="Every saved year"
           onClick={() => onScreen("compare")}
         />
         <PlanLink
           label="Edit budget"
-          detail="Change planned category amounts"
+          detail="Planned category amounts"
           onClick={() => onScreen("edit-budget")}
         />
       </div>
+      {/* DEN-6/C7. The two charts used to sit between the figures and the
+          destinations, so a 300px donut restating one number was what a reader
+          met first and every link on the hub started below the fold. The
+          surface's own facts and its four destinations come first; the charts
+          explain them and follow them. */}
+      <div className={styles.planGrid}>
+        <PlanAllocationChart plan={plan} />
+        <MoneyFlow result={result} expenses={plan.expenses} />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * One term of the projection arithmetic. `Metric` is not reused because it
+ * rounds to the dollar and these four terms were published to the cent; the
+ * figures must not change precision just because their container did.
+ */
+function ProjectionTerm({
+  label,
+  valueCents,
+  signed = false,
+}: {
+  label: string;
+  valueCents: number;
+  signed?: boolean;
+}) {
+  return (
+    <div>
+      <dt>{label}</dt>
+      <dd data-negative={valueCents < 0}>
+        {signed && valueCents > 0 ? "+" : ""}
+        {money(valueCents, 2)}
+      </dd>
     </div>
   );
 }
@@ -359,11 +427,9 @@ function PlanLink({
   onClick: () => void;
 }) {
   return (
-    <button className={styles.actionCard} onClick={onClick}>
-      <span>
-        <strong>{label}</strong>
-        <small>{detail}</small>
-      </span>
+    <button className={styles.navRow} data-lead="none" onClick={onClick}>
+      <strong>{label}</strong>
+      <em>{detail}</em>
       <ChevronRight />
     </button>
   );

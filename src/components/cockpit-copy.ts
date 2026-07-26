@@ -18,7 +18,8 @@ export function wrapBalanceCopy(
       phase === "future"
         ? "Forecast not started"
         : phase === "current"
-          ? `Live preview · ${overBudget ? "over budget" : "currently unspent"}`
+          ? // D4: the same quantity Home and Budget name "left to spend".
+            `Live preview · ${overBudget ? "over budget" : "left to spend"}`
           : overBudget
             ? "Over budget"
             : "Under budget",

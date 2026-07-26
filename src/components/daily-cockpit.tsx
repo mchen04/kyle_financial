@@ -16,7 +16,6 @@ export {
   periodForYear,
 } from "./cockpit-period-control";
 
-import { CalendarDays, ChevronRight, Sparkles } from "lucide-react";
 import { guidanceBucket } from "@/domain/budget";
 import {
   categoryRollupIsVisible,
@@ -33,9 +32,22 @@ import {
 } from "./cockpit-home-projection";
 import { PeriodControl, savingsSources } from "./cockpit-period-control";
 import { selectedPeriodPhase } from "./cockpit-period-phase";
-import { CategoryRow, Metric, TransactionRows } from "./cockpit-rows";
+import {
+  CategoryRow,
+  Metric,
+  MonthlyWrapRow,
+  TransactionRows,
+} from "./cockpit-rows";
 import { money, type Screen, type StoredPlan } from "./plan-types";
 import styles from "./cockpit-shared.module.css";
+
+/**
+ * The only content a reserved headline box carries. A non-breaking space forms
+ * exactly one line box in whatever font and leading the settled text would have
+ * used, so the reservation is the settled geometry by construction rather than
+ * by a hard-coded height that could drift away from it.
+ */
+const RESERVED_LINE = "\u00a0";
 
 export function HomeSurface({
   today,
@@ -43,6 +55,7 @@ export function HomeSurface({
   result,
   period,
   compactForOffline,
+  awaitingAuthority,
   onPeriod,
   onScreen,
   onCategory,
@@ -53,6 +66,7 @@ export function HomeSurface({
   result: PlanResult;
   period: SelectedPeriod;
   compactForOffline: boolean;
+  awaitingAuthority: boolean;
   onPeriod: (period: SelectedPeriod) => void;
   onScreen: (screen: Screen) => void;
   onCategory: (id: string) => void;
@@ -86,7 +100,25 @@ export function HomeSurface({
         right.date.localeCompare(left.date) ||
         right.updatedAt.localeCompare(left.updatedAt),
     )
-    .slice(0, 4);
+    // D4. Home is required to be exactly one screen at 360x740, 390x844 and
+    // 430x932, and those three differ by 192px of scroll region while the rest
+    // of the surface — the answer, the attention rows, the wrap row — is fixed
+    // by what it has to say. Something has to absorb 192px, and until now
+    // nothing did: the surface was sized for 390x844 (632px of content in 635px
+    // of region, which is why that one viewport looked perfect), so 430x932 sat
+    // on a 91px dead band and 360x740 pushed 86px below the fold and cut the
+    // last transaction through its own subtitle.
+    //
+    // The recent list is the only block on Home whose length is a judgement
+    // call rather than a fact — it is a preview of a ledger that is one labelled
+    // tap away on Activity, and it was already an arbitrary two of sixty-one. So
+    // it is the one lever, and the count is chosen per viewport in CSS (a media
+    // query, not a measurement, so there is no second paint and no layout
+    // shift): three rows at 430x932, two at 390x844, and none at 360x740, where
+    // the answer, the three attention rows and the wrap row already use the
+    // whole screen. Three are rendered and the stylesheet reveals as many as fit
+    // (HIG-L1, DEN-6, C7).
+    .slice(0, 3);
   const progress =
     rollup.spendingAllocatedCents === 0
       ? 0
@@ -98,47 +130,59 @@ export function HomeSurface({
   const unstarted = phase === "future";
   return (
     <div
-      className={`${styles.surfaceStack} ${
+      className={`${styles.surfaceStack} ${styles.homeSurface} ${
         compactForOffline ? styles.offlineHome : ""
       }`}
     >
       <header className={styles.surfaceHeader}>
         <div>
-          <p className={styles.eyebrow}>
-            {unstarted ? "Planned money cockpit" : "Today's money cockpit"}
-          </p>
-          <h1>{unstarted ? "Your plan, ahead." : "Your money, right now."}</h1>
+          <h1>Home</h1>
         </div>
         <PeriodControl period={period} today={today} onPeriod={onPeriod} />
       </header>
 
       <section className={styles.runwayCard}>
-        <div className={styles.runwayHeadline}>
+        {/* Two legal states and no third (C9-2): the reserved box, or the
+            settled value. The reserved box is these same three elements
+            carrying a single non-breaking space, so each line box is set by the
+            same font, leading and grid gap as the settled block and the swap
+            moves nothing. The label lives inside the reservation because it is
+            derived from the same provisional numbers (C9-3). */}
+        <div
+          className={styles.runwayHeadline}
+          data-reserved={awaitingAuthority || undefined}
+        >
           <span>
-            {unstarted
-              ? "Planned spending"
-              : over
-                ? "Over budget"
-                : "Left to spend"}
+            {awaitingAuthority
+              ? RESERVED_LINE
+              : unstarted
+                ? "Planned spending"
+                : over
+                  ? "Over budget"
+                  : "Left to spend"}
           </span>
-          <strong data-negative={over}>
-            {money(
-              unstarted
-                ? rollup.spendingAllocatedCents
-                : Math.abs(rollup.safeToSpendCents),
-            )}
+          <strong data-negative={!awaitingAuthority && over}>
+            {awaitingAuthority
+              ? RESERVED_LINE
+              : money(
+                  unstarted
+                    ? rollup.spendingAllocatedCents
+                    : Math.abs(rollup.safeToSpendCents),
+                )}
           </strong>
+          {/* The period is named by the month picker directly above, so it is
+              not restated here. */}
           <small>
-            {unstarted ? (
+            {awaitingAuthority ? (
+              RESERVED_LINE
+            ) : unstarted ? (
               <>
-                {periodLabel(period)} ·{" "}
                 {money(rollup.spendingAllocatedCents, 2)} planned; actuals begin
                 when the period starts
               </>
             ) : (
               <>
-                {periodLabel(period)} · exact:{" "}
-                {money(rollup.spendingAllocatedCents, 2)} −{" "}
+                exact: {money(rollup.spendingAllocatedCents, 2)} −{" "}
                 {money(rollup.spendingActualCents, 2)} ={" "}
                 {money(rollup.safeToSpendCents, 2)}
               </>
@@ -155,19 +199,10 @@ export function HomeSurface({
         >
           <i style={{ width: `${progress}%` }} />
         </div>
+        {/* Budgeted, spent and remaining are the three terms of the exact line
+            directly above, to the cent. Only the savings impact is a fact the
+            equation does not already carry, so only it gets its own row. */}
         <dl className={styles.runwayMetrics}>
-          <Metric
-            label={unstarted ? "Spending plan" : "Budgeted"}
-            value={rollup.spendingAllocatedCents}
-          />
-          <Metric
-            label={unstarted ? "Actuals to date" : "Spent"}
-            value={rollup.spendingActualCents}
-          />
-          <Metric
-            label={unstarted ? "Planned available" : "Remaining"}
-            value={rollup.spendingRemainingCents}
-          />
           <Metric
             label={homeSavingsImpactLabel(period, today)}
             value={savingsImpactCents}
@@ -176,97 +211,45 @@ export function HomeSurface({
         </dl>
       </section>
 
-      <div className={styles.homeGrid}>
-        <section className={styles.panel}>
-          <div className={styles.sectionHeading}>
-            <div>
-              <p className={styles.eyebrow}>Needs attention</p>
-              <h2>
-                {attention.length ? "Tight categories" : "Budget is on track"}
-              </h2>
-            </div>
-            <button
-              className={styles.textButton}
-              onClick={() => onScreen("budget")}
-            >
-              View budget <ChevronRight />
-            </button>
+      <section className={styles.rowGroup}>
+        <h2 className={styles.groupLabel}>Needs attention</h2>
+        {attention.length ? (
+          <div className={styles.categoryRows}>
+            {attention.map((item) => (
+              <CategoryRow
+                key={item.category.id}
+                item={item}
+                onClick={() => onCategory(item.category.id)}
+              />
+            ))}
           </div>
-          {attention.length ? (
-            <div className={styles.categoryRows}>
-              {attention.map((item) => (
-                <CategoryRow
-                  key={item.category.id}
-                  item={item}
-                  unstarted={unstarted}
-                  onClick={() => onCategory(item.category.id)}
-                />
-              ))}
-            </div>
-          ) : (
-            <p className={styles.emptyState}>
-              Nothing is over budget in this period. Keep logging expenses to
-              protect the signal.
-            </p>
-          )}
-        </section>
+        ) : (
+          <p className={styles.groupEmpty}>
+            Nothing is over budget in this period.
+          </p>
+        )}
+      </section>
 
-        <section className={styles.panel}>
-          <div className={styles.sectionHeading}>
-            <div>
-              <p className={styles.eyebrow}>Recent activity</p>
-              <h2>Correct it while it&apos;s fresh</h2>
-            </div>
-            <button
-              className={styles.textButton}
-              onClick={() => onScreen("activity")}
-            >
-              All activity <ChevronRight />
-            </button>
-          </div>
-          {recent.length ? (
-            <TransactionRows
-              transactions={recent}
-              categories={rollup.categories.map(({ category }) => category)}
-              onEdit={onEditTransaction}
-            />
-          ) : (
-            <p className={styles.emptyState}>
-              No expenses logged for this period yet. Fast Log is ready when you
-              are.
-            </p>
-          )}
-        </section>
-      </div>
+      <section className={styles.rowGroup} data-home-group="recent">
+        <h2 className={styles.groupLabel}>Recent activity</h2>
+        {recent.length ? (
+          <TransactionRows
+            transactions={recent}
+            categories={rollup.categories.map(({ category }) => category)}
+            onEdit={onEditTransaction}
+          />
+        ) : (
+          <p className={styles.groupEmpty}>
+            No expenses logged for this period yet.
+          </p>
+        )}
+      </section>
 
-      <div className={styles.actionRail}>
-        <button
-          className={styles.actionCard}
-          onClick={() => onScreen("wrap")}
-          disabled={period.kind !== "month" || unstarted}
-        >
-          <CalendarDays />
-          <span>
-            <strong>Monthly wrap</strong>
-            <small>
-              {unstarted
-                ? "Available when this month begins"
-                : period.kind === "month"
-                  ? "See wins, overruns, and savings impact"
-                  : "Choose a month to open its wrap"}
-            </small>
-          </span>
-          <ChevronRight />
-        </button>
-        <button className={styles.actionCard} onClick={() => onScreen("plan")}>
-          <Sparkles />
-          <span>
-            <strong>Annual plan</strong>
-            <small>See the long view behind today&apos;s choices</small>
-          </span>
-          <ChevronRight />
-        </button>
-      </div>
+      <MonthlyWrapRow
+        period={period}
+        unstarted={unstarted}
+        onOpen={() => onScreen("wrap")}
+      />
     </div>
   );
 }
@@ -275,6 +258,7 @@ export function BudgetSurface({
   today,
   plan,
   period,
+  awaitingAuthority,
   onPeriod,
   onScreen,
   onCategory,
@@ -282,6 +266,7 @@ export function BudgetSurface({
   today: string;
   plan: StoredPlan;
   period: SelectedPeriod;
+  awaitingAuthority: boolean;
   onPeriod: (period: SelectedPeriod) => void;
   onScreen: (screen: Screen) => void;
   onCategory: (id: string) => void;
@@ -296,81 +281,79 @@ export function BudgetSurface({
     unstarted ? [] : observedTransactions,
     period,
   );
+  // One list in plan order. The old surface rendered every over-budget or
+  // near-limit category twice — once in a "Needs attention" block, once here —
+  // and that block appeared and disappeared with the selected period, which was
+  // this surface's largest layout shift. Over-budget rows keep their own
+  // warning colour and read "$81 over" in place of a negative remainder, so
+  // nothing about them is hidden by dropping the duplicate.
   const visibleCategories = rollup.categories.filter(categoryRollupIsVisible);
-  const attention = visibleCategories.filter(
-    ({ remainingCents, allocatedCents, category }) =>
-      remainingCents < 0 ||
-      (allocatedCents > 0 &&
-        remainingCents <= Math.ceil(allocatedCents / 10) &&
-        guidanceBucket(category) !== "saving"),
-  );
   return (
     <div className={`${styles.surfaceStack} ${styles.budgetSurface}`}>
       <header className={styles.surfaceHeader}>
         <div>
           <p className={styles.eyebrow}>Budget</p>
-          <h1>
-            {unstarted
-              ? `${money(rollup.spendingAllocatedCents)} planned spending`
-              : `${money(Math.abs(rollup.safeToSpendCents))} ${
-                  rollup.safeToSpendCents < 0 ? "over" : "safe to spend"
-                }`}
+          {/* The eyebrow is a fixed section name and never moves. The `h1`
+              carries both the figure and the phrase that gives it meaning, so
+              the whole line is the reservation (C9-2, C9-3). It sets on one
+              line in every phase at every width, so one non-breaking space
+              reserves exactly the settled box. */}
+          <h1 data-reserved={awaitingAuthority || undefined}>
+            {awaitingAuthority
+              ? RESERVED_LINE
+              : unstarted
+                ? `${money(rollup.spendingAllocatedCents)} planned spending`
+                : /* D4. One quantity, one name. This figure is the same
+                     cents Home prints under "Left to spend" and Monthly wrap
+                     printed as both "currently unspent" and "Total remaining":
+                     four names for one number, which reads as four numbers. */
+                  `${money(Math.abs(rollup.safeToSpendCents))} ${
+                    rollup.safeToSpendCents < 0 ? "over" : "left to spend"
+                  }`}
           </h1>
         </div>
         <PeriodControl period={period} today={today} onPeriod={onPeriod} />
       </header>
-      <div className={styles.toolbar}>
-        {unstarted ? (
-          <p>
-            <strong>{money(rollup.spendingAllocatedCents, 2)}</strong> is
-            planned for spending and{" "}
-            <strong>{money(rollup.savingAllocatedCents, 2)}</strong> for saving.
-            Actual spending begins when {periodLabel(period)} starts.
-          </p>
-        ) : (
-          <p>
-            <strong>{money(rollup.actualCents, 2)}</strong> spent or funded of{" "}
-            {money(rollup.allocatedCents, 2)} total. Safe to spend keeps{" "}
-            {money(rollup.savingAllocatedCents, 2)} of saving allocations
-            reserved; exact remainder{" "}
-            <strong>{money(rollup.safeToSpendCents, 2)}</strong>.
-          </p>
-        )}
+      {/* One box in both period phases: identical labels, identical row count,
+          so stepping the month changes digits and never geometry (C9). */}
+      <dl className={styles.budgetMath}>
         <div>
-          <button onClick={() => onScreen("edit-budget")}>Edit budget</button>
-          <button onClick={() => onScreen("manage-categories")}>
-            Manage categories
-          </button>
+          <dt>Spent or funded</dt>
+          <dd>{money(rollup.actualCents, 2)}</dd>
         </div>
+        <div>
+          <dt>Allocated total</dt>
+          <dd>{money(rollup.allocatedCents, 2)}</dd>
+        </div>
+        <div>
+          <dt>Saving reserved</dt>
+          <dd>{money(rollup.savingAllocatedCents, 2)}</dd>
+        </div>
+        <div>
+          <dt>Safe to spend</dt>
+          <dd data-negative={rollup.safeToSpendCents < 0}>
+            {money(rollup.safeToSpendCents, 2)}
+          </dd>
+        </div>
+      </dl>
+      <p className={styles.budgetNote}>
+        {unstarted
+          ? `Actual spending begins when ${periodLabel(period)} starts.`
+          : "Safe to spend holds saving allocations in reserve."}
+      </p>
+      <div className={styles.budgetActions}>
+        <button onClick={() => onScreen("edit-budget")}>Edit budget</button>
+        <button onClick={() => onScreen("manage-categories")}>
+          Manage categories
+        </button>
       </div>
-      {attention.length > 0 && (
-        <section className={styles.panel}>
-          <p className={styles.eyebrow}>Needs attention</p>
-          <div className={styles.categoryRows}>
-            {attention.map((item) => (
-              <CategoryRow
-                key={item.category.id}
-                item={item}
-                unstarted={unstarted}
-                onClick={() => onCategory(item.category.id)}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-      <section className={styles.panel}>
-        <div className={styles.sectionHeading}>
-          <div>
-            <p className={styles.eyebrow}>All categories</p>
-            <h2>Planned and actual</h2>
-          </div>
-        </div>
+      <section className={styles.rowGroup}>
+        <h2 className={styles.groupLabel}>All categories</h2>
         <div className={styles.categoryRows}>
           {visibleCategories.map((item) => (
             <CategoryRow
               key={item.category.id}
               item={item}
-              unstarted={unstarted}
               onClick={() => onCategory(item.category.id)}
             />
           ))}

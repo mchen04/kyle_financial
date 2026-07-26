@@ -1,0 +1,199 @@
+{
+  "generatedAt": "2026-07-25T07:21:49.056Z",
+  "mode": "gate",
+  "failDemo": null,
+  "deviceScaleFactor": 3,
+  "bars": {
+    "vertical": {
+      "home": 1,
+      "standard": 3,
+      "deep": 4,
+      "entry": 1.5
+    },
+    "cls": 0.02,
+    "minimumTargetPx": 44,
+    "chromeAboveExemptList": 0.6
+  },
+  "rows": [
+    {
+      "surface": "activity",
+      "label": "Activity",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 3,
+      "listExemption": {
+        "reason": "transaction history (named by the mission)",
+        "rowSelector": "main [data-density-row=\"transaction\"]"
+      },
+      "markTime": 5607.5,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": {
+        "rowSelector": "main [data-density-row=\"transaction\"]",
+        "rowCount": 61,
+        "chromeAboveFirstRowPx": 188.89,
+        "chromeAboveFirstRowCost": 0.22380405805687204,
+        "rowHeights": [
+          {
+            "height": 64,
+            "count": 46
+          },
+          {
+            "height": 80,
+            "count": 15
+          }
+        ],
+        "rowRegionPx": 4144,
+        "error": null
+      },
+      "scrollHeight": 4397,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 5.209715639810427,
+      "cls": 0,
+      "shiftCount": 0,
+      "headlineFirstPaint": "Activity",
+      "headlineSettled": "Activity",
+      "headlineSamples": [
+        {
+          "text": "Activity",
+          "busy": false
+        }
+      ],
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "activity",
+      "label": "Activity",
+      "viewport": "360x740",
+      "primaryViewport": false,
+      "bar": 3,
+      "listExemption": {
+        "reason": "transaction history (named by the mission)",
+        "rowSelector": "main [data-density-row=\"transaction\"]"
+      },
+      "markTime": 5950.0999999940395,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": {
+        "rowSelector": "main [data-density-row=\"transaction\"]",
+        "rowCount": 61,
+        "chromeAboveFirstRowPx": 188.89,
+        "chromeAboveFirstRowCost": 0.25525760135135134,
+        "rowHeights": [
+          {
+            "height": 64,
+            "count": 46
+          },
+          {
+            "height": 80,
+            "count": 15
+          }
+        ],
+        "rowRegionPx": 4144,
+        "error": null
+      },
+      "scrollHeight": 4397,
+      "documentScrollHeight": 740,
+      "measuredRegion": "main",
+      "innerHeight": 740,
+      "documentScrollCost": 1,
+      "verticalCost": 5.941891891891892,
+      "cls": 0,
+      "shiftCount": 0,
+      "headlineFirstPaint": "Activity",
+      "headlineSettled": "Activity",
+      "headlineSamples": [
+        {
+          "text": "Activity",
+          "busy": false
+        }
+      ],
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    },
+    {
+      "surface": "activity",
+      "label": "Activity",
+      "viewport": "430x932",
+      "primaryViewport": false,
+      "bar": 3,
+      "listExemption": {
+        "reason": "transaction history (named by the mission)",
+        "rowSelector": "main [data-density-row=\"transaction\"]"
+      },
+      "markTime": 5456.300000011921,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": {
+        "rowSelector": "main [data-density-row=\"transaction\"]",
+        "rowCount": 61,
+        "chromeAboveFirstRowPx": 188.89,
+        "chromeAboveFirstRowCost": 0.20267234442060086,
+        "rowHeights": [
+          {
+            "height": 64,
+            "count": 46
+          },
+          {
+            "height": 80,
+            "count": 15
+          }
+        ],
+        "rowRegionPx": 4144,
+        "error": null
+      },
+      "scrollHeight": 4397,
+      "documentScrollHeight": 932,
+      "measuredRegion": "main",
+      "innerHeight": 932,
+      "documentScrollCost": 1,
+      "verticalCost": 4.717811158798283,
+      "cls": 0,
+      "shiftCount": 0,
+      "headlineFirstPaint": "Activity",
+      "headlineSettled": "Activity",
+      "headlineSamples": [
+        {
+          "text": "Activity",
+          "busy": false
+        }
+      ],
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 430,
+      "scrollWidth": 430,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": []
+    }
+  ]
+}

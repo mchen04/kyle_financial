@@ -60,8 +60,7 @@ export function ExpenseLedger({
     <section className={styles.ledgerCard} aria-labelledby="expenses-title">
       <div className={styles.sectionHeading}>
         <div>
-          <p className={styles.eyebrow}>Your planned life</p>
-          <h1 id="expenses-title">Monthly expense ledger</h1>
+          <h2 id="expenses-title">Monthly expense ledger</h2>
         </div>
         <button className={styles.addButton} onClick={addExpense}>
           <Plus size={17} /> Add expense

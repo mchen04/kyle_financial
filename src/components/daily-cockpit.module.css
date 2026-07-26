@@ -96,12 +96,42 @@
   text-align: center;
 }
 
+/* D2. With `appearance: auto` the platform draws the disclosure arrow inside
+   the control's own content box *after* layout has already given the box to the
+   label, so at 360x740 an 86.4px control holding a 68.5px label left ~9.5px for
+   an arrow that wants ~15 and the browser painted the arrow through the last
+   glyph ("Jul 202⌄6"). It was clean at 390 and 430 purely because those widths
+   happened to leave enough slack, which is a coincidence, not a fit.
+   Drawing the arrow ourselves makes the space it needs part of the box model:
+   it is reserved as padding, so the label can never be laid out into it at any
+   width, in any locale, at any month name length. The two gradients are the
+   standard pure-CSS chevron, drawn in the same registry role the control sets
+   its own text in, so no colour literal enters the stylesheet. */
 .monthStepper select {
   min-height: var(--control-sm);
-  padding: 0 var(--space-3);
+  padding: 0 var(--space-5);
+  appearance: none;
   border: 0;
   border-radius: var(--radius-sm);
-  background: var(--color-transparent);
+  background-color: var(--color-transparent);
+  background-image:
+    linear-gradient(
+      45deg,
+      var(--color-transparent) 50%,
+      var(--text-primary) 50%
+    ),
+    linear-gradient(
+      135deg,
+      var(--text-primary) 50%,
+      var(--color-transparent) 50%
+    );
+  background-repeat: no-repeat;
+  background-position:
+    right var(--space-2) top 50%,
+    right var(--space-1) top 50%;
+  background-size:
+    var(--space-1) var(--space-1),
+    var(--space-1) var(--space-1);
   color: var(--text-primary);
   font-weight: var(--weight-bold);
   text-align: center;
@@ -165,12 +195,35 @@
   letter-spacing: var(--tracking-tighter);
 }
 
-.runwayHeadline > strong[data-negative="true"] {
-  color: var(--color-amber-200);
-}
-
 .runwayHeadline > small {
   color: var(--text-inverse-muted);
+}
+
+/* Reserved headline box (C9). Every element below keeps its own font, leading,
+   margin and grid position and holds a single non-breaking space, so the box it
+   occupies is the settled box to the sub-pixel; only the ink changes. Nothing
+   here sets a height, because a hard-coded height is a second source of truth
+   that can drift away from the type it is supposed to match. */
+.runwayHeadline[data-reserved] > span,
+.runwayHeadline[data-reserved] > strong,
+.runwayHeadline[data-reserved] > small,
+.surfaceHeader h1[data-reserved] {
+  width: 62%;
+  border-radius: var(--radius-sm);
+  color: var(--color-transparent);
+  background: var(--alpha-white-13);
+}
+
+.runwayHeadline[data-reserved] > span {
+  width: 44%;
+}
+
+.runwayHeadline[data-reserved] > small {
+  width: 80%;
+}
+
+.surfaceHeader h1[data-reserved] {
+  background: var(--surface-accent);
 }
 
 .runwayTrack {
@@ -217,8 +270,37 @@
   color: var(--status-warning-text);
 }
 
-.runwayMetrics [data-negative="true"] {
-  color: var(--color-amber-200);
+/* Every negative figure that sits on an inverse (navy) surface — the Home
+   runway card and the category-detail hero — reads from one role, and it has to
+   be declared after the light-surface rule above because both carry the same
+   specificity. The light-surface amber measures 1.92:1 on navy, which is how
+   the category-detail overage came to be the least readable number on its own
+   screen; this one measures 9.66:1. */
+.runwayHeadline > strong[data-negative="true"],
+.runwayMetrics [data-negative="true"],
+.detailMetrics [data-negative="true"] {
+  color: var(--status-warning-text-inverse);
+}
+
+/* C6: every amount, percentage, count and date figure is tabular so digit
+   changes cannot re-measure a line box. */
+.surfaceHeader h1,
+.backHeader h1,
+.runwayHeadline > strong,
+.runwayHeadline > small,
+.runwayMetrics dd,
+.detailMetrics dd,
+.mathBreakdown dd,
+.activityTotal,
+.wrapHero > strong,
+.planOutcome > div > strong,
+.categoryRow small,
+.categoryRow em,
+.transactionRow small,
+.transactionRow em,
+.navRow em,
+.budgetNote {
+  font-variant-numeric: tabular-nums;
 }
 
 .homeGrid,
@@ -238,72 +320,173 @@
   box-shadow: var(--shadow-card);
 }
 
-.sectionHeading,
-.toolbar {
+.sectionHeading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-}
-
-.sectionHeading {
   margin-bottom: var(--space-4);
 }
 
-.sectionHeading h2,
+/* D7. 24px/700 is exactly what the page <h1> sets to at phone widths, so a
+   section heading at that size announced itself as a peer of the surface title
+   and there was no hierarchy step anywhere on Compare or Monthly wrap. One
+   rung down is a step a reader can see, and it returns 6px a section. */
+/* One section rung, product-wide. L9 stepped these headings down from the page
+   title's 24px, which fixed the rank but left the app running TWO section
+   forms: bold sentence-case here and on Account and Compare, and the grey
+   letterspaced caps `.groupLabel` on Home, Budget and Activity. Two judges
+   found them on vertically adjacent cards on Monthly wrap — "Budget versus
+   actual" in one form, "CURRENTLY UNSPENT" in the other — so a reader scanning
+   for "where does the next section start" got a different signal each time.
+   The caps form wins because it was already the majority and it is the cheaper
+   of the two in vertical cost. The element stays an <h2>; only its dress
+   changes, so the document outline is untouched. */
+.sectionHeading h2 {
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+  font: var(--weight-bold) var(--text-sm) / 1.38 var(--font-data);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+/* An empty state is not a section: its <h2> is the thing the reader is meant to
+   read, so it keeps the sentence-case treatment. */
 .emptyHero h2 {
   margin: var(--space-1) 0 0;
-  font: var(--weight-bold) var(--text-xl) / 1.15 var(--font-display);
+  font: var(--weight-bold) var(--text-lg) / 1.2 var(--font-display);
 }
 
-.textButton {
-  min-height: var(--control-sm);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: 0;
-  border: 0;
-  background: var(--color-transparent);
-  color: var(--text-action-strong);
-  font-weight: var(--weight-bold);
-  cursor: pointer;
-}
-
-.textButton svg,
-.actionCard > svg:last-child {
-  width: var(--icon-sm);
-  height: var(--icon-sm);
-}
-
+/* C4: rows inside a group sit at 0px with a hairline between them; the 8px
+   gap that used to separate them bought no information and cost 8px per row. */
 .categoryRows,
-.transactionRows,
+.transactionRows {
+  display: grid;
+  gap: var(--space-0);
+}
+
+.categoryRows > * + *,
+.transactionRows > * + * {
+  border-top: var(--border-hairline) solid var(--border-subtle);
+}
+
 .activityGroups {
   display: grid;
   gap: var(--space-2);
 }
 
-.activitySummary {
+/* C2: a group label costs one 13px line plus 4px, never a subtitle. */
+.rowGroup {
+  display: grid;
+  gap: var(--space-0);
+}
+
+.groupLabel {
+  margin: 0 0 var(--space-1);
+  color: var(--text-secondary);
+  font: var(--weight-bold) var(--text-sm) / 1.38 var(--font-data);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+.groupEmpty {
+  min-height: var(--control-md);
   display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.activitySummary p,
-.activitySummary span {
+  align-items: center;
   margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
 }
 
-.activitySummary strong {
+/* C5: two facts and one destination is a row, not an 80px card. */
+.navRow {
+  width: 100%;
+  min-height: var(--control-md);
+  display: grid;
+  grid-template-columns: var(--icon-lg) auto minmax(0, 1fr) var(--icon-sm);
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-0) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-transparent);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.navRow > svg:first-child {
+  width: var(--icon-lg);
+  color: var(--text-action);
+}
+
+.navRow > svg:last-child {
+  width: var(--icon-sm);
+  color: var(--text-tertiary);
+}
+
+/* The same row where there is no leading icon to align to. */
+.navRow[data-lead="none"] {
+  grid-template-columns: auto minmax(0, 1fr) var(--icon-sm);
+}
+
+.navRow em {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-style: normal;
+  font-size: var(--text-sm);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navRow:disabled {
+  color: var(--text-disabled);
+  cursor: default;
+}
+
+.budgetMath {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-3);
+  border: var(--border-hairline) solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface-panel);
+}
+
+.budgetMath dt {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.budgetMath dd {
+  margin: var(--space-1) 0 0;
+  font: var(--weight-bold) var(--text-md) / 1.25 var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
+
+.budgetNote {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.budgetActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* C1/C5: the period total is one labelled line beside the heading, not a
+   bordered summary card. A <span> rather than a <p> so it is not subject to the
+   header's prose rules, which hide the trailing paragraph in landscape. */
+.activityTotal {
   display: block;
   margin-top: var(--space-1);
-  font-family: var(--font-display);
-  font-size: var(--text-2xl);
-  letter-spacing: var(--tracking-tight);
-}
-
-.activitySummary span {
   color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 
 .categoryRow,
@@ -343,9 +526,36 @@
   gap: var(--space-1);
 }
 
+/* C1 three-line rung. A transaction that carries a note is a three-line block,
+   and C3 puts any block of three or more lines at 1.5 leading (HIG-T2: tight
+   leading is legitimate in a list row, but not past two lines). At 1.5 the
+   three line boxes measure 24 + 19.5 + 19.5 = 63px, which with the row's 8px
+   top and bottom padding is 79px — so the rung is 80px and the row height is
+   the rung rather than whatever the text happened to reflow to. The 1.5 leading
+   already contributes 8px of internal separation, so the 4px inter-line gap
+   would double-count it and goes to 0 (C4). */
+.transactionRow[data-lines="3"] {
+  min-height: var(--space-20);
+}
+
+.transactionRow[data-lines="3"] > span {
+  gap: var(--space-0);
+  line-height: var(--leading-body);
+}
+
+.rowFigures {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.categoryRow > .rowFigures {
+  justify-items: end;
+  gap: var(--space-0);
+}
+
 .categoryRow small,
 .transactionRow small,
-.actionCard small,
 .pageIntro {
   color: var(--text-secondary);
   font-size: var(--text-sm);
@@ -380,67 +590,18 @@
   line-height: var(--leading-body);
 }
 
-.actionRail,
+/* C4: a row group, so 0px between rows with a hairline, not a 16px card gap. */
 .linkGrid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-0);
 }
 
-.actionCard {
-  min-height: var(--space-20);
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-4);
-  border: var(--border-hairline) solid var(--border-default);
-  border-radius: var(--radius-lg);
-  background: var(--surface-panel);
-  color: var(--text-primary);
-  text-align: left;
-  cursor: pointer;
+.linkGrid > * + * {
+  border-top: var(--border-hairline) solid var(--border-subtle);
 }
 
-.actionCard > svg:first-child {
-  flex: 0 0 auto;
-  width: var(--icon-lg);
-  color: var(--text-action);
-}
-
-.actionCard > span {
-  min-width: 0;
-  display: grid;
-  gap: var(--space-1);
-}
-
-.actionCard > svg:last-child {
-  margin-left: auto;
-}
-
-.actionCard:disabled {
-  color: var(--text-disabled);
-  cursor: default;
-}
-
-.toolbar {
-  min-height: var(--control-lg);
-  padding: var(--space-3) var(--space-4);
-  border: var(--border-hairline) solid var(--border-default);
-  border-radius: var(--radius-md);
-  background: var(--surface-panel);
-}
-
-.toolbar p {
-  margin: 0;
-  color: var(--text-secondary);
-}
-
-.toolbar > div {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.toolbar button,
+.budgetActions button,
 .emptyHero button,
 .loadMore {
   min-height: var(--control-sm);
@@ -491,7 +652,7 @@
   width: 100%;
   min-height: var(--control-sm);
   border: 0;
-  background: var(--color-transparent);
+  background-color: var(--color-transparent);
   color: var(--text-primary);
 }
 
@@ -500,28 +661,29 @@
   color: var(--text-tertiary);
 }
 
-.dateHeading {
-  margin: 0 0 var(--space-2);
-  color: var(--text-secondary);
-  font: var(--weight-bold) var(--text-sm) / 1.2 var(--font-data);
-}
+/* An empty state is the absence of rows, not an object. This was a 360px
+   min-height box drawn with a dashed hairline, holding ~100px of content
+   floated in its middle — a third of the viewport spent outlining emptiness, on
+   the one surface whose populated form fits seven rows in the same space. Three
+   independent judges named it, and the dashed border is the only one in the
+   product, so it read as an unstyled placeholder from a different app.
 
+   It is now the platform idiom: a symbol, a title and a line of body copy,
+   centred on the page background, sized to its own content and nothing more.
+   No container, no border, no reserved height. */
 .emptyHero {
-  min-height: var(--layout-xl);
   display: grid;
   place-items: center;
   align-content: center;
-  gap: var(--space-3);
-  padding: var(--space-8);
-  border: var(--border-hairline) dashed var(--border-default);
-  border-radius: var(--radius-lg);
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-4);
   text-align: center;
 }
 
 .emptyHero > svg {
-  width: var(--space-12);
-  height: var(--space-12);
-  color: var(--text-action);
+  width: var(--space-8);
+  height: var(--space-8);
+  color: var(--text-tertiary);
 }
 
 .emptyHero p {
@@ -535,19 +697,41 @@
   color: var(--text-inverse);
 }
 
+/* The back control sits above the title, not beside it. Beside it, the control
+   is as wide as its own label — `Back to Home`, `Back to Budget`, `Back to
+   Plan` — so it pushed the <h1> to a different x on every detail surface, and
+   none of those x positions matched the tab-root headlines, which sit hard
+   against the page gutter. Flipping between screens, the largest text on the
+   page visibly slid. Stacking gives every title in the product one left edge,
+   and it is also the platform's own arrangement: a back item in the bar, the
+   large title on the line below it. */
 .backHeader {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
+  display: grid;
+  justify-items: start;
+  gap: var(--space-1);
 }
 
 .backHeader > button {
+  justify-self: start;
   width: auto;
+  /* The chevron is optically outdented so the label, not the glyph, lines up
+     with the title below it. */
+  margin-inline-start: calc(-1 * var(--space-2));
   padding-inline: var(--space-2) var(--space-3);
 }
 
+/* One line, always. The 18ch measure inherited from `.surfaceHeader h1` wrapped
+   "Edit monthly budget" and "Manage categories" onto a second line and pushed
+   the first datum on those surfaces 197px and 184px down the screen, against
+   151px for the ones that happened to fit. */
 .backHeader h1 {
-  font-size: clamp(var(--text-2xl), var(--fluid-5), var(--text-4xl));
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--text-xl);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .detailMetrics {

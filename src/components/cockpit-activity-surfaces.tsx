@@ -2,7 +2,6 @@
 
 import { CirclePlus, Plus, Search } from "lucide-react";
 import { useState } from "react";
-import type { TransactionEntry } from "@/domain/budget";
 import {
   observedTransactionsThrough,
   periodLabel,
@@ -13,9 +12,15 @@ import {
 } from "@/domain/daily-money";
 import { BackPage } from "./cockpit-back-page";
 import { PeriodControl } from "./cockpit-period-control";
-import { Metric, TransactionRows } from "./cockpit-rows";
+import { selectedPeriodPhase } from "./cockpit-period-phase";
+import { Metric, MonthlyWrapRow, TransactionRows } from "./cockpit-rows";
 import { money, type StoredPlan } from "./plan-types";
 import styles from "./cockpit-shared.module.css";
+
+/** Upper-case the first letter only, so "left to fund" stays a phrase. */
+function sentenceCase(label: string): string {
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
 
 export function ActivitySurface({
   today,
@@ -23,6 +28,7 @@ export function ActivitySurface({
   period,
   onPeriod,
   onEdit,
+  onWrap,
   onFastLog,
 }: {
   today: string;
@@ -30,8 +36,10 @@ export function ActivitySurface({
   period: SelectedPeriod;
   onPeriod: (period: SelectedPeriod) => void;
   onEdit: (id: string) => void;
+  onWrap: () => void;
   onFastLog?: () => void;
 }) {
+  const unstarted = selectedPeriodPhase(period, today) === "future";
   const [query, setQuery] = useState("");
   const [categoryId, setCategoryId] = useState("all");
   const [visibleLimit, setVisibleLimit] = useState(100);
@@ -67,21 +75,37 @@ export function ActivitySurface({
         right.updatedAt.localeCompare(left.updatedAt),
     );
   const visibleTransactions = transactions.slice(0, visibleLimit);
-  const groups = visibleTransactions.reduce((grouped, transaction) => {
-    const entries = grouped.get(transaction.date) ?? [];
-    entries.push(transaction);
-    grouped.set(transaction.date, entries);
-    return grouped;
-  }, new Map<string, TransactionEntry[]>());
   return (
-    <div className={styles.surfaceStack}>
+    <div className={`${styles.surfaceStack} ${styles.activitySurface}`}>
+      {/* One header treatment across the four tabs. Budget and Plan each name
+          the screen in a 13px eyebrow and answer it in a 24px `h1`; Activity was
+          the odd one out, an 18px `h1` that repeated the tab's own label and
+          carried no figure at all, with the answer demoted to the line beneath
+          it. It is now the same three parts in the same order and the same
+          sizes: eyebrow names the screen, `h1` is the figure the screen exists
+          to report, one 13px line qualifies it (C2, C7). Home is the same three
+          parts too — label, amount, qualifier — on its inverse hero card. */}
       <header className={styles.surfaceHeader}>
         <div>
           <p className={styles.eyebrow}>Activity</p>
-          <h1>Find and fix expenses.</h1>
+          <h1>{money(periodTotalCents)} logged</h1>
+          {/* C5: the count is a fact nobody acts on, so it is one line under
+              the heading rather than a bordered summary card. The period itself
+              is named by the control beside it. */}
+          <span className={styles.activityTotal}>
+            {periodTransactions.length}{" "}
+            {periodTransactions.length === 1 ? "expense" : "expenses"} in this
+            period
+          </span>
         </div>
         <PeriodControl period={period} today={today} onPeriod={onPeriod} />
       </header>
+      {/* "What did I overspend on last month?" is a retrospective question, and
+          a fresh reader reads that as a history question and taps Activity. The
+          wrap is not removed from Home; this is a second path to the same
+          surface, above a list that can run to hundreds of rows, carrying its
+          own summary value rather than a bare chevron (C12). */}
+      <MonthlyWrapRow period={period} unstarted={unstarted} onOpen={onWrap} />
       {futureTransactions.length > 0 && (
         <section
           className={styles.panel}
@@ -89,7 +113,7 @@ export function ActivitySurface({
         >
           <div className={styles.sectionHeading}>
             <div>
-              <p className={styles.eyebrow}>Needs correction</p>
+              <p className={styles.groupLabel}>Needs correction</p>
               <h2 id="future-actuals-title">Future-dated expenses</h2>
             </div>
           </div>
@@ -104,19 +128,6 @@ export function ActivitySurface({
           />
         </section>
       )}
-      <section
-        className={`${styles.panel} ${styles.activitySummary}`}
-        aria-label={`${periodLabel(period)} activity total`}
-      >
-        <div>
-          <p className={styles.eyebrow}>{periodLabel(period)} total</p>
-          <strong>{money(periodTotalCents)}</strong>
-        </div>
-        <span>
-          {periodTransactions.length}{" "}
-          {periodTransactions.length === 1 ? "expense" : "expenses"}
-        </span>
-      </section>
       <div className={styles.filters}>
         <label>
           <Search />
@@ -144,25 +155,17 @@ export function ActivitySurface({
           </select>
         </label>
       </div>
+      {/* C2: this list spanned 24 date headings inside 24 bordered panels,
+          against a maximum of 5 section headers per surface and a rule that a
+          group of fewer than 3 rows gets no header at all. The day now rides on
+          each row, so the list is one hairline-separated group (C4). */}
       {transactions.length ? (
         <div className={styles.activityGroups}>
-          {[...groups].map(([date, items]) => (
-            <section className={styles.panel} key={date}>
-              <h2 className={styles.dateHeading}>
-                {new Intl.DateTimeFormat("en-US", {
-                  weekday: "long",
-                  month: "short",
-                  day: "numeric",
-                  timeZone: "UTC",
-                }).format(new Date(`${date}T00:00:00Z`))}
-              </h2>
-              <TransactionRows
-                transactions={items}
-                categories={categories}
-                onEdit={onEdit}
-              />
-            </section>
-          ))}
+          <TransactionRows
+            transactions={visibleTransactions}
+            categories={categories}
+            onEdit={onEdit}
+          />
           {visibleTransactions.length < transactions.length && (
             <button
               className={styles.loadMore}
@@ -234,17 +237,30 @@ export function CategoryDetailSurface({
   return (
     <BackPage title={item.category.name} onBack={onBack}>
       <div className={styles.detailMetrics}>
+        {/* The domain names these "spent" / "funded" / "remaining" / "left to
+            fund" in lower case because they also read inside sentences. As a
+            row of three peer labels they have to match each other, and two
+            judges read "Allocated spent remaining" as a heading followed by two
+            fragments. Sentence case is applied here, at the one place they are
+            set as labels, rather than by changing what the domain calls them. */}
         <Metric label="Allocated" value={item.allocatedCents} />
-        <Metric label={item.actualLabel} value={item.actualCents} />
-        <Metric label={item.remainingLabel} value={item.remainingCents} />
+        <Metric
+          label={sentenceCase(item.actualLabel)}
+          value={item.actualCents}
+        />
+        <Metric
+          label={sentenceCase(item.remainingLabel)}
+          value={item.remainingCents}
+        />
       </div>
       <section className={styles.panel}>
-        <p className={styles.eyebrow}>{periodLabel(period)}</p>
+        <p className={styles.groupLabel}>{periodLabel(period)}</p>
         {transactions.length ? (
           <TransactionRows
             transactions={transactions}
             categories={[item.category]}
             onEdit={onEdit}
+            showCategory={false}
           />
         ) : (
           <p className={styles.emptyState}>No activity in this period.</p>

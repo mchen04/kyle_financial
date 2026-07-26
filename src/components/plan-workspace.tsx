@@ -31,6 +31,7 @@ import {
   type SaveState,
   type Screen,
   type StoredPlan,
+  type TabScreen,
   type WorkspaceLocation,
   type WorkspaceRoute,
 } from "./plan-types";
@@ -45,6 +46,7 @@ export interface PlanWorkspaceProps {
   draft: StoredPlan;
   location: WorkspaceLocation;
   saveState: SaveState;
+  planAwaitingAuthority: boolean;
   onLocation: (location: WorkspaceLocation) => void;
   onDraft: (change: PlanDraftChange) => void;
   onYear: (year: number) => void;
@@ -66,13 +68,41 @@ const budgetScreens = new Set<Screen>([
   "category",
   "edit-budget",
   "manage-categories",
-  "wrap",
 ]);
+
+/**
+ * Which of the four tabs is highlighted. Monthly wrap is reachable from Home
+ * and from Activity, so it keeps the highlight on the branch the reader came
+ * from rather than jumping the bar to a tab they did not tap (C13: the tab bar
+ * is identical on every surface and never moves under the reader).
+ *
+ * A wrap opened from Home used to light Budget, on the reasoning that the wrap
+ * is a Budget-section surface. Two independent judges read the result as the
+ * two pieces of persistent chrome contradicting each other: the back control
+ * says `Back to Home` while the bar says the reader is standing in Budget. The
+ * back control names where the reader came from, so the bar names it too.
+ */
+function activeTabFor(route: WorkspaceRoute): Screen {
+  if (route.screen === "wrap") return route.returnTo;
+  if (route.screen === "account") return route.returnTo;
+  if (budgetScreens.has(route.screen)) return "budget";
+  if (planScreens.has(route.screen)) return "plan";
+  return route.screen;
+}
+
+/** The tab Account should return to: the one the reader opened it from. */
+function accountReturnFor(route: WorkspaceRoute): TabScreen {
+  const tab = activeTabFor(route);
+  return tab === "budget" || tab === "activity" || tab === "plan"
+    ? tab
+    : "home";
+}
 
 export function PlanWorkspace(props: PlanWorkspaceProps) {
   const { draft, location, onLocation, today } = props;
   const { route } = location;
   const { screen } = route;
+  const activeTab = activeTabFor(route);
   const contentRef = useRef<HTMLElement>(null);
   const [calculationError, setCalculationError] = useState("");
   const [periodSelection, setPeriodSelection] = useState(() => ({
@@ -126,11 +156,9 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
           <span>{PRODUCT_NAME}</span>
         </div>
         <nav aria-label="Main navigation">
-          <PrimaryNav screen={screen} onRoute={navigate} />
+          <PrimaryNav tab={activeTab} onRoute={navigate} />
         </nav>
         <p className={styles.sidebarFoot}>
-          Daily decisions · annual plan
-          <br />
           Tax data {currentResult.appliedTaxYear}
         </p>
       </aside>
@@ -145,25 +173,43 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
             showFastLog && canCreateExpense ? () => fastLog.open() : undefined
           }
         />
-        <main ref={contentRef} className={styles.content}>
+        {/* The plans on screen came from the device cache and the server's
+            answer is still in flight, so this region's content is being
+            updated. Assistive technology is told the same thing the reserved
+            headline box tells a sighted reader. */}
+        <main
+          ref={contentRef}
+          className={`${styles.content} ${
+            showFastLog && canCreateExpense ? styles.contentClearsFastLog : ""
+          }`}
+          aria-busy={props.planAwaitingAuthority || undefined}
+        >
           {calculationError && (
             <p className={styles.syncNotice} role="alert">
               <CircleHelp size={16} /> {calculationError}
             </p>
           )}
-          {currentResult.usesFallbackTaxTable && (
-            <p className={styles.fallbackNotice}>
-              <CircleHelp size={16} />
-              <span>
-                Tax data isn&apos;t available for {draft.year}. This estimate
-                uses {currentResult.appliedTaxYear} data
-                {currentResult.usesFutureTaxTable
-                  ? " as a rough later-year proxy"
-                  : ""}
-                .
-              </span>
-            </p>
-          )}
+          {/* This notice names the draft's year and asserts something about it.
+              While the draft is known-provisional that assertion is provisional
+              too — here it read "Tax data isn't available for 2025" about a
+              cached year the server was about to replace with 2026, and then
+              vanished, moving the whole surface up 65px. It is not suppressed:
+              it renders the moment the plan is settled, which is the only
+              moment it is true. */}
+          {!props.planAwaitingAuthority &&
+            currentResult.usesFallbackTaxTable && (
+              <p className={styles.fallbackNotice}>
+                <CircleHelp size={16} />
+                <span>
+                  Tax data isn&apos;t available for {draft.year}. This estimate
+                  uses {currentResult.appliedTaxYear} data
+                  {currentResult.usesFutureTaxTable
+                    ? " as a rough later-year proxy"
+                    : ""}
+                  .
+                </span>
+              </p>
+            )}
           <PlanWorkspaceContent
             today={today}
             user={props.user}
@@ -171,6 +217,7 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
             draft={draft}
             route={route}
             saveState={props.saveState}
+            planAwaitingAuthority={props.planAwaitingAuthority}
             result={currentResult}
             period={activePeriod}
             onPeriod={selectPeriod}
@@ -184,14 +231,16 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
         </main>
         {showFastLog && canCreateExpense && (
           <button
-            className={`${styles.fastLogButton} ${
-              screen === "home" ? styles.fastLogLabeled : ""
-            }`}
+            /* D5 / rule 2. Home rendered a labelled "+ Fast Log" pill and
+               Budget and Activity rendered a bare 48px circle whose only name
+               was an aria-label, so the same capability was visually unlabelled
+               on two of the four tabs. One treatment, everywhere. */
+            className={`${styles.fastLogButton} ${styles.fastLogLabeled}`}
             aria-label="Fast Log expense"
             onClick={() => fastLog.open()}
           >
             <Plus />
-            {screen === "home" && <span>Fast Log</span>}
+            <span>Fast Log</span>
           </button>
         )}
         <nav
@@ -200,7 +249,7 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
           aria-label="Main navigation"
           tabIndex={-1}
         >
-          <PrimaryNav screen={screen} onRoute={navigate} />
+          <PrimaryNav tab={activeTab} onRoute={navigate} />
         </nav>
       </div>
       {location.overlay?.kind === "fast-log" && (
@@ -231,34 +280,34 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
 }
 
 function PrimaryNav({
-  screen,
+  tab,
   onRoute,
 }: {
-  screen: Screen;
+  tab: Screen;
   onRoute: (route: WorkspaceRoute) => void;
 }) {
   return (
     <>
       <NavButton
-        active={screen === "home"}
+        active={tab === "home"}
         icon={<House />}
         label="Home"
         onClick={() => onRoute({ screen: "home" })}
       />
       <NavButton
-        active={budgetScreens.has(screen)}
+        active={tab === "budget"}
         icon={<WalletCards />}
         label="Budget"
         onClick={() => onRoute({ screen: "budget" })}
       />
       <NavButton
-        active={screen === "activity"}
+        active={tab === "activity"}
         icon={<Activity />}
         label="Activity"
         onClick={() => onRoute({ screen: "activity" })}
       />
       <NavButton
-        active={planScreens.has(screen)}
+        active={tab === "plan"}
         icon={<Landmark />}
         label="Plan"
         onClick={() => onRoute({ screen: "plan" })}
@@ -301,6 +350,7 @@ function TopBar({
   onRetryLocalSave,
   onRetrySync,
   onFastLog,
+  planAwaitingAuthority,
 }: PlanWorkspaceProps & { onFastLog?: () => void }) {
   const { screen } = location.route;
   const [copyError, setCopyError] = useState("");
@@ -407,14 +457,31 @@ function TopBar({
             onClick={onFastLog}
           >
             <Plus />
-            {screen === "home" && <span>Fast Log</span>}
+            <span>Fast Log</span>
           </button>
         )}
+        {/* One control, two states. It used to read "Open account" while
+            Account was already open, which is the one thing it could not be
+            doing. */}
         <button
           className={styles.profileButton}
-          aria-label="Open account"
+          aria-label={
+            location.route.screen === "account"
+              ? "Close account"
+              : "Open account"
+          }
           aria-current={screen === "account" ? "page" : undefined}
-          onClick={() => onLocation({ route: { screen: "account" } })}
+          onClick={() =>
+            onLocation({
+              route:
+                location.route.screen === "account"
+                  ? { screen: location.route.returnTo }
+                  : {
+                      screen: "account",
+                      returnTo: accountReturnFor(location.route),
+                    },
+            })
+          }
         >
           <UserRound />
         </button>
@@ -450,7 +517,15 @@ function TopBar({
           )}
         </div>
       )}
-      {saveState === "offline" && (
+      {/* The restore path sets "offline" before the sync engine has had a chance
+          to say anything, so during the known-provisional window this 65px
+          banner asserts the device is offline while it is in fact fetching, and
+          then removes itself — moving the whole surface up 65px, three times
+          the CLS bar. `planAwaitingAuthority` is only ever set when
+          `navigator.onLine` is true, so a device that really is offline never
+          reaches this branch and its banner, its cached plan and its queued
+          edits are exactly what they were. */}
+      {saveState === "offline" && !planAwaitingAuthority && (
         <div className={styles.offlineNotice} role="status">
           <span>
             Showing the latest copy saved on this device. Offline edits stay

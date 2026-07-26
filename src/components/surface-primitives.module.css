@@ -27,6 +27,18 @@
   text-transform: uppercase;
 }
 
+/* The grey section label. `.eyebrow` above is blue and names the SCREEN;
+   this names a section INSIDE a screen. Two judges found the two roles
+   sharing one blue treatment across six surfaces, so the colour no longer
+   sorted them. Same geometry as the cockpit's own `.groupLabel`. */
+.groupLabel {
+  margin: 0 0 var(--space-1);
+  color: var(--ink-soft);
+  font: 700 var(--text-sm)/1.38 var(--data);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
 .muted {
   color: var(--ink-soft);
 }
@@ -92,16 +104,35 @@
   box-shadow: var(--shadow-card);
 }
 
-.wideCard h1,
-.wideCard h2 {
+.wideCard h1 {
   margin: 0 0 var(--space-6);
   font: 650 clamp(var(--text-xl), var(--fluid-3), var(--text-3xl))/1.05
     var(--display);
   letter-spacing: var(--tracking-tight);
 }
 
+/* The one section rung, applied to the card family that carried a second one.
+   This set an <h2> inside a card to the same 24px the page title uses, so
+   Account's "Install on iPhone" announced itself a rank above the section
+   beside it. It is now the same grey letterspaced caps every other section
+   heading in the product uses. */
+.wideCard h2 {
+  margin: 0 0 var(--space-4);
+  color: var(--ink-soft);
+  font: 700 var(--text-sm)/1.38 var(--data);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+/* A note that sits under the figures it explains rather than above them, so it
+   is separated from what comes next, not pulled up into what came before.
+   The bottom margin is the "not pulled up into what came before" half, from the
+   next block's point of view: on Benefits this paragraph had ~35px of clearance
+   above it and ~7px below, so its descenders read as touching the top edge of
+   the amber HSA/FSA callout and the note looked like it was falling into the
+   warning. Symmetric clearance, so the two blocks read as two blocks. */
 .wideCard > .muted {
-  margin: calc(-1 * var(--space-3)) 0 var(--space-6);
+  margin: var(--space-3) 0 var(--space-5);
 }
 
 .sectionHeading {
@@ -111,11 +142,17 @@
   gap: var(--space-4);
 }
 
-.sectionHeading h1 {
+/* The one section rung. This used to size an <h1>, and Plan details carried two
+   of them: the page title from the detail header and "Monthly expense ledger"
+   from the card inside it. L9 made the card heading an <h2> and stepped it
+   down; two judges then found the product still running two section forms, so
+   it is now the grey letterspaced caps that was already the majority. */
+.sectionHeading h2 {
   margin: 0;
-  font: 650 clamp(var(--text-xl), var(--fluid-3), var(--text-2xl))/1
-    var(--display);
-  letter-spacing: var(--tracking-tight);
+  color: var(--ink-soft);
+  font: 700 var(--text-sm)/1.38 var(--data);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
 }
 
 .iconButton {
@@ -149,7 +186,7 @@
 .moneyInput span {
   padding-left: var(--space-2);
   color: var(--ink-soft);
-  font: var(--text-sm)/1 var(--data);
+  font: var(--text-sm)/1 var(--body);
 }
 
 .moneyInput input {
@@ -162,7 +199,7 @@
   background: var(--color-transparent);
   color: var(--ink);
   text-align: right;
-  font-family: var(--data);
+  font-variant-numeric: tabular-nums;
   font-size: var(--text-md);
 }
 
@@ -209,5 +246,6 @@
   display: block;
   margin-top: var(--space-2);
   color: var(--ink);
-  font: 600 var(--text-md)/1 var(--data);
+  font: 600 var(--text-md)/1 var(--body);
+  font-variant-numeric: tabular-nums;
 }

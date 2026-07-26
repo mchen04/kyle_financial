@@ -1,0 +1,621 @@
+{
+  "generatedAt": "2026-07-25T12:26:23.293Z",
+  "mode": "gate",
+  "failDemo": null,
+  "deviceScaleFactor": 3,
+  "engines": [
+    {
+      "engine": "webkit",
+      "gates": "geometry"
+    }
+  ],
+  "bars": {
+    "vertical": {
+      "home": 1,
+      "standard": 3,
+      "deep": 4,
+      "entry": 1.5
+    },
+    "cls": 0.02,
+    "minimumTargetPx": 44,
+    "minimumFontSizePx": 11,
+    "chromeAboveExemptList": 0.6
+  },
+  "rows": [
+    {
+      "surface": "onboarding",
+      "label": "Onboarding · cold load",
+      "engine": "webkit",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 1.5,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "fitsWithoutScrolling": false,
+      "markTime": 0,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "innerScroll": {
+        "clientHeight": 844,
+        "scrollHeight": 844,
+        "contentHeight": 719.2,
+        "overflowPx": 0,
+        "slackPx": 124.8
+      },
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 13,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 844,
+        "textNodes": 11,
+        "valueControls": 3,
+        "datumPer100px": 1.3,
+        "datumWithControlsPer100px": 1.66
+      },
+      "scrollHeight": 844,
+      "documentScrollHeight": 844,
+      "measuredRegion": "documentElement",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 16,
+      "frameTicks": 92,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Create your plan",
+      "headlineSettled": "Create your plan",
+      "headlineSamples": [
+        {
+          "text": "House by 30",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "Create your plan",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+      "failures": []
+    },
+    {
+      "surface": "home",
+      "label": "Home",
+      "engine": "webkit",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 1,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "fitsWithoutScrolling": true,
+      "markTime": 5129,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "innerScroll": {
+        "clientHeight": 635,
+        "scrollHeight": 635,
+        "contentHeight": 633.2,
+        "overflowPx": 0,
+        "slackPx": 1.8
+      },
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 844,
+        "textNodes": 51,
+        "valueControls": 2,
+        "datumPer100px": 6.04,
+        "datumWithControlsPer100px": 6.28
+      },
+      "scrollHeight": 844,
+      "documentScrollHeight": 844,
+      "measuredRegion": "documentElement",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 65,
+      "frameTicks": 388,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [
+        {
+          "text": "Home | Left to spend $123",
+          "hero": "Left to spend $123",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Left to spend $123"],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+      "failures": []
+    },
+    {
+      "surface": "activity",
+      "label": "Activity",
+      "engine": "webkit",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 3,
+      "listExemption": {
+        "reason": "transaction history (named by the mission)",
+        "rowSelector": "main [data-density-row=\"transaction\"]"
+      },
+      "singleAnswerPaint": false,
+      "fitsWithoutScrolling": false,
+      "markTime": 8471,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": {
+        "rowSelector": "main [data-density-row=\"transaction\"]",
+        "rowCount": 61,
+        "chromeAboveFirstRowPx": 260.38,
+        "chromeAboveFirstRowCost": 0.3085011848341232,
+        "rowHeights": [
+          {
+            "height": 54,
+            "count": 46
+          },
+          {
+            "height": 80,
+            "count": 15
+          }
+        ],
+        "rowRegionPx": 3684,
+        "error": null
+      },
+      "innerScroll": {
+        "clientHeight": 635,
+        "scrollHeight": 3952,
+        "contentHeight": 3952.4,
+        "overflowPx": 3317.4,
+        "slackPx": 0
+      },
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 635,
+        "textNodes": 48,
+        "valueControls": 2,
+        "datumPer100px": 7.56,
+        "datumWithControlsPer100px": 7.87
+      },
+      "scrollHeight": 3952,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 4.682464454976303,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 97,
+      "frameTicks": 585,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "$5,255 logged",
+      "headlineSettled": "$5,255 logged",
+      "headlineSamples": [
+        {
+          "text": "$5,255 logged",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+      "failures": []
+    },
+    {
+      "surface": "manage-categories",
+      "label": "Manage categories",
+      "engine": "webkit",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "fitsWithoutScrolling": false,
+      "markTime": 12752,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "innerScroll": {
+        "clientHeight": 691,
+        "scrollHeight": 953,
+        "contentHeight": 953,
+        "overflowPx": 262,
+        "slackPx": 0
+      },
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 691,
+        "textNodes": 24,
+        "valueControls": 0,
+        "datumPer100px": 3.47,
+        "datumWithControlsPer100px": 3.47
+      },
+      "scrollHeight": 953,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1.1291469194312795,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 135,
+      "frameTicks": 770,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Manage categories",
+      "headlineSettled": "Manage categories",
+      "headlineSamples": [
+        {
+          "text": "Manage categories",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+      "failures": []
+    },
+    {
+      "surface": "plan-details",
+      "label": "Plan details",
+      "engine": "webkit",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "fitsWithoutScrolling": false,
+      "markTime": 18419,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "innerScroll": {
+        "clientHeight": 691,
+        "scrollHeight": 2311,
+        "contentHeight": 2310.8,
+        "overflowPx": 1619.8,
+        "slackPx": 0
+      },
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 3,
+        "detail": [
+          {
+            "overflowPx": 24,
+            "ellipsis": true,
+            "tag": "input",
+            "label": "Expense name",
+            "text": "Health and pharmacy",
+            "clientWidth": 158,
+            "scrollWidth": 182
+          },
+          {
+            "overflowPx": 5,
+            "ellipsis": true,
+            "tag": "input",
+            "label": "Expense name",
+            "text": "Phone and internet",
+            "clientWidth": 158,
+            "scrollWidth": 163
+          },
+          {
+            "overflowPx": 4,
+            "ellipsis": true,
+            "tag": "input",
+            "label": "Expense name",
+            "text": "Brokerage transfer",
+            "clientWidth": 158,
+            "scrollWidth": 162
+          }
+        ]
+      },
+      "densityRegion": {
+        "regionHeightPx": 691,
+        "textNodes": 43,
+        "valueControls": 0,
+        "datumPer100px": 6.22,
+        "datumWithControlsPer100px": 6.22
+      },
+      "scrollHeight": 2311,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 2.7381516587677726,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 172,
+      "frameTicks": 899,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Plan details | Savings / month $819.78",
+      "headlineSettled": "Plan details | Savings / month $819.78",
+      "headlineSamples": [
+        {
+          "text": "Plan details | Savings / month $819.78",
+          "hero": "Savings / month $819.78",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Savings / month $819.78"],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+      "failures": [
+        "[webkit] 3 box(es) are narrower than their own text (an ellipsis is not a fit): [{\"overflowPx\":24,\"ellipsis\":true,\"tag\":\"input\",\"label\":\"Expense name\",\"text\":\"Health and pharmacy\",\"clientWidth\":158,\"scrollWidth\":182},{\"overflowPx\":5,\"ellipsis\":true,\"tag\":\"input\",\"label\":\"Expense name\",\"text\":\"Phone and internet\",\"clientWidth\":158,\"scrollWidth\":163},{\"overflowPx\":4,\"ellipsis\":true,\"tag\":\"input\",\"label\":\"Expense name\",\"text\":\"Brokerage transfer\",\"clientWidth\":158,\"scrollWidth\":162}]"
+      ]
+    },
+    {
+      "surface": "benefits",
+      "label": "Benefits",
+      "engine": "webkit",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "fitsWithoutScrolling": false,
+      "markTime": 25004,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "innerScroll": {
+        "clientHeight": 691,
+        "scrollHeight": 2193,
+        "contentHeight": 2193.1,
+        "overflowPx": 1502.1,
+        "slackPx": 0
+      },
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 691,
+        "textNodes": 28,
+        "valueControls": 1,
+        "datumPer100px": 4.05,
+        "datumWithControlsPer100px": 4.2
+      },
+      "scrollHeight": 2193,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 2.5983412322274884,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 220,
+      "frameTicks": 1141,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Benefits",
+      "headlineSettled": "Benefits",
+      "headlineSamples": [
+        {
+          "text": "Benefits",
+          "hero": "",
+          "busy": false
+        }
+      ],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+      "failures": []
+    },
+    {
+      "surface": "fast-log-new",
+      "label": "Fast Log · new expense",
+      "engine": "webkit",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 4,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "fitsWithoutScrolling": false,
+      "markTime": 32947,
+      "arrivalError": null,
+      "injection": null,
+      "listRegion": null,
+      "innerScroll": {
+        "clientHeight": 717,
+        "scrollHeight": 717,
+        "contentHeight": 717,
+        "overflowPx": 0,
+        "slackPx": 0
+      },
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 0,
+        "detail": []
+      },
+      "densityRegion": {
+        "regionHeightPx": 717,
+        "textNodes": 11,
+        "valueControls": 2,
+        "datumPer100px": 1.53,
+        "datumWithControlsPer100px": 1.81
+      },
+      "scrollHeight": 717,
+      "documentScrollHeight": 844,
+      "measuredRegion": "dialog:section",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 0.8495260663507109,
+      "cls": 0,
+      "clsNative": 0,
+      "clsGeometric": 0,
+      "clsSource": "both zero",
+      "shiftCount": 0,
+      "shiftDetail": [],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 262,
+      "frameTicks": 1274,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [],
+      "heroPaints": [],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+      "failures": []
+    }
+  ]
+}

@@ -106,17 +106,12 @@ export function AccountScreen({
   return (
     <section className={styles.accountGrid}>
       <div className={styles.wideCard}>
-        <p className={styles.eyebrow}>Your data</p>
-        <h1>Account and data</h1>
+        {/* The surface is titled by its own back header; repeating it here was
+            a second, competing h1. */}
         <p className={styles.accountEmail}>{user.email}</p>
-        <p className={styles.muted}>
-          Your plans stay private to this account. Export a complete copy
-          whenever you want.
-        </p>
         <p className={styles.accountPrivacy}>
-          No bank connection or ads. Your plans remain on the server until you
-          delete this account; deletion also clears this device&apos;s cached
-          copy.
+          Plans remain on the server until you delete this account; deletion
+          also clears this device&apos;s cached copy.
         </p>
         {exportError && (
           <p className={styles.warning} role="alert">
@@ -168,8 +163,7 @@ export function AccountScreen({
         </div>
       </div>
       <div className={styles.wideCard}>
-        <p className={styles.eyebrow}>Install on iPhone</p>
-        <h2>Keep your plan one tap away.</h2>
+        <h2>Install on iPhone</h2>
         <ol className={styles.installSteps}>
           <li>
             <span>1</span>Open this site in Safari.

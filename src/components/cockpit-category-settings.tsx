@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowDown, ArrowUp, Plus } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronDown, Plus } from "lucide-react";
+import { useState } from "react";
 import {
   addBudgetCategory,
   CATEGORY_COLOR_TOKENS,
@@ -43,9 +44,7 @@ export function EditBudgetSurface({
   };
   return (
     <BackPage title="Edit monthly budget" onBack={onBack}>
-      <p className={styles.pageIntro}>
-        Change planned amounts in one pass. Annual categories remain annual.
-      </p>
+      <p className={styles.pageIntro}>Annual categories remain annual.</p>
       <section className={styles.formList}>
         {plan.expenses
           .filter(({ archived }) => !archived)
@@ -82,6 +81,7 @@ export function ManageCategoriesSurface({
   onDraft: (plan: StoredPlan) => void;
   onBack: () => void;
 }) {
+  const [openIds, setOpenIds] = useState<Record<string, boolean>>({});
   const sorted = plan.expenses.toSorted(
     (left, right) =>
       Number(left.archived) - Number(right.archived) ||
@@ -100,7 +100,7 @@ export function ManageCategoriesSurface({
   return (
     <BackPage title="Manage categories" onBack={onBack}>
       <div className={styles.toolbar}>
-        <p>Rename, classify, reorder, or archive. History stays attached.</p>
+        <p>Tap a category to rename, recolour, reorder, or archive it.</p>
         <button
           onClick={() =>
             onDraft({
@@ -113,78 +113,130 @@ export function ManageCategoriesSurface({
         </button>
       </div>
       <section className={styles.formList}>
-        {sorted.map((category) => (
-          <div
-            className={styles.manageRow}
-            key={category.id}
-            data-archived={category.archived}
-          >
-            <i data-color={category.colorToken} aria-hidden="true" />
-            <label>
-              <span className={styles.srOnly}>Category name</span>
-              <input
-                value={category.name}
-                maxLength={100}
-                onChange={(event) =>
-                  patch(category.id, { name: event.target.value })
+        {sorted.map((category) => {
+          const open = Boolean(openIds[category.id]);
+          return (
+            <div
+              className={styles.manageItem}
+              key={category.id}
+              data-archived={category.archived}
+            >
+              {/* C1/C5. The collapsed row is the same 48px row every other list
+                  in this app uses — colour dot, name, and the two facts that
+                  distinguish one category from another — so twelve categories
+                  read on one screen where five used to. It states everything it
+                  contains: the name, the colour (as the dot itself), the type,
+                  and, when it applies, that the category is archived. Only the
+                  controls are behind the disclosure, and the disclosure is
+                  labelled with what it opens. */}
+              <button
+                type="button"
+                className={styles.manageRow}
+                aria-expanded={open}
+                aria-controls={`category-editor-${category.id}`}
+                aria-label={`Rename, recolour, reorder, or archive ${category.name}`}
+                onClick={() =>
+                  setOpenIds((current) => ({
+                    ...current,
+                    [category.id]: !current[category.id],
+                  }))
                 }
-              />
-            </label>
-            <select
-              aria-label={`${category.name} type`}
-              value={guidanceBucket(category)}
-              onChange={(event) =>
-                patch(category.id, {
-                  guidanceBucket: event.target.value as GuidanceBucket,
-                  group: BUCKET_LABELS[event.target.value as GuidanceBucket],
-                })
-              }
-            >
-              {Object.entries(BUCKET_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-            <select
-              aria-label={`${category.name} color`}
-              value={category.colorToken}
-              onChange={(event) =>
-                patch(category.id, {
-                  colorToken: event.target.value as CategoryColorToken,
-                })
-              }
-            >
-              {CATEGORY_COLOR_TOKENS.map((color) => (
-                <option key={color}>{color}</option>
-              ))}
-            </select>
-            <div className={styles.reorderButtons}>
-              <button
-                aria-label={`Move ${category.name} up`}
-                disabled={category.archived}
-                onClick={() => move(category.id, -1)}
               >
-                <ArrowUp />
+                <i data-color={category.colorToken} aria-hidden="true" />
+                <strong>{category.name}</strong>
+                <em>
+                  {BUCKET_LABELS[guidanceBucket(category)]}
+                  {category.archived ? " · Archived" : ""}
+                </em>
+                <ChevronDown />
               </button>
-              <button
-                aria-label={`Move ${category.name} down`}
-                disabled={category.archived}
-                onClick={() => move(category.id, 1)}
-              >
-                <ArrowDown />
-              </button>
+              {open && (
+                <div
+                  className={styles.manageEditor}
+                  id={`category-editor-${category.id}`}
+                >
+                  <label className={styles.editorField}>
+                    <span>Name</span>
+                    <input
+                      aria-label={`${category.name} name`}
+                      value={category.name}
+                      maxLength={100}
+                      onChange={(event) =>
+                        patch(category.id, { name: event.target.value })
+                      }
+                    />
+                  </label>
+                  <label className={styles.editorField}>
+                    <span>Type</span>
+                    <select
+                      aria-label={`${category.name} type`}
+                      value={guidanceBucket(category)}
+                      onChange={(event) =>
+                        patch(category.id, {
+                          guidanceBucket: event.target.value as GuidanceBucket,
+                          group:
+                            BUCKET_LABELS[event.target.value as GuidanceBucket],
+                        })
+                      }
+                    >
+                      {Object.entries(BUCKET_LABELS).map(([value, label]) => (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className={styles.editorField}>
+                    <span>Colour</span>
+                    <select
+                      aria-label={`${category.name} color`}
+                      value={category.colorToken}
+                      onChange={(event) =>
+                        patch(category.id, {
+                          colorToken: event.target.value as CategoryColorToken,
+                        })
+                      }
+                    >
+                      {CATEGORY_COLOR_TOKENS.map((color) => (
+                        <option key={color}>{color}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <div className={styles.editorField}>
+                    <span>Order</span>
+                    <div className={styles.reorderButtons}>
+                      <button
+                        aria-label={`Move ${category.name} up`}
+                        disabled={category.archived}
+                        onClick={() => move(category.id, -1)}
+                      >
+                        <ArrowUp />
+                      </button>
+                      <button
+                        aria-label={`Move ${category.name} down`}
+                        disabled={category.archived}
+                        onClick={() => move(category.id, 1)}
+                      >
+                        <ArrowDown />
+                      </button>
+                    </div>
+                  </div>
+                  <div className={styles.editorField}>
+                    <span>History</span>
+                    <button
+                      className={styles.archiveButton}
+                      onClick={() =>
+                        patch(category.id, { archived: !category.archived })
+                      }
+                    >
+                      {category.archived ? "Reactivate" : "Archive"}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-            <button
-              className={styles.archiveButton}
-              onClick={() =>
-                patch(category.id, { archived: !category.archived })
-              }
-            >
-              {category.archived ? "Reactivate" : "Archive"}
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </section>
     </BackPage>
   );

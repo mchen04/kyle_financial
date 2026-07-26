@@ -1,0 +1,59 @@
+{
+  "generatedAt": "2026-07-25T07:27:34.357Z",
+  "mode": "gate",
+  "failDemo": "overflow",
+  "deviceScaleFactor": 3,
+  "bars": {
+    "vertical": {
+      "home": 1,
+      "standard": 3,
+      "deep": 4,
+      "entry": 1.5
+    },
+    "cls": 0.02,
+    "minimumTargetPx": 44,
+    "chromeAboveExemptList": 0.6
+  },
+  "rows": [
+    {
+      "surface": "budget",
+      "label": "Budget",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 3,
+      "listExemption": null,
+      "markTime": 5451.9000000059605,
+      "arrivalError": null,
+      "injection": "overflow: document body widened to 3000px",
+      "listRegion": null,
+      "scrollHeight": 1154,
+      "documentScrollHeight": 844,
+      "measuredRegion": "main",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1.367298578199052,
+      "cls": 0,
+      "shiftCount": 0,
+      "headlineFirstPaint": "$123 safe to spend",
+      "headlineSettled": "$123 safe to spend",
+      "headlineSamples": [
+        {
+          "text": "$123 safe to spend",
+          "busy": false
+        }
+      ],
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": true,
+      "clientWidth": 390,
+      "scrollWidth": 3000,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": ["horizontal overflow: clientWidth 390 !== scrollWidth 3000"]
+    }
+  ]
+}

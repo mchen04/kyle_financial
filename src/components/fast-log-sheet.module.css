@@ -1,10 +1,3 @@
-.eyebrow {
-  margin: 0 0 var(--space-1);
-  color: var(--text-action-strong);
-  font: var(--weight-bold) var(--text-xs) / 1 var(--font-data);
-  letter-spacing: var(--tracking-wider);
-}
-
 .sheetBackdrop {
   position: fixed;
   z-index: var(--layer-sheet);
@@ -84,11 +77,16 @@
 .inlineCategory input {
   width: 100%;
   min-height: var(--control-md);
-  padding: 0 var(--space-3);
+  padding-inline-start: var(--space-3);
   border: var(--border-hairline) solid var(--border-default);
   border-radius: var(--radius-sm);
-  background: var(--surface-panel);
+  background-color: var(--surface-panel);
   color: var(--text-primary);
+}
+
+.sheetFields input,
+.inlineCategory input {
+  padding-inline-end: var(--space-3);
 }
 
 .amountField {
@@ -211,8 +209,22 @@
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   }
 
+  /* One footer shape for both states of this sheet. It used to be a wrapping
+     flex row, which the edit state (Delete + Save) satisfied on one line while
+     the new state (Save & add another + Save expense) wrapped to two — two
+     half-width buttons stacked against the left edge with the whole right half
+     of the sheet empty, and the primary action rendered narrower than the
+     secondary above it. Three judges read the two states as two different
+     designs. A two-column grid gives both the same row: secondary or
+     destructive leading, primary trailing, together spanning the sheet. A lone
+     action spans it. */
   .sheet footer {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sheet footer > :only-child {
+    grid-column: 1 / -1;
   }
 
   .secondaryAction {

@@ -16,9 +16,7 @@
   --color-sky-50: #cbd9e7;
   --color-blue-700: #0f4f82;
   --color-blue-600: #1769aa;
-  --color-blue-300: #88c6ef;
   --color-teal-700: #087e73;
-  --color-teal-300: #7dd8ca;
   --color-amber-800: #71360f;
   --color-amber-700: #803c0e;
   --color-amber-600: #934310;
@@ -43,7 +41,6 @@
   --alpha-white-90: rgb(255 255 255 / 90%);
   --alpha-white-13: rgb(255 255 255 / 13%);
   --alpha-white-12: rgb(255 255 255 / 12%);
-  --alpha-white-02: rgb(255 255 255 / 2%);
   --alpha-sky-38: rgb(220 235 248 / 38%);
   --alpha-focus: rgb(23 105 170 / 35%);
   --alpha-action-shadow: rgb(23 105 170 / 20%);
@@ -72,6 +69,12 @@
   --status-positive: var(--color-teal-700);
   --status-warning: var(--color-amber-500);
   --status-warning-text: var(--color-amber-700);
+  /* The same "over / negative" role on an inverse surface. The light-surface
+     amber is a 1.92:1 hairline against --color-navy-950 and fails WCAG AA for
+     any text size; this one measures 9.66:1 against it, so an overage stays the
+     most readable figure on a dark hero card rather than the least. Any
+     dark-surface negative figure uses this and never --status-warning-text. */
+  --status-warning-text-inverse: var(--color-amber-200);
   --status-danger-text: var(--color-amber-600);
   --border-default: var(--color-line-300);
   --border-subtle: var(--color-line-100);
@@ -115,6 +118,9 @@
   --font-display: ui-rounded, "Avenir Next", Avenir, "Segoe UI", sans-serif;
   --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-data: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  /* The user agent's own `smaller` ratio, named so it can be floored. See the
+     `small` rule below (DF3 / HIG-T3). */
+  --text-scale-smaller: 0.8333em;
   --text-xs: 0.6875rem;
   --text-sm: 0.8125rem;
   --text-md: 1rem;
@@ -178,9 +184,7 @@
   --layout-xl: 360px;
   --layout-panel: 400px;
   --layout-2xl: 440px;
-  --layout-3xl: 520px;
   --layout-4xl: 560px;
-  --layout-5xl: 620px;
   --layout-6xl: 680px;
   --layout-7xl: 720px;
   --layout-8xl: 760px;
@@ -192,7 +196,6 @@
   --viewport-height: 100dvh;
   --canvas-wash-depth: 22rem;
   --viewport-sheet-height: 90dvh;
-  --viewport-auth-panel-height: 34dvh;
   --fluid-2: 2vw;
   --fluid-2-1: 2.1vw;
   --fluid-2-5: 2.5vw;
@@ -200,15 +203,10 @@
   --fluid-3-5: 3.5vw;
   --fluid-5: 5vw;
   --fluid-6: 6vw;
-  --fluid-6-5: 6.5vw;
   --fluid-7: 7vw;
   --fluid-9: 9vw;
   --fluid-10: 10vw;
   --fluid-12: 12vw;
-  --fluid-18: 18vw;
-  --fluid-45: 45vw;
-  --fluid-negative-15: -15vw;
-  --fluid-negative-20: -20vw;
 
   /* Compatibility aliases consumed by the existing planner surfaces. */
   --ink: var(--text-primary);
@@ -251,6 +249,15 @@ body {
     ),
     var(--surface-canvas);
   font-family: var(--font-body);
+  /* C6, as one inherited rule rather than the 16 per-component declarations it
+     had grown into. Those covered ~115 numeric runs and missed 50, including
+     the app's two largest figures (Plan's $87,905 at 32px and Monthly wrap's
+     $123 at 56px) and Plan's 15-row stacked dollar column, where proportional
+     digits meant the column did not align. `font-variant-numeric` inherits, and
+     the four control types below take `font: inherit`, so declaring it once on
+     the body reaches every amount, percentage, count and date in the product —
+     including the ones nobody has written yet. */
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -289,6 +296,120 @@ input,
 select,
 textarea {
   font-size: var(--text-md);
+}
+
+/* L9 / rule 4, applied once for every <select> in the app rather than to the
+   controls that happened to be found first.
+
+   How big the hole was, measured rather than estimated: `--fail-demo
+   menulist-real` puts `appearance: auto` back on every select in the document
+   and runs the whole catalogue. On WebKit that is **19 of 21 surface states red
+   and 49 sub-44px control instances** at 390x844; the identical injection on
+   Chromium is **0 of 21**. Both JSONs are in docs/evidence/l9/.
+
+   Measured, both engines, same DOM, same stylesheet, 390x844:
+
+     <select style="min-height:44px">                 chromium 75x44   webkit 75x44
+     <select style="min-height:44px;padding:0 32px">  chromium 115x44  webkit 115x44
+     <select style="min-height:44px;border:1px solid">chromium 104x44  webkit  73x23
+     <select style="min-height:44px;border-radius:6px">chromium 104x44 webkit  73x23
+     <select style="min-height:44px;background:#fff"> chromium 104x44  webkit  73x23
+     <select style="min-height:44px;appearance:none"> chromium  41x44  webkit  41x44
+
+   The moment a select is painted — any border, any radius, any background —
+   WebKit leaves the native menulist theme for its styled-menulist path, whose
+   user-agent rules beat the author's: `getComputedStyle(select).minHeight`
+   reads 18px on a control this stylesheet sets to 44px, and author padding
+   computes to 0. Every select in this app is painted, so every one of them
+   shipped at ~23px to iPhone Safari while measuring 44px in Chromium.
+   `appearance: none` is the one setting the two engines agree on.
+
+   Turning the native appearance off also takes the platform's disclosure arrow
+   with it, so the arrow is drawn here — the same two-gradient chevron and the
+   same reserved padding DF2 proved on the Month select, where the point is that
+   the space the arrow needs is part of the box model and the label can never be
+   laid out into it. A rule that sets its own horizontal padding on a select
+   must therefore leave `padding-inline-end` alone, or reserve the chevron
+   itself. */
+select {
+  appearance: none;
+  min-height: var(--control-sm);
+  padding-inline-end: var(--space-6);
+  /* Two gradients, each painting one half of a small solid triangle. A chevron
+     was tried instead and is recorded as a failure: two diagonal *bands* over
+     the same box cross into an "✗" with a tail rather than meeting in a caret,
+     and two judges caught it overlapping the "6" of the year chip in the very
+     next round. The constraint that forces the triangle is real — a `<select>`
+     cannot carry a pseudo-element, and the token authority forbids raw colours,
+     so an SVG data URI with a fill is not available either. Two half-gradients
+     meeting at a shared edge is the one construction that renders a clean glyph
+     under both constraints, and it is verified in both engines.
+
+     The glyph gets its own gutter: it starts 12px in from the trailing edge,
+     and `padding-inline-end` above reserves 20px, so the last character of the
+     longest value can never be laid out into it. */
+  background-image:
+    linear-gradient(
+      45deg,
+      var(--color-transparent) 50%,
+      var(--text-secondary) 50%
+    ),
+    linear-gradient(
+      135deg,
+      var(--text-secondary) 50%,
+      var(--color-transparent) 50%
+    );
+  background-repeat: no-repeat;
+  background-position:
+    right var(--space-3) top 50%,
+    right var(--space-2) top 50%;
+  background-size:
+    var(--space-1) var(--space-1),
+    var(--space-1) var(--space-1);
+}
+
+/* Same rule, same reason: a <summary> is the only way to reach what its
+   <details> holds, so it is a touch target. Two of them ("Modeling notes", on
+   Plan details and on Benefits) shipped at 32px. */
+summary {
+  min-height: var(--control-sm);
+}
+
+/* DF1, applied once for the whole app rather than per field. A text input has
+   no wrapping to fall back on: when its value is wider than its content box the
+   browser simply clips, and the default `text-overflow: clip` cuts through the
+   glyph it lands on, so "Health and pharmacy" reads "Health and pharma" with
+   nothing saying it was cut. Blink applies `text-overflow` to an input only
+   while it is *not* focused, which is exactly the wanted behaviour: an unfocused
+   field says it is truncating, and a field being typed into still scrolls its
+   caret into view. Sizing each field to its content is still the real fix
+   wherever it is possible; this is the floor underneath every one of them, so
+   this defect cannot reappear on a field nobody thought to check. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select {
+  text-overflow: ellipsis;
+}
+
+/* HIG-T3 / DF3. `small` has no size of its own in this design system — the user
+   agent gives it the relative `smaller` keyword, which *compounds*: a `small`
+   inside a `--text-sm` (13px) block computes to 10.83px and one inside a
+   `--text-xs` (11px) block to 9.17px, both under the 11pt iOS legibility floor
+   and both invisible in the source, because no stylesheet anywhere names those
+   numbers. Replacing `smaller` with an explicit ratio floored at `--text-xs`
+   fixes the cause rather than the two places it happened to surface:
+   the ratio is the same 0.8333 the UA applies, so a `small` inside body text
+   still sets at 13.33px and every reserved line box that was measured against
+   that (the Home headline's qualifier, C9) is unchanged to the sub-pixel, while
+   no nesting depth can take it below 11px. Anything that needs to be smaller
+   than its parent and is already at the floor simply stays at the floor. */
+small {
+  font-size: max(var(--text-scale-smaller), var(--text-xs));
+}
+
+/* Same class of defect, same treatment: `sub`/`sup` are `smaller` too. */
+sub,
+sup {
+  font-size: max(var(--text-scale-smaller), var(--text-xs));
 }
 
 @media (--reduced-motion) {

@@ -2,20 +2,43 @@
   .surfaceHeader {
     align-items: start;
     flex-direction: column;
+    gap: var(--space-2);
   }
 
+  /* One 44px row instead of two stacked ones: the kind tabs and the month
+     stepper are the same control and cost 106px stacked (C4, C1). */
   .periodControl {
     width: 100%;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
     justify-items: stretch;
+    gap: var(--space-2);
   }
 
   .periodTabs {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(var(--control-sm), auto));
+    padding: var(--space-0);
+    border: 0;
+    background: var(--color-transparent);
+  }
+
+  .periodTabs button {
+    padding-inline: var(--space-1);
   }
 
   .monthStepper {
+    grid-template-columns: var(--control-sm) minmax(0, 1fr) var(--control-sm);
     justify-content: center;
+  }
+
+  /* Symmetric, and never below the 16px the drawn chevron occupies on the
+     right — the 4px this used to set is what let the label reach the arrow's
+     band at 360px (D2). The label is three characters here, so 16px each side
+     still leaves the control far inside its column. */
+  .monthStepper select {
+    min-width: 0;
+    padding-inline: var(--space-4);
   }
 
   .planGrid {
@@ -25,45 +48,169 @@
 
 @media (--viewport-compact) {
   .surfaceStack {
-    gap: var(--space-4);
+    gap: var(--space-3);
   }
 
   .surfaceHeader h1 {
+    max-width: none;
     font-size: clamp(var(--text-2xl), var(--fluid-12), var(--text-4xl));
   }
 
+  /* C2: the Home heading names the tab and carries no figure. On a phone the
+     tab bar names it too, and it is the highlighted tab, so the word costs 31px
+     of the one screen Home is allowed to be and tells a sighted reader nothing
+     the chrome around it is not already saying. It stays in the accessibility
+     tree — this is the app's own `.srOnly` treatment, not `display: none` —
+     because a screen-reader user has no highlighted tab to read. */
+  .homeSurface .surfaceHeader > div:first-child {
+    position: absolute;
+    width: var(--border-hairline);
+    height: var(--border-hairline);
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .homeSurface .surfaceHeader h1 {
+    margin: 0;
+    font-size: var(--text-lg);
+  }
+
+  /* The Budget answer stays the largest thing on its surface but at a size
+     where both phase strings ("… safe to spend" / "… planned spending") set on
+     one line at 360-430px, so stepping the period cannot reflow it (C9). */
+  .budgetSurface .surfaceHeader h1 {
+    font-size: var(--text-xl);
+  }
+
   .runwayCard {
-    gap: var(--space-4);
-    padding: var(--space-6);
+    gap: var(--space-2);
+    padding: var(--space-4);
   }
 
   .runwayHeadline > strong {
-    font-size: clamp(var(--text-4xl), var(--fluid-18), var(--text-6xl));
+    font-size: var(--text-4xl);
   }
 
-  .runwayMetrics,
-  .detailMetrics,
   .homeGrid,
-  .actionRail,
   .linkGrid,
   .planOutcome {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  /* One column put the 120px input on its own full-width row and the projected
+     figure on another, so more than half the card was empty white on both. The
+     two belong side by side: the input is the number you change and the figure
+     is what changing it produces. `auto` sizes the input column to the field
+     itself, and the projection takes the rest and sets against the card's right
+     edge, so the card stops being half empty and loses a row.
+
+     This is its own rule and not a fourth selector on the one above, which is
+     how it was written first: a comment placed between `.linkGrid,` and
+     `.planOutcome` is still inside the selector list, so the two-column layout
+     silently reached `.homeGrid` and `.linkGrid` as well and collapsed Plan's
+     navigation rows to 35.6px wide. The gate caught it on both engines. */
+  .planOutcome {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: end;
+    gap: var(--space-3);
+  }
+
+  .planOutcome > div {
+    text-align: right;
+  }
+
+  /* C5 + C1. Three label/value pairs stacked down 197px with the entire right
+     half of the card empty: three facts that are read together, compared
+     against each other, and never acted on individually. Stacking them bought
+     nothing but width. Side by side at 96px per column they still set on one
+     line each — "Left to fund" is the longest label at 13px and "$1,200" the
+     longest value at 18px — and the block costs 64px instead of 197px, which is
+     133px of the first screen handed back to the transaction list the surface
+     exists to show. */
+  .detailMetrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+
+  .detailMetrics dd {
+    font-size: var(--text-lg);
+  }
+
+  /* Label and value on one line (C1, C4) instead of a stacked metric block. */
   .runwayMetrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
   }
 
-  .runwayCard {
-    margin-bottom: calc(var(--control-md) + var(--space-4));
-  }
-
-  .mathBreakdown {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .runwayMetrics dd {
+    margin: 0;
+    font-size: var(--text-md);
   }
 
   .runwayMetrics div {
-    display: block;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding-top: var(--space-2);
+  }
+
+  .mathBreakdown,
+  .budgetMath {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* C5. Monthly wrap's "Budget versus actual" holds three metrics in a
+     two-column grid, so "Total remaining +$123" sat alone on its own row with
+     the cell beside it empty — a hole the reader has to read past. Two changes,
+     both from C5's own rationale about card chrome: the odd last cell spans the
+     full width instead of leaving a gap, and each cell puts its label and value
+     on one baseline rather than stacking them, which is what a homogeneous unit
+     that is compared down a column looks like as a row. The three-metric block
+     goes 144px -> 104px and the six-metric one 224px -> 160px, and no cell on
+     either is empty. */
+  /* One baseline per cell only works while the label and the figure both fit on
+     it. Measured on Plan at 390x844, they do not: every one of the four labels
+     wrapped to two lines (32px) AND the figure still overflowed its own cell —
+     `Spending variance` by 18.5px, `Starting balance` by 8.9px, `Planned total`
+     by 9.6px, `Funding variance` by 0. `justify-content: space-between` cannot
+     right-align content already wider than its box, so the four figures ended
+     at four different x positions and the column a reader scans down did not
+     exist.
+
+     Stacking the label over the figure gives the figure the cell's full width.
+     The labels stop wrapping, so the cell is 44px instead of the 48px the
+     one-baseline version needed, and the figures align on a single left edge
+     per column — which is the alignment that matters, because they are set in
+     tabular numerals. */
+  .mathBreakdown div {
+    min-height: var(--control-sm);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--micro-2);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  /* The label wraps if it must. `white-space: nowrap` was tried, to hold every
+     cell at 44px, and the gate refused it in one run: Monthly wrap's
+     `Saving funding variance` needs 145px in a 134px box, and an ellipsis is
+     not a fit. A label that needs two lines takes two lines — the figure below
+     it still gets the cell's whole width, which is the alignment this change
+     exists to buy. */
+  .mathBreakdown dt {
+    line-height: 1.25;
+  }
+
+  .mathBreakdown dd {
+    margin: 0;
+  }
+
+  .mathBreakdown div:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 
   .panel,
@@ -71,16 +218,17 @@
     padding: var(--space-4);
   }
 
-  .sectionHeading,
-  .toolbar {
+  .sectionHeading {
     align-items: start;
     flex-direction: column;
   }
 
+  /* The 60px right gutter was decorative — the chevron it reserved is hidden
+     at this width — and it was what forced every row onto two lines. */
   .categoryRow,
   .transactionRow {
     grid-template-columns: var(--space-3) minmax(0, 1fr) auto;
-    padding-right: calc(var(--control-md) + var(--space-3));
+    padding-right: var(--space-2);
   }
 
   .categoryRow > svg,
@@ -88,18 +236,73 @@
     display: none;
   }
 
+  /* C1 + C6: a 48px row — name on the left, both figures stacked in a fixed
+     120px tabular column on the right, so digit count never re-flows the name
+     and the row height is identical in every period phase (C9). */
+  .categoryRow {
+    min-height: var(--control-md);
+    grid-template-columns: var(--space-3) minmax(0, 1fr) var(--layout-xs);
+  }
+
   .categoryRow em {
-    max-width: var(--layout-2xs);
     font-size: var(--text-sm);
   }
 
-  .filters {
-    grid-template-columns: minmax(0, 1fr);
+  /* A two-line transaction sets 18px + 4px + 16px = 38px, which with the row's
+     8px padding is 54px — the 64px desktop rung was 10px of dead band per row,
+     and it is what put the whole 61-row Activity list and the tail of Home's
+     Recent activity further down the screen than their content needed. The
+     three-line rung is unchanged. */
+  .transactionRow:not([data-lines="3"]) {
+    min-height: var(--control-md);
   }
 
-  .surfaceStack:has(.emptyHero) .emptyHero > svg,
-  .surfaceStack:has(.emptyHero) .emptyHero button {
+  /* The Activity heading now carries the period total, so it is sized like
+     every other tab's answer rather than like a label. Same 24px as Budget's
+     and Plan's, which is the point. */
+  .activitySurface .surfaceHeader h1 {
+    font-size: var(--text-xl);
+  }
+
+  .planHub .surfaceHeader h1 {
+    font-size: var(--text-xl);
+  }
+
+  /* C1/C4: search and category are two 48px controls that fit one row at
+     360px; stacking them cost a second control row plus a 12px gap. */
+  .filters {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 42%);
+  }
+
+  .filters input,
+  .filters select {
+    min-width: 0;
+  }
+
+  .emptyHero > svg,
+  .emptyHero button {
     display: none;
+  }
+
+  /* D4, rung 2 of 3 — 390x844. Three recent rows are rendered; two are shown,
+     which is what fits beside the answer, the attention rows and the wrap row
+     in a 635px region. */
+  .homeSurface
+    [data-home-group="recent"]
+    [data-density-row="transaction"]:nth-child(n + 3) {
+    display: none;
+  }
+}
+
+/* D4, rung 3 of 3 — 430x932 and taller. The region grows 88px against 390x844
+   while the rest of Home does not, so a third recent row goes in rather than a
+   third recent row's worth of empty space. 54px of the 91px band, leaving 37px,
+   which is under one row and so cannot be filled by another. */
+@media (--tall-shell-900) {
+  .homeSurface
+    [data-home-group="recent"]
+    [data-density-row="transaction"]:nth-child(n + 3) {
+    display: grid;
   }
 }
 
@@ -136,7 +339,10 @@
     letter-spacing: var(--tracking-snug);
   }
 
-  .surfaceHeader p:last-child {
+  /* The supporting line under a headline, never the eyebrow above it: on
+     surfaces whose header carries only an eyebrow and an h1, the eyebrow is
+     also the last p. */
+  .surfaceHeader p:last-child:not(:first-child) {
     display: none;
   }
 
@@ -163,22 +369,22 @@
     font-size: var(--text-2xl);
   }
 
-  .runwayMetrics {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .runwayMetrics div {
-    display: block;
-  }
-
   .runwayMetrics dd {
     font-size: var(--text-lg);
   }
 }
 
 @media (--short-shell-740) {
+  /* Same reading as the compact rule above, and the same treatment: the title
+     leaves the layout but stays announced. */
   .surfaceStack:has(.runwayCard) .surfaceHeader > div:first-child {
-    display: none;
+    position: absolute;
+    width: var(--border-hairline);
+    height: var(--border-hairline);
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   .surfaceStack:has(.runwayCard) .surfaceHeader {
@@ -187,28 +393,7 @@
 
   .runwayCard {
     gap: var(--space-3);
-    margin-bottom: calc(var(--control-lg) + var(--space-3));
-    padding: var(--space-4);
-  }
-
-  .runwayMetrics {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .runwayMetrics div {
-    display: block;
-  }
-
-  .runwayMetrics dd {
-    font-size: var(--text-md);
-  }
-
-  .surfaceStack:has(.emptyHero) .surfaceHeader > div:first-child {
-    display: none;
-  }
-
-  .surfaceStack:has(.emptyHero) .surfaceHeader {
-    grid-template-columns: minmax(0, 1fr);
+    padding: var(--space-3);
   }
 
   .emptyHero {
@@ -216,6 +401,12 @@
     gap: var(--space-2);
     padding: var(--space-3) var(--space-3)
       calc(var(--control-md) + var(--space-3));
+  }
+
+  /* 740pt-tall phones give the answer one step less display size so the whole
+     Home surface still lands inside one screen. */
+  .homeSurface .runwayHeadline > strong {
+    font-size: var(--text-3xl);
   }
 
   .offlineHome .runwayCard {
@@ -236,11 +427,7 @@
     display: none;
   }
 
-  .planHub .surfaceHeader h1 {
-    font-size: var(--text-2xl);
-  }
-
-  .planHub .surfaceHeader p:last-child {
+  .planHub .surfaceHeader p:last-child:not(:first-child) {
     display: none;
   }
 
@@ -265,15 +452,16 @@
   .budgetSurface .surfaceHeader h1 {
     font-size: var(--text-xl);
   }
-}
 
-@media (--short-phone-740) {
-  .surfaceStack:has(.emptyHero) .surfaceHeader > div:first-child {
+  /* D4, rung 1 of 3 — 360x740. The region is 531px and the answer, its exact
+     qualifier (C7 requires that line), the three over-budget rows and the wrap
+     row already come to 527px of it. The recent preview is what does not fit,
+     and it is the only block here that is a preview: the same rows, all
+     sixty-one of them, are one labelled tap away on the Activity tab, which is
+     also where the two rows that used to be here were cut off mid-subtitle.
+     Nothing that is only available on Home is dropped. */
+  .homeSurface [data-home-group="recent"] {
     display: none;
-  }
-
-  .surfaceStack:has(.emptyHero) .surfaceHeader {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
 

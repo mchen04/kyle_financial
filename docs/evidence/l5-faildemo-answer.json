@@ -1,0 +1,117 @@
+{
+  "generatedAt": "2026-07-25T08:43:55.027Z",
+  "mode": "gate",
+  "failDemo": "answer",
+  "deviceScaleFactor": 3,
+  "bars": {
+    "vertical": {
+      "home": 1,
+      "standard": 3,
+      "deep": 4,
+      "entry": 1.5
+    },
+    "cls": 0.02,
+    "minimumTargetPx": 44,
+    "chromeAboveExemptList": 0.6
+  },
+  "rows": [
+    {
+      "surface": "home-provisional-restore",
+      "label": "Home · cache restore awaiting the server",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 1,
+      "listExemption": null,
+      "singleAnswerPaint": true,
+      "markTime": 0,
+      "arrivalError": null,
+      "injection": "answer: the primary answer repainted with a second value at +900ms",
+      "listRegion": null,
+      "scrollHeight": 844,
+      "documentScrollHeight": 844,
+      "measuredRegion": "documentElement",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0.00004068052875076527,
+      "clsNative": 0.00004068052875076527,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 2,
+      "shiftDetail": [
+        {
+          "value": 0.000021,
+          "startTime": 45,
+          "sources": [
+            {
+              "node": "span :: Saving",
+              "from": [266, 29, 64, 14],
+              "to": [272, 29, 58, 14]
+            }
+          ]
+        },
+        {
+          "value": 0.000019,
+          "startTime": 74,
+          "sources": [
+            {
+              "node": "span :: Saved",
+              "from": [272, 29, 58, 14],
+              "to": [279, 29, 51, 14]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 16,
+      "frameTicks": 506,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [
+        {
+          "text": "House by 30",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "Home",
+          "hero": "",
+          "busy": true
+        },
+        {
+          "text": "Home | Left to spend $123",
+          "hero": "Left to spend $123",
+          "busy": false
+        },
+        {
+          "text": "Home | Left to spend $1",
+          "hero": "Left to spend $1",
+          "busy": false
+        },
+        {
+          "text": "Home | Left to spend $123",
+          "hero": "Left to spend $123",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Left to spend $123", "Left to spend $1"],
+      "blockedRequests": 1,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": [
+        "the primary answer was painted 2 times with different values, so a number rendered provisionally and changed meaning: [\"Left to spend $123\",\"Left to spend $1\"]"
+      ]
+    }
+  ]
+}

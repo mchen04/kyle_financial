@@ -1,5 +1,11 @@
+/* `margin: 0` is load-bearing: this is a <figure>, and the UA stylesheet's
+   `margin: 1em 40px` was insetting the card 40px inside the app's 12px gutter
+   on both sides. It rendered 286px wide where every other card on Plan is
+   366px, which is what wrapped "Brokerage transfer", "Phone and internet" and
+   "Health and pharmacy" onto second lines and broke the legend's row rhythm. */
 .allocationFigure {
   grid-column: 1 / -1;
+  margin: 0;
   display: grid;
   grid-template-columns: minmax(var(--layout-panel-sm), 0.65fr) minmax(
       var(--layout-xl),

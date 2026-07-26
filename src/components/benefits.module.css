@@ -1,7 +1,3 @@
-.eyebrow {
-  composes: eyebrow from "./surface-primitives.module.css";
-}
-
 .muted {
   composes: muted from "./surface-primitives.module.css";
 }
@@ -26,8 +22,40 @@
   composes: modelDisclosure from "./surface-primitives.module.css";
 }
 
-.benefitSummary {
-  composes: benefitSummary from "./surface-primitives.module.css";
+/* C5 — the payroll/employer/savings figures are read, never acted on as a
+   unit, so they are a hairline row group rather than four cards. C1 — 44px
+   single-line rows, 0px gap, 1px hairline. C6 — tabular figures. */
+.summaryRows {
+  display: grid;
+  gap: 0;
+  margin: var(--space-4) 0;
+}
+
+.summaryRows > div {
+  min-height: var(--control-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  border-bottom: var(--border-hairline) solid var(--border-subtle);
+}
+
+.summaryRows > div:last-child {
+  border-bottom: 0;
+}
+
+.summaryRows dt {
+  min-width: 0;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+
+.summaryRows dd {
+  margin: 0;
+  color: var(--ink);
+  font: 600 var(--text-md)/1 var(--body);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
 .compactField {
@@ -68,9 +96,16 @@
 }
 
 .addSelect select {
+  /* The pill the reader sees is this <label>; the control inside it used to be
+     311x21 inside a 340x44 box, so the top and bottom 11px of the affordance
+     did nothing. Stretching the select to the pill makes the hit area and the
+     visible control the same rectangle. */
+  flex: 1 1 auto;
+  align-self: stretch;
+  min-width: 0;
   min-height: var(--control-sm);
   border: 0;
-  background: var(--surface-panel);
+  background-color: var(--surface-panel);
   color: var(--blue);
   font-weight: 700;
 }
@@ -79,9 +114,13 @@
   display: grid;
 }
 
+/* A name is free text up to 100 characters, so no column width makes clipping
+   impossible. What the column can guarantee is that overflow reads as
+   "continues" rather than as a sliced glyph. */
 .benefitName input {
   min-width: 0;
   width: 100%;
+  text-overflow: ellipsis;
   padding: var(--micro-3) var(--space-1);
   border: var(--border-hairline) solid var(--color-transparent);
   border-radius: var(--radius-sm);
@@ -131,20 +170,20 @@
   width: 100%;
   min-height: var(--control-sm);
   margin-top: var(--space-2);
-  padding: 0 var(--space-2);
+  padding-inline-start: var(--space-2);
   border: var(--border-hairline) solid var(--line);
   border-radius: var(--radius-sm);
-  background: var(--surface-panel);
+  background-color: var(--surface-panel);
   color: var(--ink);
   font-size: var(--text-md);
 }
 
 .benefitRow > select {
   min-height: var(--control-sm);
-  padding: 0 var(--space-7) 0 var(--space-2);
+  padding-inline-start: var(--space-2);
   border: var(--border-hairline) solid var(--line);
   border-radius: var(--radius-sm);
-  background: var(--surface-panel);
+  background-color: var(--surface-panel);
   font-size: var(--text-md);
 }
 
@@ -243,84 +282,82 @@
     align-items: flex-start;
     flex-direction: column;
   }
-  .sectionHeading > div {
-    min-width: 0;
-    width: 100%;
-  }
-  .sectionHeading h1 {
-    font-size: var(--text-xl);
-  }
   .sectionHeading .addSelect {
     width: 100%;
     justify-content: center;
   }
+  /* Order 6 — a supporting note, not a figure; 13px is what every other
+     surface's note line already uses. */
+  .wideCard > .muted {
+    font-size: var(--text-sm);
+  }
   .moneyInput input {
     font-size: var(--text-md);
   }
-  .benefitSummary {
-    grid-template-columns: 1fr;
-  }
+  /* C1 — the row's five controls fit two 44px lines. The name spans the first
+     two columns rather than sharing its line with the annual figure: at one
+     column it measured 184px, which is narrower than the default label
+     "Employer 401(k) match" sets in, so the name clipped mid-glyph and the
+     severed edge ran into the figure beside it. The figure moves down beside
+     the amount it is computed from, which is also where it belongs. The third
+     column is `auto` so it is sized by that figure rather than by the 44px
+     delete button, and the button is pushed to its end. */
   .benefitRow {
-    grid-template-columns: minmax(0, 1fr) var(--layout-xs) var(--control-sm);
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr) var(--layout-2xs) auto;
     grid-template-areas:
-      "name name name"
-      "type amount remove"
-      "result result result";
+      "name name remove"
+      "type amount result";
     row-gap: var(--space-2);
-    padding: var(--space-3) 0;
+    column-gap: var(--space-2);
+    padding: var(--space-2) 0;
   }
   .benefitRowWithDiscount {
-    grid-template-columns: minmax(0, 1fr) var(--layout-xs) var(--control-sm);
+    grid-template-columns: minmax(0, 1fr) var(--layout-2xs) auto;
     grid-template-areas:
-      "name name name"
-      "type amount remove"
-      "discount result result";
+      "name name remove"
+      "type amount result"
+      "discount discount discount";
   }
   .benefitName {
     grid-area: name;
-    grid-row: auto;
+    align-self: center;
   }
   .benefitRow > select {
     grid-area: type;
-    grid-row: auto;
+    min-width: 0;
+    width: 100%;
   }
   .benefitRow > .moneyInput {
     grid-area: amount;
-    grid-row: auto;
   }
   .benefitRow > .iconButton {
     grid-area: remove;
-    grid-row: auto;
+    justify-self: end;
   }
   .benefitRow > .muted {
     grid-area: result;
-    grid-row: auto;
     align-self: center;
     padding: 0;
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .benefitRowWithDiscount > .muted {
+    grid-area: result;
   }
   .compactField {
     grid-area: discount;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
     max-width: none;
+  }
+  .compactField input {
+    width: var(--layout-2xs);
   }
   .customTreatment {
     grid-column: 1 / -1;
-  }
-}
-
-@media (--viewport-narrow) {
-  .benefitRow,
-  .benefitRowWithDiscount {
-    grid-template-columns: minmax(0, 1fr) var(--control-sm);
-    grid-template-areas:
-      "name name"
-      "type type"
-      "amount remove"
-      "discount discount"
-      "result result";
-  }
-
-  .benefitRow > select {
-    width: 100%;
   }
 }
 

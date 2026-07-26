@@ -4,7 +4,7 @@ import { PWA_BACKGROUND_COLOR } from "@/domain/ui-tokens";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${PRODUCT_NAME} — Daily Money Cockpit`,
+    name: PRODUCT_NAME,
     short_name: PRODUCT_NAME,
     description: PRODUCT_DESCRIPTION,
     start_url: "/",

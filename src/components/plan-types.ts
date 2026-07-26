@@ -16,22 +16,29 @@ import { calculatePlan } from "@/domain/tax/engine";
 
 export type { StoredPlan } from "@/domain/stored-plan";
 
+/** The four surfaces the tab bar can land on, and the only legal `returnTo`. */
+export type TabScreen = "home" | "budget" | "activity" | "plan";
+
 export type WorkspaceRoute =
   | {
       screen:
-        | "home"
-        | "budget"
-        | "activity"
-        | "plan"
+        | TabScreen
         | "manage-categories"
-        | "wrap"
         | "plan-details"
         | "benefits"
-        | "compare"
-        | "account";
+        | "compare";
     }
   | { screen: "category"; categoryId: string }
-  | { screen: "edit-budget"; returnTo: "budget" | "plan" };
+  | { screen: "edit-budget"; returnTo: "budget" | "plan" }
+  // Account is opened from the avatar in the top bar, which is present on every
+  // surface, so it is the one secondary surface with no fixed parent. The tab
+  // the reader was on travels with the route so its back control can name a
+  // real destination instead of leaving the tab bar as the only way out.
+  | { screen: "account"; returnTo: TabScreen }
+  // Monthly wrap is reachable from Home and from Activity (C12: a labeled 48px
+  // row on both). The origin travels with the route so the back control names
+  // the surface it actually returns to and the tab bar keeps its highlight.
+  | { screen: "wrap"; returnTo: "home" | "activity" };
 
 export type Screen = WorkspaceRoute["screen"];
 

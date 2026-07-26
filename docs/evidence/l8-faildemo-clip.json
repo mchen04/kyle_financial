@@ -1,0 +1,137 @@
+{
+  "generatedAt": "2026-07-25T11:28:38.053Z",
+  "mode": "gate",
+  "failDemo": "clip",
+  "deviceScaleFactor": 3,
+  "bars": {
+    "vertical": {
+      "home": 1,
+      "standard": 3,
+      "deep": 4,
+      "entry": 1.5
+    },
+    "cls": 0.02,
+    "minimumTargetPx": 44,
+    "minimumFontSizePx": 11,
+    "chromeAboveExemptList": 0.6
+  },
+  "rows": [
+    {
+      "surface": "home",
+      "label": "Home",
+      "viewport": "390x844",
+      "primaryViewport": true,
+      "bar": 1,
+      "listExemption": null,
+      "singleAnswerPaint": false,
+      "fitsWithoutScrolling": true,
+      "markTime": 4995.4000000059605,
+      "arrivalError": null,
+      "injection": "clip: one 40px nowrap box holding a 160px string, no ellipsis",
+      "listRegion": null,
+      "innerScroll": {
+        "clientHeight": 635,
+        "scrollHeight": 650,
+        "contentHeight": 650.1,
+        "overflowPx": 15.1,
+        "slackPx": 0
+      },
+      "tinyType": {
+        "count": 0,
+        "minFontSizePx": 11,
+        "detail": []
+      },
+      "clippedText": {
+        "count": 1,
+        "detail": [
+          {
+            "overflowPx": 115,
+            "tag": "div",
+            "label": "",
+            "text": "Health and pharmacy",
+            "clientWidth": 40,
+            "scrollWidth": 155
+          }
+        ]
+      },
+      "densityRegion": {
+        "regionHeightPx": 844,
+        "textNodes": 52,
+        "valueControls": 2,
+        "datumPer100px": 6.16,
+        "datumWithControlsPer100px": 6.4
+      },
+      "scrollHeight": 844,
+      "documentScrollHeight": 844,
+      "measuredRegion": "documentElement",
+      "innerHeight": 844,
+      "documentScrollCost": 1,
+      "verticalCost": 1,
+      "cls": 0.015861714404870303,
+      "clsNative": 0.015861714404870303,
+      "clsGeometric": 0,
+      "clsSource": "layout-shift API",
+      "shiftCount": 2,
+      "shiftDetail": [
+        {
+          "value": 0.015332,
+          "startTime": 5092,
+          "sources": [
+            {
+              "node": "div :: HomeMonthYTDYearJanFebMarAprMayJunJulAugSepOctNovDecLeft to ",
+              "from": [12, 84, 366, 612],
+              "to": [12, 102, 366, 605]
+            },
+            {
+              "node": "section :: Left to spend$123exact: $4,478.00 − $4,354.57 = $123.43Savin",
+              "from": [0, 83, 390, 326],
+              "to": [0, 101, 390, 326]
+            }
+          ]
+        },
+        {
+          "value": 0.000529,
+          "startTime": 5019,
+          "sources": [
+            {
+              "node": "span :: Saved",
+              "from": [176, 29, 51, 14],
+              "to": [279, 29, 51, 14]
+            }
+          ]
+        }
+      ],
+      "geometricShiftCount": 0,
+      "geometricScrollSkips": 0,
+      "geometricSamples": 66,
+      "frameTicks": 7157,
+      "nativeLayoutShiftLive": true,
+      "headlineFirstPaint": "Home | Left to spend $123",
+      "headlineSettled": "Home | Left to spend $123",
+      "headlineSamples": [
+        {
+          "text": "Home | Left to spend $123",
+          "hero": "Left to spend $123",
+          "busy": false
+        }
+      ],
+      "heroPaints": ["Left to spend $123"],
+      "blockedRequests": 0,
+      "smallTargets": 0,
+      "smallTargetDetail": [],
+      "horizontalOverflow": false,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "consoleErrors": 0,
+      "consoleErrorDetail": [],
+      "observerError": null,
+      "devicePixelRatio": 3,
+      "maxTouchPoints": 0,
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
+      "failures": [
+        "single-screen surface overflows its scroll region by 15.1px (content 650px in 635px), so a row is cut off below the fold",
+        "1 box(es) clip their own text with no ellipsis: [{\"overflowPx\":115,\"tag\":\"div\",\"label\":\"\",\"text\":\"Health and pharmacy\",\"clientWidth\":40,\"scrollWidth\":155}]"
+      ]
+    }
+  ]
+}

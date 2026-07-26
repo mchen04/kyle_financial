@@ -204,7 +204,6 @@ export function FastLogSheet({
       >
         <header>
           <div>
-            <p className={styles.eyebrow}>One clean entry</p>
             <h2 id="fast-log-title">
               {existing ? "Edit expense" : "Fast Log"}
             </h2>
@@ -280,7 +279,7 @@ export function FastLogSheet({
                 );
               }}
             >
-              <Plus /> Create category without losing this expense
+              <Plus /> Create category
             </button>
           )}
           <label>
@@ -311,7 +310,13 @@ export function FastLogSheet({
             />
           </label>
           <label>
-            Note <small>Optional</small>
+            {/* The label is a grid, so a bare text node and the <small> beside
+                it became two grid rows: one field carrying what looked like two
+                stacked labels, and a whole line spent on the word "Optional".
+                One element, one row. */}
+            <span>
+              Note <small>Optional</small>
+            </span>
             <input
               value={note}
               maxLength={500}

@@ -1,11 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import type { User } from "@/domain/api-contracts";
 import type { SelectedPeriod } from "@/domain/daily-money";
 import type { PlanResult } from "@/domain/tax/engine";
+import { BackPage } from "./cockpit-back-page";
 import {
   ActivitySurface,
   BudgetSurface,
@@ -25,9 +25,18 @@ import type {
   SaveState,
   Screen,
   StoredPlan,
+  TabScreen,
   WorkspaceRoute,
 } from "./plan-types";
-import styles from "./financial-app.module.css";
+
+/** Account is the one secondary surface reachable from all four tabs, so its
+ *  back control names whichever one the reader came from. */
+const tabLabels: Record<TabScreen, string> = {
+  home: "Home",
+  budget: "Budget",
+  activity: "Activity",
+  plan: "Plan",
+};
 
 const AccountScreen = dynamic(() =>
   import("./account-screen").then(({ AccountScreen }) => AccountScreen),
@@ -46,6 +55,7 @@ export function PlanWorkspaceContent({
   draft,
   route,
   saveState,
+  planAwaitingAuthority,
   result,
   period,
   onPeriod,
@@ -62,6 +72,7 @@ export function PlanWorkspaceContent({
   draft: StoredPlan;
   route: WorkspaceRoute;
   saveState: SaveState;
+  planAwaitingAuthority: boolean;
   result: PlanResult;
   period: SelectedPeriod;
   onPeriod: (period: SelectedPeriod) => void;
@@ -78,7 +89,12 @@ export function PlanWorkspaceContent({
   const preferredHsaAllocation =
     currentHsaFamilyAllocation(draft) ?? hsaAllocationIntents.get(draft.id);
   const navigateScreen = (screen: Screen) => {
-    if (screen === "category" || screen === "edit-budget")
+    if (
+      screen === "category" ||
+      screen === "edit-budget" ||
+      screen === "wrap" ||
+      screen === "account"
+    )
       throw new Error(`${screen} requires route context`);
     onNavigate({ screen });
   };
@@ -98,9 +114,20 @@ export function PlanWorkspaceContent({
           plan={draft}
           result={result}
           period={period}
-          compactForOffline={saveState === "offline"}
+          // Awaiting the server's answer is not the settled offline state, and
+          // the compact offline layout is a different box. Keeping the full
+          // layout through the reserved window is what makes the swap to the
+          // settled value a zero-shift swap.
+          compactForOffline={saveState === "offline" && !planAwaitingAuthority}
+          awaitingAuthority={planAwaitingAuthority}
           onPeriod={onPeriod}
-          onScreen={navigateScreen}
+          onScreen={(screen) => {
+            if (screen === "wrap") {
+              onNavigate({ screen, returnTo: "home" });
+              return;
+            }
+            navigateScreen(screen);
+          }}
           onCategory={(categoryId) =>
             onNavigate({ screen: "category", categoryId })
           }
@@ -113,6 +140,7 @@ export function PlanWorkspaceContent({
           today={today}
           plan={draft}
           period={period}
+          awaitingAuthority={planAwaitingAuthority}
           onPeriod={onPeriod}
           onScreen={(screen) => {
             if (screen === "edit-budget") {
@@ -134,6 +162,7 @@ export function PlanWorkspaceContent({
           period={period}
           onPeriod={onPeriod}
           onEdit={onOpenTransaction}
+          onWrap={() => onNavigate({ screen: "wrap", returnTo: "activity" })}
           onFastLog={canCreateExpense ? () => onOpenTransaction() : undefined}
         />
       );
@@ -171,7 +200,8 @@ export function PlanWorkspaceContent({
           plan={draft}
           result={result}
           period={period}
-          onBack={() => onNavigate({ screen: "home" })}
+          backTo={route.returnTo}
+          onBack={() => onNavigate({ screen: route.returnTo })}
         />
       );
     case "plan":
@@ -192,8 +222,9 @@ export function PlanWorkspaceContent({
       );
     case "plan-details":
       return (
-        <SubPage
+        <BackPage
           title="Plan details"
+          backLabel="Plan"
           onBack={() => onNavigate({ screen: "plan" })}
         >
           <PlanScreen
@@ -203,51 +234,42 @@ export function PlanWorkspaceContent({
             preferredHsaAllocation={preferredHsaAllocation}
             onHsaAllocationIntent={rememberHsaAllocation}
           />
-        </SubPage>
+        </BackPage>
       );
     case "benefits":
       return (
-        <SubPage title="Benefits" onBack={() => onNavigate({ screen: "plan" })}>
+        <BackPage
+          title="Benefits"
+          backLabel="Plan"
+          onBack={() => onNavigate({ screen: "plan" })}
+        >
           <BenefitsScreen draft={draft} result={result} onDraft={onDraft} />
-        </SubPage>
+        </BackPage>
       );
     case "compare":
       return (
-        <SubPage
+        <BackPage
           title="Compare years"
+          backLabel="Plan"
           onBack={() => onNavigate({ screen: "plan" })}
         >
           <CompareScreen plans={plans} />
-        </SubPage>
+        </BackPage>
       );
     case "account":
       return (
-        <AccountScreen
-          user={user}
-          plans={plans}
-          onLogout={onLogout}
-          onDeleteAccount={onDeleteAccount}
-        />
+        <BackPage
+          title="Account and data"
+          backLabel={tabLabels[route.returnTo]}
+          onBack={() => onNavigate({ screen: route.returnTo })}
+        >
+          <AccountScreen
+            user={user}
+            plans={plans}
+            onLogout={onLogout}
+            onDeleteAccount={onDeleteAccount}
+          />
+        </BackPage>
       );
   }
-}
-
-function SubPage({
-  title,
-  onBack,
-  children,
-}: {
-  title: string;
-  onBack: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={styles.subPage}>
-      <button onClick={onBack}>
-        <ChevronLeft /> Back to Plan
-      </button>
-      <h1>{title}</h1>
-      {children}
-    </div>
-  );
 }

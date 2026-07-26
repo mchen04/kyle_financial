@@ -158,8 +158,16 @@ export function PeriodControl({
             }
           >
             {MONTH_NAMES.map((month, index) => (
+              // Abbreviated, and without the year, so the picker, the period
+              // tabs, and both stepper arrows share one 44px row at 360px wide
+              // without clipping. The year is the same on all twelve options —
+              // this control only ever steps within `period.year` — so printing
+              // it twelve times bought nothing and cost the 35px that left the
+              // native arrow overlapping the label at 360px (D2). The year
+              // itself is unchanged and still on screen, in the top bar's year
+              // picker, which is visible on every surface.
               <option key={month} value={index + 1}>
-                {month} {period.year}
+                {month.slice(0, 3)}
               </option>
             ))}
           </select>
