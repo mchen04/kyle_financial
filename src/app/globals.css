@@ -133,6 +133,15 @@
   --text-6xl: 5.25rem;
   --text-7xl: 7rem;
   --leading-tight: 1.05;
+  /* The third leading rung, between the two that already existed. `tight` is
+     display leading: it sets stacked headline lines as one block and is too
+     close for anything with descenders sitting near a border. `body` is running
+     copy, which is too airy for a label that is one line by construction. A
+     single-line label inside a bounded box — a chip, a pill, a compact metric —
+     needs its line box to clear the glyphs and nothing more. 1.25 was already
+     the de-facto value at three such sites in this codebase, authored raw each
+     time; naming it is what stops the fourth. */
+  --leading-compact: 1.25;
   --leading-body: 1.5;
   --tracking-tighter: -0.065em;
   --tracking-tight: -0.04em;
@@ -159,6 +168,15 @@
   --shadow-page: 0 18px 50px var(--alpha-ink-shadow-08);
   --motion-fast: 120ms;
   --motion-standard: 180ms;
+  /* `fast` and `standard` are TRANSITION durations: a discrete state change,
+     bounded at the ~200ms above which a UI stops feeling immediate. A looping
+     indeterminate indicator is a different quantity — a period, not a duration
+     — and neither transition rung can express it (a 180ms spin is 5.5
+     revolutions a second, which reads as a flicker, not as progress). These two
+     are the periods the app already ran at, named rather than re-authored: one
+     rotation of a status spinner, and one sweep of the loading bar. */
+  --motion-spin-period: 800ms;
+  --motion-sweep-period: 1100ms;
   --layer-content: 1;
   --layer-sticky: 10;
   --layer-nav: 20;

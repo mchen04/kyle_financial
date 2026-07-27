@@ -74,7 +74,7 @@ export function PwaRuntime() {
         waiting.postMessage({ type: "SKIP_WAITING" });
       }}
     >
-      <RefreshCw size={16} />
+      <RefreshCw />
       <span className={styles.updateFull}>Update ready · reload</span>
       <span className={styles.updateShort}>Update</span>
     </button>

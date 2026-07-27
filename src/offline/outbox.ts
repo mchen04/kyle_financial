@@ -193,6 +193,113 @@ export function prepareMutations(
   return prepared;
 }
 
+/**
+ * Adopts what a dying document parked, at the place its own intent belongs.
+ *
+ * `prepareMutations` is the enqueue path, and its rule — append at the tail,
+ * stamp `max(intent, newest delivery + 1)` — is right for the only thing that
+ * calls it: a mutation the session has just produced, which really is the
+ * newest thing that has happened. A journalled mutation is the opposite. It was
+ * produced by a document that has already ended, and the session may have done
+ * anything since, in this tab or another one sharing the same outbox.
+ *
+ * Handing it the tail stamp made an intent from minutes ago the newest write in
+ * the queue, and the server judges by the delivered `updatedAt` — so a rename
+ * parked by a closed tab overwrote a rename the reader had just committed in
+ * the tab still open. Two ordinary tabs, no synthetic events, both engines.
+ *
+ * So adoption inserts by intent instead. Each entry is placed before the first
+ * queued mutation whose own intent is newer than it, and is delivered at its
+ * own intent time rather than a bumped one. Three consequences, and they are
+ * the whole fix:
+ *
+ * - Against a newer queued edit to the same field, the adopted entry is now the
+ *   *earlier* one, so the existing compaction in `planMutationBatch` keeps the
+ *   newer edit and discards it. It never reaches the wire.
+ * - Against newer state on the server, it is delivered at its true age, so
+ *   `isIncomingVersionNewer` refuses it — acknowledged, not applied. The client
+ *   does not re-implement that judgement; it stops lying to it.
+ * - Against nothing newer at all, it is the reader's most recent intent and
+ *   still wins, which is the case the journal exists for.
+ *
+ * Queued mutations keep their relative order and their existing delivery
+ * stamps: only the sequence numbers are re-dealt, densely, so an entry can be
+ * given a place ahead of them. Re-adoption is a no-op — an id already in the
+ * outbox yields no work at all — which is what keeps clearing the journal only
+ * *after* the transaction commits the safe order, and keeps a re-sent mutation
+ * the same mutation as far as the server's receipt table is concerned.
+ */
+export function adoptJournalledMutations(
+  existing: SequencedSyncMutation[],
+  journalled: readonly SyncMutation[],
+): SequencedSyncMutation[] {
+  const byId = new Map(
+    existing.map((mutation) => [mutation.mutationId, mutation]),
+  );
+  const adopted: SyncMutation[] = [];
+  for (const entry of journalled) {
+    const mutation = syncMutationSchema.parse(entry);
+    const prior = byId.get(mutation.mutationId);
+    if (prior) {
+      if (
+        syncIntentFingerprint(toIntentMutation(prior)) !==
+        syncIntentFingerprint(mutation)
+      )
+        throw new Error("Mutation ID was reused with different content");
+      continue;
+    }
+    byId.set(mutation.mutationId, {
+      ...mutation,
+      localSequence: 0,
+      deliveryUpdatedAt: mutation.updatedAt,
+    });
+    adopted.push(mutation);
+  }
+  if (adopted.length === 0) return [];
+  return resequence(mergeByIntent(existing, adopted));
+}
+
+function mergeByIntent(
+  existing: readonly SequencedSyncMutation[],
+  adopted: readonly SyncMutation[],
+): (SequencedSyncMutation | SyncMutation)[] {
+  const pending = [...adopted].toSorted(
+    (left, right) => Date.parse(left.updatedAt) - Date.parse(right.updatedAt),
+  );
+  const merged: (SequencedSyncMutation | SyncMutation)[] = [];
+  for (const mutation of existing) {
+    const queuedAt = Date.parse(mutation.updatedAt);
+    // `<=`, so an adopted entry and a queued one made in the same millisecond
+    // resolve in the queued one's favour: it belongs to the session that is
+    // still running, and compaction keeps whichever is later in this list.
+    while (pending.length > 0 && Date.parse(pending[0].updatedAt) <= queuedAt)
+      merged.push(pending.shift()!);
+    merged.push(mutation);
+  }
+  return [...merged, ...pending];
+}
+
+function resequence(
+  merged: readonly (SequencedSyncMutation | SyncMutation)[],
+): SequencedSyncMutation[] {
+  let sequence = 0;
+  let priorDeliveryTime = Number.NEGATIVE_INFINITY;
+  return merged.map((mutation) => {
+    const delivered =
+      "deliveryUpdatedAt" in mutation ? mutation.deliveryUpdatedAt : undefined;
+    const deliveryTime = Math.max(
+      Date.parse(delivered ?? mutation.updatedAt),
+      priorDeliveryTime + 1,
+    );
+    priorDeliveryTime = deliveryTime;
+    return {
+      ...mutation,
+      localSequence: ++sequence,
+      deliveryUpdatedAt: new Date(deliveryTime).toISOString(),
+    };
+  });
+}
+
 export function addPreparedMutations(
   store: IDBObjectStore,
   mutations: readonly SequencedSyncMutation[],

@@ -11,7 +11,7 @@ import {
   unobservedTransactionsAfter,
 } from "@/domain/daily-money";
 import { BackPage } from "./cockpit-back-page";
-import { PeriodControl } from "./cockpit-period-control";
+import { PeriodControl, type PlanYearChoice } from "./cockpit-period-control";
 import { selectedPeriodPhase } from "./cockpit-period-phase";
 import { Metric, MonthlyWrapRow, TransactionRows } from "./cockpit-rows";
 import { money, type StoredPlan } from "./plan-types";
@@ -26,6 +26,7 @@ export function ActivitySurface({
   today,
   plan,
   period,
+  planYear,
   onPeriod,
   onEdit,
   onWrap,
@@ -34,6 +35,7 @@ export function ActivitySurface({
   today: string;
   plan: StoredPlan;
   period: SelectedPeriod;
+  planYear: PlanYearChoice;
   onPeriod: (period: SelectedPeriod) => void;
   onEdit: (id: string) => void;
   onWrap: () => void;
@@ -98,7 +100,12 @@ export function ActivitySurface({
             period
           </span>
         </div>
-        <PeriodControl period={period} today={today} onPeriod={onPeriod} />
+        <PeriodControl
+          period={period}
+          today={today}
+          planYear={planYear}
+          onPeriod={onPeriod}
+        />
       </header>
       {/* "What did I overspend on last month?" is a retrospective question, and
           a fresh reader reads that as a history question and taps Activity. The

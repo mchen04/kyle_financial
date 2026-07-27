@@ -7,8 +7,15 @@
     var(--space-1);
   background: var(--ink);
   color: var(--text-inverse);
-  font: 700 var(--text-sm)/1 var(--data);
-  letter-spacing: var(--tracking-tight);
+}
+
+/* The mark is a house glyph, not a lettered tile, so the tile sizes the glyph
+   instead of setting a font. The stroke inherits the tile's own ink, so the
+   only thing left to state is the box: 20px of glyph centred in 40px of tile,
+   which keeps the same optical weight the three letters had. */
+.brandMark > svg {
+  width: var(--icon-md);
+  height: var(--icon-md);
 }
 
 .wordmark {
@@ -79,6 +86,24 @@
   color: var(--ink);
   font-size: var(--text-sm);
   font-weight: 700;
+}
+
+/* The plan-year chip. It is a primitive because two surfaces render it — the
+   top bar on screens with no reporting period, and the cockpit's month/year row
+   on the three that have one — and a reader who steps between them must be
+   looking at the same control. Deliberately unlike its row-mate: the month
+   picker is borderless with a drawn caret, this one is an outlined chip, and
+   the period-kind tabs above are a segmented pill. Three idioms because they
+   choose three different things. `padding-inline-end` is left to the app-wide
+   `select` rule, which reserves the gutter its caret is drawn into. */
+.yearSelect {
+  min-height: var(--control-sm);
+  padding-inline-start: var(--space-2);
+  border: var(--border-hairline) solid var(--line);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-panel);
+  color: var(--ink);
+  font-weight: var(--weight-bold);
 }
 
 .warning {
@@ -222,6 +247,40 @@
 }
 
 .modelDisclosure svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  flex: 0 0 auto;
+}
+
+/* T3. Icon dimensions were authored as `size={N}` props in the TSX, which the
+   token audit reads only inside `style={...}` objects and therefore never saw:
+   the app shipped 14, 15 and 17px glyphs against a three-step icon scale that
+   has none of those values. Every glyph is sized here instead, from the scale,
+   by ROLE — which is the rule this codebase already applied by hand:
+
+     --icon-md (20px)  an icon-only tap target, where the glyph IS the control
+                       (.monthStepper svg, .backHeader svg, .reorderButtons
+                       button svg, .detailsToggle svg, .iconButton svg)
+     --icon-sm (16px)  a glyph sitting beside a word, where the text sets the
+                       line box and the glyph annotates it (.navRow > svg,
+                       .primaryButton svg, .ledgerHint svg, .expenseToast svg)
+
+   In every `--icon-sm` case below the glyph is shorter than the --text-sm line
+   box it shares a row with, so none of these rules can change a row's height. */
+.iconButton svg {
+  width: var(--icon-md);
+  height: var(--icon-md);
+}
+
+.secondaryButton svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  flex: 0 0 auto;
+}
+
+.warning svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
   flex: 0 0 auto;
 }
 

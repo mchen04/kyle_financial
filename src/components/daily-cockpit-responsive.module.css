@@ -5,14 +5,27 @@
     gap: var(--space-2);
   }
 
-  /* One 44px row instead of two stacked ones: the kind tabs and the month
-     stepper are the same control and cost 106px stacked (C4, C1). */
+  /* Two rows: the kind tabs, then the month and the year. The tabs used to
+     share the stepper's 44px row (C4, C1) and the year was in the top bar
+     entirely; the reader read the row as one undifferentiated strip of period
+     settings and could not find the year at all. The second row is the cost of
+     naming the period in one place, and it is only paid on surfaces that have
+     a reporting period. */
+  /* The two rows are one control, so they are bound tighter than the 8px that
+     separates this control from its neighbours — at 8px each row read as its
+     own setting, which is the confusion the split was made to fix. */
   .periodControl {
     width: 100%;
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     align-items: center;
     justify-items: stretch;
-    gap: var(--space-2);
+    gap: var(--space-1);
+  }
+
+  /* The stepper takes the free width and the year chip keeps its own, so the
+     month label stays centred between its arrows at every phone width. */
+  .periodRange {
+    justify-content: flex-end;
   }
 
   .periodTabs {
@@ -28,6 +41,8 @@
   }
 
   .monthStepper {
+    flex: 1 1 auto;
+    min-width: 0;
     grid-template-columns: var(--control-sm) minmax(0, 1fr) var(--control-sm);
     justify-content: center;
   }
@@ -77,16 +92,75 @@
     font-size: var(--text-lg);
   }
 
-  /* The Budget answer stays the largest thing on its surface but at a size
-     where both phase strings ("… safe to spend" / "… planned spending") set on
-     one line at 360-430px, so stepping the period cannot reflow it (C9). */
-  .budgetSurface .surfaceHeader h1 {
-    font-size: var(--text-xl);
+  /* Home is the one surface that must land inside a single screen, and the
+     dedicated month/year row costs it 52px. Its five blocks are already
+     separated by a group label or a card edge, so the 12px band between them is
+     doing the separating twice; 8px still reads as a break and returns 16px
+     across the four gaps. Scoped to Home because Home is the surface with the
+     budget — the other cockpit surfaces scroll and keep the roomier rhythm. */
+  .surfaceStack.homeSurface {
+    gap: var(--space-2);
   }
 
+  /* B1. The Budget answer is the one number the reader opens this tab for, and
+     at 24px it set no larger than a section heading. One step up the existing
+     scale — `--text-xl` -> `--text-2xl`, 24px -> 32px. The value and the phrase
+     are one text node in one `h1`, so this sizes both together in all three
+     phases ("… left to spend", "… over", "… planned spending"), which is what
+     "enlarge the value and the text" means here.
+     The old size was chosen so that every phase string set on ONE line at
+     360-430px, because stepping the period swaps the phase and a change of line
+     count moves the whole surface (C9). Measured in the harness's own Chromium,
+     at 32px "$4,478 planned spending" is 374px and the content box at 390 is
+     366px and at 360 is 336px, so that guarantee cannot survive the step: the
+     gate caught the swap at CLS 0.0405 and 0.0269.
+     B1b. That guarantee was first bought with
+     `min-height: calc(2 * --text-2xl * --leading-tight)` = 67.2px, reserving a
+     second line unconditionally. Measured, the second line was only ever USED
+     at 360x740 in one of three phases: at 390 and at 430 the headline set on
+     one line in every phase, and the reservation showed as 32px of permanently
+     empty band under it.
+     The reservation is now structural instead. The figure and the phrase are
+     two spans (see `daily-cockpit.tsx`) and this rule makes the `h1` a grid, so
+     each takes its own row: two lines in every phase, at every width, for any
+     magnitude — including the six- and seven-figure amounts that reflowed even
+     at 24px, and including a phrase longer than any this app ships. Same 67.2px
+     box, so nothing on the surface moved; but the box is filled, so there is no
+     band, and the line count can no longer depend on a string's width at all.
+     `text-wrap: balance` is gone with it: it existed to split the wrapped
+     one-string state at the figure, which is now where the split always is.
+     A grid container ignores the anonymous whitespace between its items, so the
+     word space in the markup costs nothing here and still separates the two
+     parts on desktop, where this rule does not apply and the headline sets
+     inline on one line as before. */
+  .budgetSurface .surfaceHeader h1 {
+    display: grid;
+    font-size: var(--text-2xl);
+  }
+
+  /* 12px of card padding, which is what the 740pt rung below already sets, so
+     the card now has one phone inset instead of two. 8px off Home's height. */
   .runwayCard {
     gap: var(--space-2);
-    padding: var(--space-4);
+    padding: var(--space-3);
+  }
+
+  /* The three lines of the answer are one sentence — label, figure, exact
+     working — so they set as a block: 2px between them, and the 1.5 body
+     leading the label and the working inherit from the page dropped to the
+     display leading the figure between them already uses. Neither line wraps at
+     any phone width, so the leading was only padding line boxes that have one
+     line in them. `strong` keeps its own 0.95 and is untouched. */
+  .runwayHeadline {
+    gap: var(--micro-2);
+    line-height: var(--leading-tight);
+  }
+
+  /* Home's two group labels sit directly above a row whose own 8px of padding
+     already separates the label from the first line of text, so the 4px below
+     each label was a second separator doing the same job. */
+  .homeSurface h2 {
+    margin-bottom: var(--space-0);
   }
 
   .runwayHeadline > strong {
@@ -150,12 +224,14 @@
     font-size: var(--text-md);
   }
 
+  /* The hairline above the row is what separates it from the progress track;
+     the padding only has to keep the text off the line. */
   .runwayMetrics div {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     gap: var(--space-2);
-    padding-top: var(--space-2);
+    padding-top: var(--space-1);
   }
 
   .mathBreakdown,
@@ -202,7 +278,7 @@
      it still gets the cell's whole width, which is the alignment this change
      exists to buy. */
   .mathBreakdown dt {
-    line-height: 1.25;
+    line-height: var(--leading-compact);
   }
 
   .mathBreakdown dd {
@@ -257,11 +333,17 @@
     min-height: var(--control-md);
   }
 
-  /* The Activity heading now carries the period total, so it is sized like
-     every other tab's answer rather than like a label. Same 24px as Budget's
-     and Plan's, which is the point. */
+  /* A1. The Activity heading carries the period total, so it is sized like
+     every other tab's answer rather than like a label — and it moves up the
+     same one step as Budget's, because "$1,234 logged" and "$1,234 left to
+     spend" are the same kind of statement and a reader who has learned one
+     size should not meet a second. `$…` and the word `logged` are one text
+     node in one `h1`, so both grow together.
+     `.activityTotal` below it ("61 expenses in this period") deliberately stays
+     at 1rem: it is the count, not the total, and it is the only thing on this
+     header that still marks the answer as the answer. */
   .activitySurface .surfaceHeader h1 {
-    font-size: var(--text-xl);
+    font-size: var(--text-2xl);
   }
 
   .planHub .surfaceHeader h1 {
@@ -354,11 +436,16 @@
     gap: var(--space-1);
   }
 
+  /* The month/year row is the grid item now, so the centring that used to sit
+     on the stepper moves to the row that contains it. */
+  .periodRange {
+    justify-self: center;
+  }
+
   .monthStepper {
     grid-template-columns:
       var(--control-sm) minmax(var(--layout-2xs), auto)
       var(--control-sm);
-    justify-self: center;
   }
 
   .runwayCard {
@@ -449,8 +536,13 @@
     display: none;
   }
 
+  /* B1, second rung. This block wins over the compact one by media order on
+     every 740pt-tall phone and in phone landscape, so the step has to be
+     restated here or the increase applies at 390x844 and silently does not at
+     360x740. Only `font-size` was ever set here; the two-row split above is not
+     re-declared because nothing here overrides it. */
   .budgetSurface .surfaceHeader h1 {
-    font-size: var(--text-xl);
+    font-size: var(--text-2xl);
   }
 
   /* D4, rung 1 of 3 — 360x740. The region is 531px and the answer, its exact

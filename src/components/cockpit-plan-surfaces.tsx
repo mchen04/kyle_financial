@@ -11,7 +11,12 @@ import {
 } from "@/domain/daily-money";
 import type { PlanResult } from "@/domain/tax/engine";
 import { BackPage } from "./cockpit-back-page";
-import { monthlyWrapPhase, wrapBalanceCopy } from "./cockpit-copy";
+import {
+  monthlyWrapPhase,
+  observedPeriodLabel,
+  varianceDirectionCopy,
+  wrapBalanceCopy,
+} from "./cockpit-copy";
 import { initialMonth, savingsSources } from "./cockpit-period-control";
 import { CategoryRow, Metric } from "./cockpit-rows";
 import { PlanAllocationChart } from "./plan-allocation-chart";
@@ -242,6 +247,7 @@ export function PlanHub({
   const showStartingBalance = futurePlan
     ? plan.startingSavingsCents !== undefined
     : annualProjection.projectedEndingSavingsCents !== undefined;
+  const observedPeriod = observedPeriodLabel(plan.year, today);
   return (
     <div className={`${styles.surfaceStack} ${styles.planHub}`}>
       {/* C2/C7. This was a 46.8px two-line *sentence* — "$9,837 cash savings
@@ -285,6 +291,12 @@ export function PlanHub({
                   : (plan.startingSavingsCents / 100).toString()
               }
               placeholder="Optional"
+              // Empty means unset here, and unset is unrecoverable: this is the
+              // balance every projection on the screen is measured from. A
+              // reader who clears it and then blurs, presses Return or
+              // navigates away meant it. A reader whose document was torn down
+              // over an empty box did not necessarily mean anything at all.
+              restoreOnEmpty="document-end"
               onValue={(value) =>
                 onDraft({
                   ...plan,
@@ -332,24 +344,74 @@ export function PlanHub({
           label="Planned total"
           valueCents={annualProjection.plannedSavingsChangeCents}
         />
-        {!futurePlan && (
+        {/* P1. Both variances are observed terms — Jan through the current
+            month — sitting in the same list as a full-year planned total, and
+            neither the period nor the sign convention was stated anywhere on
+            this surface. A reader met "Funding variance -$7,000.00" with no way
+            to learn it meant seven elapsed months of a saving allocation that
+            has never been funded. The arithmetic is unchanged; the period and
+            the direction are now printed with each term, and the note below
+            says which months the variances replace.
+
+            P1b. Period and direction still did not say how the figure is BUILT
+            — a reader met "-$7,000.00 · Jan-Jul · under-funded" and could not
+            get from the screen to "$1,000/mo of saving allocation across seven
+            elapsed months, none of it funded". Each variance now prints its own
+            two operands beneath it.
+
+            Those operands are read straight off `observedBudget`, which is the
+            single object `calculateAnnualSavingsProjection` hands to
+            `calculateSavingsImpact` to compute these very variances from:
+
+              savingFundingVarianceCents = savingActualCents - savingAllocatedCents
+              spendingVarianceCents = spendingAllocatedCents - spendingActualCents
+
+            So the printed pair is the subtraction's own two inputs, not a
+            second derivation of them, and cannot disagree with the total. No
+            arithmetic in `daily-money.ts` was touched to expose them; the
+            component already held the rollup.
+
+            Gating on `observedBudget` rather than `!futurePlan` is the same
+            condition — `observedBudget` is built `undefined` on exactly
+            `plan.year > todayYear`, which is what `futurePlan` is — written the
+            way that lets the type narrow. */}
+        {observedBudget && (
           <ProjectionTerm
             label="Spending variance"
+            detail={`${observedPeriod} · ${varianceDirectionCopy(
+              "spending",
+              annualProjection.observedSpendingVarianceCents,
+            )}`}
+            derivation={`planned ${money(
+              observedBudget.spendingAllocatedCents,
+              2,
+            )} · spent ${money(observedBudget.spendingActualCents, 2)}`}
             valueCents={annualProjection.observedSpendingVarianceCents}
             signed
           />
         )}
-        {!futurePlan && (
+        {observedBudget && (
           <ProjectionTerm
-            label="Funding variance"
+            label="Saving funding variance"
+            detail={`${observedPeriod} · ${varianceDirectionCopy(
+              "savingFunding",
+              annualProjection.observedSavingFundingVarianceCents,
+            )}`}
+            derivation={`planned ${money(
+              observedBudget.savingAllocatedCents,
+              2,
+            )} · funded ${money(observedBudget.savingActualCents, 2)}`}
             valueCents={annualProjection.observedSavingFundingVarianceCents}
             signed
           />
         )}
       </dl>
       <p className={styles.budgetNote}>
-        Planned total is cash, payroll/employer, and allocations.
-        {futurePlan ? " Observed variance begins when the year starts." : ""}
+        Planned total is cash, payroll/employer, and allocations for the whole
+        year.
+        {futurePlan
+          ? " Observed variance begins when the year starts."
+          : ` Both variances cover ${observedPeriod} only, and those months replace their planned amount so nothing is counted twice. Negative is behind plan: less moved into saving categories, or more spent than planned.`}
       </p>
       {/* C5. Four homogeneous units, scanned down a column, acted on one at a
           time — that is a row list by the rule's own terms, and it fails the
@@ -399,16 +461,27 @@ export function PlanHub({
  */
 function ProjectionTerm({
   label,
+  detail,
+  derivation,
   valueCents,
   signed = false,
 }: {
   label: string;
+  detail?: string;
+  /** The term's own two operands, e.g. `planned $7,000.00 · funded $0.00`. */
+  derivation?: string;
   valueCents: number;
   signed?: boolean;
 }) {
   return (
     <div>
-      <dt>{label}</dt>
+      <dt>
+        {label}
+        {detail === undefined ? null : <small>{detail}</small>}
+        {derivation === undefined ? null : (
+          <small data-derivation="">{derivation}</small>
+        )}
+      </dt>
       <dd data-negative={valueCents < 0}>
         {signed && valueCents > 0 ? "+" : ""}
         {money(valueCents, 2)}

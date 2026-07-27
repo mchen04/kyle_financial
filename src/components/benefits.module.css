@@ -95,6 +95,15 @@
   border-radius: var(--radius-md);
 }
 
+/* T3. A glyph beside the control's label, so the beside-text step. Replaces
+   `size={17}`; the pill's height is `--control-sm`, which neither value
+   reaches, so nothing moves. */
+.addSelect > svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  flex: 0 0 auto;
+}
+
 .addSelect select {
   /* The pill the reader sees is this <label>; the control inside it used to be
      311x21 inside a 340x44 box, so the top and bottom 11px of the affordance

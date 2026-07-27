@@ -10,12 +10,16 @@ import {
   canPublishPlanSnapshot,
   canConfirmSaved,
   copyForwardIntentSnapshot,
+  displayedSaveState,
   durableLogoutProblem,
   enqueueSerializedIntent,
+  hasDurabilityGap,
+  intentAwaitingDurableWrite,
   isCurrentAccountOperation,
   mergePlansWithLocalIntent,
   planIntentForYear,
   prepareCopyForward,
+  publishDurabilityGap,
   reconciliationCompletionState,
   reconciliationStateWithPersistencePriority,
   registerPlanWriteFailure,
@@ -26,8 +30,143 @@ import {
   runDevicePersistenceRetry,
   shouldEvictAccount,
   shouldInvalidateForAuthentication,
+  subscribeToDurabilityGap,
+  unflushedIntentMutations,
   userWithLatestSession,
 } from "./sync-state";
+
+describe("what the status chip is allowed to claim", () => {
+  it("refuses to say Saved over an edit still inside an input", () => {
+    expect(displayedSaveState("saved", true)).toBe("unsaved");
+    expect(displayedSaveState("saved", false)).toBe("saved");
+  });
+
+  it("never softens a state that already reports trouble", () => {
+    expect(displayedSaveState("saving", true)).toBe("saving");
+    expect(displayedSaveState("offline", true)).toBe("offline");
+    expect(displayedSaveState("local-error", true)).toBe("local-error");
+    expect(displayedSaveState("sync-error", true)).toBe("sync-error");
+    expect(displayedSaveState("rejected", true)).toBe("rejected");
+  });
+});
+
+/**
+ * The second "Saved over unsaved work": fifteen category amounts were measured
+ * sitting in memory under a `Saved` chip while the device write chain was
+ * stalled behind a held account lock. `saveState` cannot see that — it becomes
+ * `saving` from inside the local write's `then`, which is precisely what never
+ * runs — so the gap has to be read off the two things that do know: what the
+ * session is holding, and what the device last stored.
+ */
+describe("an edit the engine was handed and has not stored yet", () => {
+  const stored = storedPlan(2026, { startingSavingsCents: 2_850_000 });
+  const snapshots = new Map([[2026, JSON.stringify(stored)]]);
+  const inMemory = { ...stored, startingSavingsCents: 3_100_000 };
+
+  it("is not reported when the session matches the device", () => {
+    expect(intentAwaitingDurableWrite([stored], snapshots)).toBe(false);
+  });
+
+  it("is reported while the write chain is stalled", () => {
+    expect(intentAwaitingDurableWrite([inMemory], snapshots)).toBe(true);
+  });
+
+  it("is what stops the chip saying Saved over it", () => {
+    expect(
+      displayedSaveState(
+        "saved",
+        intentAwaitingDurableWrite([inMemory], snapshots),
+      ),
+    ).toBe("unsaved");
+  });
+
+  /** A plan with no baseline is one the device never stored, not a gap. */
+  it("is not reported for a plan this device has no snapshot of", () => {
+    expect(intentAwaitingDurableWrite([stored], new Map())).toBe(false);
+  });
+
+  it("notifies the chip only when the answer changes", () => {
+    const seen: boolean[] = [];
+    const unsubscribe = subscribeToDurabilityGap(() =>
+      seen.push(hasDurabilityGap()),
+    );
+    try {
+      publishDurabilityGap(true);
+      publishDurabilityGap(true);
+      publishDurabilityGap(false);
+
+      expect(seen).toEqual([true, false]);
+      expect(hasDurabilityGap()).toBe(false);
+    } finally {
+      unsubscribe();
+      publishDurabilityGap(false);
+    }
+  });
+});
+
+describe("the intent a dying document still has to hand over", () => {
+  const baseline = storedPlan(2026, { startingSavingsCents: 2_850_000 });
+  const snapshots = new Map([[2026, JSON.stringify(baseline)]]);
+  let nextId = 0;
+  const createId = () =>
+    `00000000-0000-4000-8000-${String(++nextId).padStart(12, "0")}`;
+
+  it("sends nothing when the session matches what the device stored", () => {
+    expect(
+      unflushedIntentMutations(
+        [baseline],
+        snapshots,
+        "2026-07-12T00:00:00.000Z",
+        createId,
+      ),
+    ).toEqual([]);
+  });
+
+  it("sends only the difference the durable write never saw", () => {
+    const edited = { ...baseline, startingSavingsCents: 9_900_000 };
+
+    const mutations = unflushedIntentMutations(
+      [edited],
+      snapshots,
+      "2026-07-12T00:00:00.000Z",
+      createId,
+    );
+
+    expect(mutations).toHaveLength(1);
+    expect(mutations[0].planYear).toBe(2026);
+    expect(mutations[0].field).toBe("startingSavingsCents");
+    expect(mutations[0].value).toBe(9_900_000);
+    expect(mutations[0].updatedAt).toBe("2026-07-12T00:00:00.000Z");
+  });
+
+  it("sends a cleared optional scalar as null, never as nothing", () => {
+    const edited = { ...baseline };
+    delete edited.startingSavingsCents;
+
+    const mutations = unflushedIntentMutations(
+      [edited],
+      snapshots,
+      "2026-07-12T00:00:00.000Z",
+      createId,
+    );
+
+    expect(mutations.map(({ field, value }) => [field, value])).toEqual([
+      ["startingSavingsCents", null],
+    ]);
+    expect(JSON.parse(JSON.stringify(mutations[0])).value).toBeNull();
+  });
+
+  it("ignores a plan the device has never durably stored", () => {
+    expect(
+      unflushedIntentMutations(
+        [storedPlan(2027)],
+        snapshots,
+        "2026-07-12T00:00:00.000Z",
+        createId,
+      ),
+    ).toEqual([]);
+  });
+});
 
 describe("sync durability state", () => {
   it("fences delayed work across same-account reauthentication", () => {

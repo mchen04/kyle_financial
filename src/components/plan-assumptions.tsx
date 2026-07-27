@@ -12,6 +12,7 @@ import {
   showsSpouseHsaEligibility,
   type HsaFamilyAllocation,
 } from "./hsa-controls";
+import { BufferedTextInput } from "./buffered-text-input";
 import { centsFromInput, money, type StoredPlan } from "./plan-types";
 import { Guidance } from "./plan-visualizations";
 import styles from "./plan.module.css";
@@ -64,7 +65,7 @@ export function PlanAssumptions({
       <details>
         <summary>
           <span>
-            <Settings2 size={17} /> Income and taxes
+            <Settings2 /> Income and taxes
           </span>
           <span>Edit</span>
         </summary>
@@ -254,19 +255,19 @@ export function PlanAssumptions({
               {showsHsaFamilyAllocation(draft) && (
                 <label>
                   Agreed primary share of family HSA limit
-                  <input
+                  <BufferedTextInput
                     type="number"
                     min="0"
                     max="100"
                     step="0.1"
-                    value={draft.primaryHsaFamilyAllocationPpm / 10_000}
-                    onChange={(event) => {
+                    value={(
+                      draft.primaryHsaFamilyAllocationPpm / 10_000
+                    ).toString()}
+                    restoreOnEmpty
+                    onValue={(value) => {
                       const primary = Math.min(
                         1_000_000,
-                        Math.max(
-                          0,
-                          Math.round(Number(event.target.value) * 10_000),
-                        ),
+                        Math.max(0, Math.round(Number(value) * 10_000)),
                       );
                       const allocation = {
                         primaryHsaFamilyAllocationPpm: primary,

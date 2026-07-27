@@ -352,12 +352,18 @@ describe("daily cockpit integration contract", () => {
     const rentAmount = container.querySelector<HTMLInputElement>(
       '[aria-label="Rent planned amount"]',
     )!;
+    // An edit in flight is the reader's, not the plan's: the box shows exactly
+    // what was typed and the plan is untouched until the edit ends. "1." is the
+    // case that used to make that visible — it parses to a *different* number
+    // than the string shown — and it is now simply not persisted yet.
+    const rentBeforeEdit = latest.expenses[0].amountCents;
     fill(rentAmount, "1.");
     expect(rentAmount.value).toBe("1.");
-    expect(latest.expenses[0].amountCents).toBe(100);
+    expect(latest.expenses[0].amountCents).toBe(rentBeforeEdit);
     act(() =>
       rentAmount.dispatchEvent(new FocusEvent("focusout", { bubbles: true })),
     );
+    expect(latest.expenses[0].amountCents).toBe(100);
     expect(rentAmount.value).toBe("1");
 
     click(button(container, "Plan"));
@@ -366,12 +372,13 @@ describe("daily cockpit integration contract", () => {
     )!;
     fill(startingSavings, "1.");
     expect(startingSavings.value).toBe("1.");
-    expect(latest.startingSavingsCents).toBe(100);
+    expect(latest.startingSavingsCents).toBeUndefined();
     act(() =>
       startingSavings.dispatchEvent(
         new FocusEvent("focusout", { bubbles: true }),
       ),
     );
+    expect(latest.startingSavingsCents).toBe(100);
     expect(startingSavings.value).toBe("1");
 
     act(() => root.unmount());
@@ -382,6 +389,35 @@ describe("daily cockpit integration contract", () => {
       );
     });
     expect(container.textContent).toContain("Integration coffee");
+  });
+
+  it("gives the month and the year one row of their own, and never two year controls at once", () => {
+    act(() => {
+      root.render(
+        <WorkspaceHarness initialPlan={baseline} onPlan={() => undefined} />,
+      );
+    });
+    const yearControls = () => [
+      ...container.querySelectorAll('[aria-label="Plan year"]'),
+    ];
+
+    // The cockpit surfaces choose the year on their period row and every other
+    // screen chooses it in the top bar. Both instances exist in the tree, so
+    // the only thing keeping the app honest is that they are exclusive.
+    for (const tab of ["Home", "Budget", "Activity", "Plan"]) {
+      click(button(container, tab));
+      expect(yearControls()).toHaveLength(1);
+    }
+    click(button(container, "Budget"));
+    click(button(container, "Manage categories"));
+    expect(yearControls()).toHaveLength(1);
+
+    click(button(container, "Home"));
+    const row = yearControls()[0].parentElement!;
+    expect(row.querySelector('select[aria-label="Month"]')).not.toBeNull();
+    // H3: the row belongs to the month and the year. The period-kind tabs are
+    // the row above it, not a third control sharing this one.
+    expect(row.querySelector("button[aria-pressed]")).toBeNull();
   });
 
   it("persists an offline UI intent through a cold account restore, then syncs exactly once", async () => {

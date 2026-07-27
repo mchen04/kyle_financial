@@ -30,7 +30,11 @@ import {
   homeSavingsImpactCents,
   homeSavingsImpactLabel,
 } from "./cockpit-home-projection";
-import { PeriodControl, savingsSources } from "./cockpit-period-control";
+import {
+  PeriodControl,
+  savingsSources,
+  type PlanYearChoice,
+} from "./cockpit-period-control";
 import { selectedPeriodPhase } from "./cockpit-period-phase";
 import {
   CategoryRow,
@@ -54,6 +58,7 @@ export function HomeSurface({
   plan,
   result,
   period,
+  planYear,
   compactForOffline,
   awaitingAuthority,
   onPeriod,
@@ -65,6 +70,7 @@ export function HomeSurface({
   plan: StoredPlan;
   result: PlanResult;
   period: SelectedPeriod;
+  planYear: PlanYearChoice;
   compactForOffline: boolean;
   awaitingAuthority: boolean;
   onPeriod: (period: SelectedPeriod) => void;
@@ -138,7 +144,12 @@ export function HomeSurface({
         <div>
           <h1>Home</h1>
         </div>
-        <PeriodControl period={period} today={today} onPeriod={onPeriod} />
+        <PeriodControl
+          period={period}
+          today={today}
+          planYear={planYear}
+          onPeriod={onPeriod}
+        />
       </header>
 
       <section className={styles.runwayCard}>
@@ -258,6 +269,7 @@ export function BudgetSurface({
   today,
   plan,
   period,
+  planYear,
   awaitingAuthority,
   onPeriod,
   onScreen,
@@ -266,6 +278,7 @@ export function BudgetSurface({
   today: string;
   plan: StoredPlan;
   period: SelectedPeriod;
+  planYear: PlanYearChoice;
   awaitingAuthority: boolean;
   onPeriod: (period: SelectedPeriod) => void;
   onScreen: (screen: Screen) => void;
@@ -295,24 +308,63 @@ export function BudgetSurface({
           <p className={styles.eyebrow}>Budget</p>
           {/* The eyebrow is a fixed section name and never moves. The `h1`
               carries both the figure and the phrase that gives it meaning, so
-              the whole line is the reservation (C9-2, C9-3). It sets on one
-              line in every phase at every width, so one non-breaking space
-              reserves exactly the settled box. */}
+              the whole line is the reservation (C9-2, C9-3).
+
+              B1b. The figure and the phrase are two elements rather than one
+              string. They were one string reserved at two lines
+              (`min-height: calc(2 * --text-2xl * --leading-tight)`), because
+              stepping the period swaps the phrase and a change of line count
+              moves the whole surface. But at 390 and 430 — the two commonest
+              iPhone widths — no phase string ever reached a second line, so the
+              reservation was never spent: the surface carried 32px of empty
+              band under a one-line headline in every phase, permanently, and
+              read as a hole rather than as rhythm.
+
+              Splitting them buys the same guarantee out of geometry instead of
+              out of whitespace. On a phone the `h1` is a grid, so each part is
+              its own row: the figure sets on line one and the phrase on line
+              two, in EVERY phase, at EVERY width, for any magnitude. The box is
+              the same 67.2px it was reserved at — nothing on the surface moved
+              — but both lines now carry text, so the band is gone and the
+              layout is stiffer than the reservation was (that one still
+              shifted if a phrase ever reached a third line; this cannot).
+
+              Each part is a `<span>` and both are inside the one `h1`, so the
+              accessible name is unchanged. Whitespace between them is a grid
+              container's ignored anonymous text, and reappears as the word
+              space when the grid does not apply (desktop, where the headline
+              sets inline on one line as before). */}
           <h1 data-reserved={awaitingAuthority || undefined}>
-            {awaitingAuthority
-              ? RESERVED_LINE
-              : unstarted
-                ? `${money(rollup.spendingAllocatedCents)} planned spending`
+            <span>
+              {awaitingAuthority
+                ? RESERVED_LINE
                 : /* D4. One quantity, one name. This figure is the same
                      cents Home prints under "Left to spend" and Monthly wrap
                      printed as both "currently unspent" and "Total remaining":
                      four names for one number, which reads as four numbers. */
-                  `${money(Math.abs(rollup.safeToSpendCents))} ${
-                    rollup.safeToSpendCents < 0 ? "over" : "left to spend"
-                  }`}
+                  money(
+                    unstarted
+                      ? rollup.spendingAllocatedCents
+                      : Math.abs(rollup.safeToSpendCents),
+                  )}
+            </span>{" "}
+            <span>
+              {awaitingAuthority
+                ? RESERVED_LINE
+                : unstarted
+                  ? "planned spending"
+                  : rollup.safeToSpendCents < 0
+                    ? "over"
+                    : "left to spend"}
+            </span>
           </h1>
         </div>
-        <PeriodControl period={period} today={today} onPeriod={onPeriod} />
+        <PeriodControl
+          period={period}
+          today={today}
+          planYear={planYear}
+          onPeriod={onPeriod}
+        />
       </header>
       {/* One box in both period phases: identical labels, identical row count,
           so stepping the month changes digits and never geometry (C9). */}

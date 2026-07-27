@@ -96,7 +96,7 @@
   width: 100%;
   min-height: var(--control-md);
   display: grid;
-  grid-template-columns: var(--space-3) minmax(0, 1fr) auto var(--icon-sm);
+  grid-template-columns: var(--space-3) minmax(0, 1fr) auto var(--space-7);
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-0) var(--space-2);
@@ -125,20 +125,43 @@
   white-space: nowrap;
 }
 
+/* B2. The bucket was bare text sitting a gap away from a bare chevron glyph, and
+   the two read as one label — "Wants ⌄". Each gets its own bounded container so
+   the row states two separate things: what the category is, and that there is
+   more behind it. The chip is a filled pill on the panel; the disclosure is an
+   outlined square. Both are 28px or shorter inside a 48px rung, so the row does
+   not grow, and neither is a control — the whole row is still one button. */
 .manageRow > em {
+  justify-self: end;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-hairline) solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--surface-canvas);
   color: var(--text-secondary);
   font-style: normal;
   font-size: var(--text-sm);
+  line-height: var(--leading-compact);
   white-space: nowrap;
 }
 
-.manageRow > svg {
+.manageRow > span {
+  width: var(--space-7);
+  height: var(--space-7);
+  display: inline-grid;
+  place-items: center;
+  border: var(--border-hairline) solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface-panel);
+}
+
+.manageRow > span > svg {
   width: var(--icon-sm);
+  height: var(--icon-sm);
   color: var(--text-tertiary);
   transition: transform var(--motion-standard) ease;
 }
 
-.manageRow[aria-expanded="true"] > svg {
+.manageRow[aria-expanded="true"] > span > svg {
   transform: rotate(180deg);
 }
 
@@ -214,6 +237,7 @@
 
 .reorderButtons svg {
   width: var(--icon-md);
+  height: var(--icon-md);
 }
 
 .archiveButton {
@@ -228,6 +252,29 @@
   .toolbar {
     align-items: start;
     flex-direction: column;
+  }
+}
+
+/* W6. The chip and the disclosure square are the two boxes the row was asked
+   for, so they are fixed; what pays for them is the row's own whitespace, not
+   the category name. The Budget row this one is modelled on drops its chevron
+   entirely below 720px (daily-cockpit-responsive.module.css:292-301), so at
+   phone widths .manageRow carries 40px of chrome its twin does not, and the
+   name column — the only column that holds information a reader cannot get
+   anywhere else on the row — was the column absorbing it. Below 380px the
+   three inter-column gaps go to 8px and the row's inline inset to 4px, which
+   returns 20px to the name: the longest fixture name, "Health and pharmacy",
+   was 4px short of fitting and now clears with 16px to spare. Nothing here
+   changes a height, and the open editor moves with the row so the two keep one
+   left edge. */
+@media (--viewport-small) {
+  .manageRow {
+    gap: var(--space-2);
+    padding-inline: var(--space-1);
+  }
+
+  .manageEditor {
+    padding-inline: var(--space-1);
   }
 }
 

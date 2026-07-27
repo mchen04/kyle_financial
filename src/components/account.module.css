@@ -19,6 +19,14 @@
   font-size: var(--text-sm);
 }
 
+/* T3. Beside-text step; replaces `size={16}`. Shorter than the --text-sm line
+   box, so the note's height is unchanged. */
+.estimateNote > svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  flex: 0 0 auto;
+}
+
 .warning {
   composes: warning from "./surface-primitives.module.css";
 }

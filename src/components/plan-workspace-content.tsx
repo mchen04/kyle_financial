@@ -59,6 +59,7 @@ export function PlanWorkspaceContent({
   result,
   period,
   onPeriod,
+  onYear,
   onDraft,
   onNavigate,
   onOpenTransaction,
@@ -76,6 +77,7 @@ export function PlanWorkspaceContent({
   result: PlanResult;
   period: SelectedPeriod;
   onPeriod: (period: SelectedPeriod) => void;
+  onYear: (year: number) => void;
   onDraft: (plan: StoredPlan) => void;
   onNavigate: (route: WorkspaceRoute) => void;
   onOpenTransaction: (transactionId?: string) => void;
@@ -86,6 +88,10 @@ export function PlanWorkspaceContent({
   const [hsaAllocationIntents, setHsaAllocationIntents] = useState(
     () => new Map<string, HsaFamilyAllocation>(),
   );
+  /* The three cockpit surfaces choose the plan year on their own period row,
+     so they are handed the same year list the top bar renders for every other
+     screen. See `periodScreens` in `plan-workspace.tsx`. */
+  const planYear = { years: plans.map((plan) => plan.year), onYear };
   const preferredHsaAllocation =
     currentHsaFamilyAllocation(draft) ?? hsaAllocationIntents.get(draft.id);
   const navigateScreen = (screen: Screen) => {
@@ -114,6 +120,7 @@ export function PlanWorkspaceContent({
           plan={draft}
           result={result}
           period={period}
+          planYear={planYear}
           // Awaiting the server's answer is not the settled offline state, and
           // the compact offline layout is a different box. Keeping the full
           // layout through the reserved window is what makes the swap to the
@@ -140,6 +147,7 @@ export function PlanWorkspaceContent({
           today={today}
           plan={draft}
           period={period}
+          planYear={planYear}
           awaitingAuthority={planAwaitingAuthority}
           onPeriod={onPeriod}
           onScreen={(screen) => {
@@ -160,6 +168,7 @@ export function PlanWorkspaceContent({
           today={today}
           plan={draft}
           period={period}
+          planYear={planYear}
           onPeriod={onPeriod}
           onEdit={onOpenTransaction}
           onWrap={() => onNavigate({ screen: "wrap", returnTo: "activity" })}

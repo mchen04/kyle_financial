@@ -45,6 +45,7 @@
 
 .sheet header svg {
   width: var(--icon-md);
+  height: var(--icon-md);
 }
 
 .sheet h2 {
@@ -129,6 +130,7 @@
 
 .inlineAction svg {
   width: var(--icon-sm);
+  height: var(--icon-sm);
 }
 
 .inlineCategory {
@@ -193,6 +195,7 @@
 
 .primaryAction svg {
   width: var(--icon-sm);
+  height: var(--icon-sm);
 }
 
 @media (--viewport-compact) {

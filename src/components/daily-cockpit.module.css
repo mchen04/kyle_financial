@@ -56,6 +56,17 @@
   gap: var(--space-2);
 }
 
+/* H2/H3. The month and the year are two halves of one question, so they share
+   one row and that row carries nothing else; the period-kind tabs sit on the
+   row above. The three controls stay three visibly different idioms — segmented
+   pill, borderless stepper, outlined chip — because a reader who has learned
+   which is which should not have to relearn it. */
+.periodRange {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .periodTabs {
   display: flex;
   gap: var(--space-1);
@@ -94,6 +105,25 @@
     );
   align-items: center;
   text-align: center;
+}
+
+/* The container centres its three tracks, but each arrow button declared no
+   `display` of its own, so inside its 44px box the lone <svg> was an inline box
+   sitting on the button's own text baseline — 1.50px (chromium) / 1.98px
+   (webkit) below the box centre, and low by different amounts on the two
+   engines, which is what a baseline-dependent offset looks like. `place-items:
+   center` centres the glyph in the box in both axes and is the same mechanism
+   `.detailsToggle`, the product's one other icon-only disclosure, already uses.
+   The 44px minimums on the shared rule above are untouched.
+   `padding: 0` is load-bearing, not tidying: WebKit's user-agent <button> rule
+   leaves an asymmetric block padding, so the 20px glyph centred in the padding
+   box landed 0.5px below the centre of the 44px border box the reader sees —
+   measured 0.500px on all three viewports with the padding left alone, exactly
+   on the bar. `.detailsToggle`, which zeroes it, measures 0.000. */
+.monthStepper button {
+  display: grid;
+  place-items: center;
+  padding: 0;
 }
 
 /* D2. With `appearance: auto` the platform draws the disclosure arrow inside
@@ -417,11 +447,13 @@
 
 .navRow > svg:first-child {
   width: var(--icon-lg);
+  height: var(--icon-lg);
   color: var(--text-action);
 }
 
 .navRow > svg:last-child {
   width: var(--icon-sm);
+  height: var(--icon-sm);
   color: var(--text-tertiary);
 }
 
@@ -464,7 +496,8 @@
 
 .budgetMath dd {
   margin: var(--space-1) 0 0;
-  font: var(--weight-bold) var(--text-md) / 1.25 var(--font-display);
+  font: var(--weight-bold) var(--text-md) / var(--leading-compact)
+    var(--font-display);
   font-variant-numeric: tabular-nums;
 }
 
@@ -578,6 +611,7 @@
 .categoryRow > svg,
 .transactionRow > svg {
   width: var(--icon-sm);
+  height: var(--icon-sm);
   color: var(--text-tertiary);
 }
 
@@ -656,8 +690,16 @@
   color: var(--text-primary);
 }
 
+/* T3b. `width` alone left the glyph's HEIGHT on the SVG element's own
+   `height="24"` attribute — a raw length the token audit cannot see, in the
+   same way a `size={N}` prop is one — so the magnifier rendered 17.09x24:
+   off-scale in both axes and visibly squashed, because flex then shrank the
+   tokenized width too. Both axes are now stated from the scale, and the glyph
+   is taken out of the flex shrink it never should have been subject to. */
 .filters svg {
   width: var(--icon-md);
+  height: var(--icon-md);
+  flex: 0 0 auto;
   color: var(--text-tertiary);
 }
 
@@ -711,9 +753,23 @@
   gap: var(--space-1);
 }
 
+/* The control declared no `display`, so the chevron and the label were both
+   inline-level and shared the button's text baseline: the glyph's optical
+   centre sat 4.00px (chromium) / 3.95px (webkit) ABOVE the label's, the widest
+   misalignment measured anywhere in the product. Baseline alignment lines up
+   the bottoms of two boxes of different heights, which is not what "level"
+   means for an icon beside a word. Flex + `align-items: center` levels the two
+   centres, which is the mechanism every already-compliant row here uses.
+   No `gap` is set: the two children currently sit flush (JSX drops the newline
+   between them) and the lucide chevron carries its own optical padding inside
+   its viewBox, so introducing one would move the label 4px right and disturb
+   the outdent below, which is a horizontal decision this fix has no business
+   re-making. */
 .backHeader > button {
   justify-self: start;
   width: auto;
+  display: flex;
+  align-items: center;
   /* The chevron is optically outdented so the label, not the glyph, lines up
      with the title below it. */
   margin-inline-start: calc(-1 * var(--space-2));
@@ -822,6 +878,24 @@
 .mathBreakdown dt {
   color: var(--text-secondary);
   font-size: var(--text-sm);
+}
+
+/* P1. The months a term covers, and which side of plan it fell on, are facts
+   about that term, so they sit under its own label instead of in a legend the
+   reader has to carry. One line, floored at 11px by the global `small` rule,
+   and only on the terms that have a period to state. */
+.mathBreakdown dt small {
+  display: block;
+  margin-top: var(--micro-2);
+}
+
+/* P1b. The term's own two operands, printed so a reader can perform the
+   subtraction the figure below is the result of. Tabular, so the two amounts
+   align digit-for-digit with the total; one step quieter than the period line
+   above it, so the order of reading is label, period, then working. */
+.mathBreakdown dt small[data-derivation] {
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
 }
 
 .mathBreakdown dd {

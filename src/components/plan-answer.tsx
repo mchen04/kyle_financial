@@ -87,7 +87,7 @@ export function PlanAnswer({
           )),
           ...planNotices.map((notice) => (
             <p key={notice} className={styles.modelDisclosure} role="note">
-              <CircleHelp size={16} /> {notice}
+              <CircleHelp /> {notice}
             </p>
           )),
         ]}
