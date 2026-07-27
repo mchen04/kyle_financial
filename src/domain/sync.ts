@@ -164,7 +164,13 @@ export function diffPlanMutations(
     mutationId: createId(),
     planYear: current.year,
     field,
-    value: current[field],
+    // `null`, never `undefined`: this value has to survive `JSON.stringify`,
+    // which deletes an undefined property outright, and the decoder maps only
+    // `null` back to "unset". Clearing `startingSavingsCents` used to send
+    // nothing at all, which the decoder rejected — aborting the local write
+    // ("Device save failed") and leaving the server on the old balance. The
+    // collection diff below and `encodeSyncMutation` have always used `?? null`.
+    value: current[field] ?? null,
     updatedAt,
     baseVersion:
       transportSafeFieldVersion(

@@ -6,6 +6,7 @@ import {
   persistedFieldVersionsSchema,
 } from "./plan-schema";
 import { normalizeStoredPlan } from "./stored-plan";
+import { applyDecodedSyncMutation, decodeSyncMutation } from "./sync-decoder";
 import {
   diffPlanMutations,
   isSyncField,
@@ -221,6 +222,45 @@ describe("sync field boundary", () => {
         "2026-07-12T01:00:00.000Z",
       )[0].baseVersion,
     ).toBeNull();
+  });
+
+  /**
+   * `startingSavingsCents` is the one scalar with a representation for "unset",
+   * and unsetting it used to emit `value: undefined`. `undefined` is not a wire
+   * value: `JSON.stringify` deletes the key, and the decoder — which maps only
+   * `null` back to "unset" — then refuses the mutation. Client-side that aborts
+   * the IndexedDB transaction and paints "Device save failed"; server-side the
+   * mutation is acknowledged as rejected. Both ends already speak `null`, which
+   * is what `encodeSyncMutation` has always sent, so the diff sends it too.
+   */
+  it("clears an optional scalar with null, which survives the wire", () => {
+    const previous = normalizeStoredPlan({
+      id: "00000000-0000-4000-8000-000000000001",
+      ...planInput(),
+      startingSavingsCents: 2_850_000,
+      updatedAt: "2026-07-12T00:00:00.000Z",
+      fieldVersions: {},
+    });
+
+    const mutations = diffPlanMutations(
+      previous,
+      { ...previous, startingSavingsCents: undefined },
+      "2026-07-12T01:00:00.000Z",
+      () => "00000000-0000-4000-8000-000000000009",
+    );
+
+    expect(mutations).toHaveLength(1);
+    expect(mutations[0]).toMatchObject({
+      field: "startingSavingsCents",
+      value: null,
+    });
+
+    const onTheWire = JSON.parse(JSON.stringify(mutations[0]));
+    expect(Object.hasOwn(onTheWire, "value")).toBe(true);
+    expect(
+      applyDecodedSyncMutation(previous, decodeSyncMutation(onTheWire))
+        .startingSavingsCents,
+    ).toBeUndefined();
   });
 
   it.each([

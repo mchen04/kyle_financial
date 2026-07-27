@@ -127,6 +127,11 @@
   composes: periodControl from "./daily-cockpit-responsive.module.css";
 }
 
+.periodRange {
+  composes: periodRange from "./daily-cockpit.module.css";
+  composes: periodRange from "./daily-cockpit-responsive.module.css";
+}
+
 .periodTabs {
   composes: periodTabs from "./daily-cockpit.module.css";
   composes: periodTabs from "./daily-cockpit-responsive.module.css";
@@ -208,4 +213,10 @@
 
 .wrapHero {
   composes: wrapHero from "./daily-cockpit.module.css";
+}
+
+/* The one class here that is not a cockpit class: the plan-year chip is shared
+   with the top bar, so both surfaces take it from the same primitive. */
+.yearSelect {
+  composes: yearSelect from "./surface-primitives.module.css";
 }

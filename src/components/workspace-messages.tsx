@@ -60,7 +60,7 @@ export function WarningCard({
       : "Tax-excluded limit";
   return (
     <div className={styles.warning} role="status">
-      <CircleHelp size={16} />
+      <CircleHelp />
       <div className={styles.warningBody}>
         <strong>{headline}</strong>
         <span>

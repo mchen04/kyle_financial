@@ -31,9 +31,12 @@ import {
   canPublishPlanSnapshot,
   cancelAccountPersistenceRetry,
   enqueueSerializedIntent,
+  intentAwaitingDurableWrite,
   isCurrentAccountLifecycle,
   mergePlansWithLocalIntent,
   planIntentForYear,
+  publishDurabilityGap,
+  publishUndurableUnloadIntent,
   queueAccountPersistenceRetry,
   reconciliationCompletionState,
   reconciliationStateWithPersistencePriority,
@@ -42,7 +45,10 @@ import {
   replacePlanIntent,
   resolvePlanWriteSuccess,
   runDevicePersistenceRetry,
+  unflushedIntentMutations,
 } from "./sync-state";
+import { registerUnloadIntentFlush } from "./document-exit";
+import { flushUnloadIntent } from "./unload-flush";
 import {
   requireAuthoritativePlanRefresh,
   type PlanSessionController,
@@ -167,6 +173,21 @@ export function usePlanSync(session: PlanSessionController) {
       try {
         const startup = await startupPlanState(account.id, response.plans);
         if (!isCurrentAccount()) return;
+        // A launch is the one moment the answer is knowable from scratch: a
+        // parked edit this launch could not parse is lost, and anything an
+        // earlier document reported undurable has either been carried into the
+        // outbox by now or was never recoverable at all.
+        //
+        // Storage that refuses to park is the third case and the one that used
+        // to slip through. The signal a dying document raised died with it, and
+        // a launch that cannot read the journal cannot distinguish "the last
+        // document parked nothing" from "the last document could not park what
+        // it had". Only one of those is safe to render as `Saved`, so a session
+        // with no durable parking space declines to make the claim until it has
+        // watched a write of its own reach the device.
+        publishUndurableUnloadIntent(
+          startup.unreadableJournal || startup.parkingUnavailable,
+        );
         resolvedPlans = resolveStartupPlans(response.plans, startup);
       } catch {
         if (!isCurrentAccount()) return;
@@ -456,8 +477,12 @@ export function usePlanSync(session: PlanSessionController) {
             runtimeRef.current.accountGeneration !== generation
           )
             return;
-          if (result === "persisted")
+          if (result === "persisted") {
             runtimeRef.current.savedSnapshots.set(changedDraft.year, snapshot);
+            // The device took the write, so whatever an earlier unload could
+            // not park is now somewhere that survives this document after all.
+            publishUndurableUnloadIntent(false);
+          }
           if (
             runtimeRef.current.savedSnapshots.get(changedDraft.year) !==
             snapshot
@@ -524,6 +549,59 @@ export function usePlanSync(session: PlanSessionController) {
       return runtimeRef.current.localWriteChain;
     },
     [getOwnerSignal, reconcileFor, runtimeRef, setSaveState],
+  );
+
+  /**
+   * The last thing this document does. `document-exit` has just committed every
+   * open buffer, so `runtimeRef.current.plans` — written synchronously by the
+   * draft handler, not by a React render — already holds the reader's finished
+   * edit while nothing downstream of it has run.
+   *
+   * Everything the ordinary path would do next is asynchronous and therefore
+   * already lost: the Web Locks, the IndexedDB transaction, the 650 ms debounce.
+   * `keepalive` is the one way out that does not need the document to survive —
+   * the request is handed to the browser's network stack and completes after the
+   * page is gone. It is fire-and-forget by nature: there is no one left to read
+   * the response, and the reload that follows re-reads the plan from the server
+   * anyway.
+   *
+   * Re-sending is safe. A mutation is keyed by its own id and judged by field
+   * version, so a duplicate the outbox drains later is simply not applied — it
+   * is acknowledged, not rejected, and no banner follows it.
+   */
+  const flushIntentBeforeUnload = useCallback(() => {
+    const accountId = runtimeRef.current.activeAccount;
+    if (!accountId) return;
+    const mutationTime = Math.max(
+      Date.now(),
+      runtimeRef.current.lastMutationTime + 1,
+    );
+    const mutations = unflushedIntentMutations(
+      runtimeRef.current.plans,
+      runtimeRef.current.savedSnapshots,
+      new Date(mutationTime).toISOString(),
+    );
+    if (mutations.length === 0) return;
+    runtimeRef.current.lastMutationTime = mutationTime;
+    flushUnloadIntent(accountId, mutations);
+  }, [runtimeRef]);
+
+  useEffect(
+    () => registerUnloadIntentFlush(flushIntentBeforeUnload),
+    [flushIntentBeforeUnload],
+  );
+
+  // No dependency list on purpose. Both sides of this comparison live on the
+  // runtime ref, which React cannot watch; what it can watch is that every
+  // write to either of them is paired with a dispatch, so a render is the
+  // reliable signal that the answer may have changed.
+  useEffect(() =>
+    publishDurabilityGap(
+      intentAwaitingDurableWrite(
+        runtimeRef.current.plans,
+        runtimeRef.current.savedSnapshots,
+      ),
+    ),
   );
 
   const adoptCreatedPlan = useCallback(

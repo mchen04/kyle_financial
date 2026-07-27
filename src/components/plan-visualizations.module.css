@@ -19,7 +19,7 @@
 }
 .flowRail > span {
   min-width: 0;
-  transition: width 0.18s ease;
+  transition: width var(--motion-standard) ease;
 }
 .flowLegend {
   display: flex;

@@ -3,8 +3,9 @@ import {
   sessionIdSchema,
   type User,
 } from "@/domain/api-contracts";
+import { storedPlanSchema } from "@/domain/plan-schema";
 import type { StoredPlan } from "@/domain/stored-plan";
-import type { SyncMutation } from "@/domain/sync";
+import { diffPlanMutations, type SyncMutation } from "@/domain/sync";
 import type { SaveState } from "./plan-types";
 import {
   applyDecodedSyncMutation,
@@ -59,6 +60,148 @@ export function reconciliationStateWithPersistencePriority(input: {
     return "local-error";
   if (input.syncRequestFailure) return "sync-error";
   return input.rejectedWriteFailure ? "rejected" : input.candidate;
+}
+
+/** What the status chip is allowed to claim, which is one thing more than the
+ * sync engine has an opinion about. `saveState` describes writes the engine has
+ * been given; an edit that has not reached durable storage is by construction
+ * one it cannot vouch for, so "Saved" over it is an assertion about work that
+ * exists nowhere but this process's memory. Only that claim is overridden:
+ * `saving`, `offline` and the three failures already tell the reader nothing is
+ * settled, and replacing them would hide a problem behind a milder word. */
+export type DisplayedSaveState = SaveState | "unsaved";
+
+export function displayedSaveState(
+  saveState: SaveState,
+  editAwaitingDurableWrite: boolean,
+): DisplayedSaveState {
+  return editAwaitingDurableWrite && saveState === "saved"
+    ? "unsaved"
+    : saveState;
+}
+
+/** Plans the session is holding that differ from what this device last stored. */
+function plansDivergingFromDurableState(
+  plans: readonly StoredPlan[],
+  savedSnapshots: ReadonlyMap<number, string>,
+): { plan: StoredPlan; baseline: string }[] {
+  return plans.flatMap((plan) => {
+    const baseline = savedSnapshots.get(plan.year);
+    if (baseline === undefined || baseline === JSON.stringify(plan)) return [];
+    return [{ plan, baseline }];
+  });
+}
+
+/**
+ * Whether an edit is currently living only in this process's memory.
+ *
+ * `saveState` cannot answer this. It moves to `saving` from inside the local
+ * write's `then`, so between the moment a commit hands an edit over and the
+ * moment IndexedDB acknowledges it the chip still reads whatever it read
+ * before — `Saved`, normally. That window is microseconds when the write chain
+ * is healthy and the whole session when it is not: a second tab holding the
+ * account Web Lock, an interrupted account operation, evicted storage. Fifteen
+ * category amounts were measured sitting in memory under a `Saved` chip that
+ * way, which is the same lie the buffered-edit override exists to refuse, one
+ * layer further down.
+ */
+export function intentAwaitingDurableWrite(
+  plans: readonly StoredPlan[],
+  savedSnapshots: ReadonlyMap<number, string>,
+): boolean {
+  return plansDivergingFromDurableState(plans, savedSnapshots).length > 0;
+}
+
+/**
+ * The intent that exists only in memory, as mutations: for every plan, the
+ * difference between what the session is holding and the last snapshot this
+ * device durably stored.
+ *
+ * Anything already in that snapshot is in the outbox, which survives the
+ * document and drains on the next launch, so it is not at risk and is not
+ * re-sent. What is left is exactly the edit a commit has just handed over and
+ * whose ordinary write path — an IndexedDB transaction behind two Web Locks,
+ * then a 650 ms debounce — has no chance of finishing before the document dies.
+ */
+export function unflushedIntentMutations(
+  plans: readonly StoredPlan[],
+  savedSnapshots: ReadonlyMap<number, string>,
+  updatedAt: string,
+  createId?: () => string,
+): SyncMutation[] {
+  return plansDivergingFromDurableState(plans, savedSnapshots).flatMap(
+    ({ plan, baseline }) =>
+      diffPlanMutations(
+        storedPlanSchema.parse(JSON.parse(baseline)),
+        plan,
+        updatedAt,
+        createId,
+      ),
+  );
+}
+
+const durabilityListeners = new Set<() => void>();
+/**
+ * The two independent ways an edit can be sitting nowhere durable. They are
+ * tracked apart because different code discovers them at different moments and
+ * they are resolved by different events, and reported together because the chip
+ * has exactly one thing to say about both.
+ */
+const durabilityGaps = { intentAwaitingWrite: false, unloadIntentLost: false };
+
+function publishDurability(
+  gap: keyof typeof durabilityGaps,
+  present: boolean,
+): void {
+  if (present === durabilityGaps[gap]) return;
+  durabilityGaps[gap] = present;
+  for (const listener of [...durabilityListeners]) listener();
+}
+
+/**
+ * Published by the sync engine after every render, because the two sides of the
+ * comparison — the session's plans and the device's last stored snapshots —
+ * live on a ref and change without one. Every write to either is paired with a
+ * dispatch, so "after every render" is exactly "whenever this could differ".
+ */
+export function publishDurabilityGap(present: boolean): void {
+  publishDurability("intentAwaitingWrite", present);
+}
+
+/**
+ * Published when an edit handed to the unload flush reached no durable carrier
+ * at all: `localStorage` partitioned away, disabled or full, or a journal a
+ * later launch could not parse.
+ *
+ * Nothing above can compute this. The comparison `publishDurabilityGap` makes
+ * is between memory and IndexedDB, and both can be perfectly healthy while the
+ * one synchronous write a dying document had time for was refused. It is the
+ * boolean `recordUnloadJournal` returns — computed, correct, and discarded at
+ * the call site until now, which is why the chip went on reading `Saved` over
+ * an edit that reached no buffer, no journal, no outbox and no server. That is
+ * Blocker 1's symptom verbatim, for every reader in a blocked-storage context.
+ *
+ * It is cleared by the two things that can honestly clear it: a later write
+ * that does reach the device, and a launch that finds nothing lost.
+ */
+export function publishUndurableUnloadIntent(present: boolean): void {
+  publishDurability("unloadIntentLost", present);
+}
+
+export function hasDurabilityGap(): boolean {
+  return durabilityGaps.intentAwaitingWrite || durabilityGaps.unloadIntentLost;
+}
+
+export function subscribeToDurabilityGap(listener: () => void): () => void {
+  durabilityListeners.add(listener);
+  return () => {
+    durabilityListeners.delete(listener);
+  };
+}
+
+/** Nothing is ever awaiting a device write on a server that has no device. */
+export function noDurabilityGapOnServer(): false {
+  return false;
 }
 
 export function canPublishPlanSnapshot(

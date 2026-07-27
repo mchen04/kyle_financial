@@ -115,6 +115,19 @@ export function ManageCategoriesSurface({
       <section className={styles.formList}>
         {sorted.map((category) => {
           const open = Boolean(openIds[category.id]);
+          // B2/a11y. The row's `aria-label` overrides its contents, so the
+          // bucket chip beside the name — the very fact the chip was just
+          // promoted to a first-class visual box to carry — was announced to
+          // nobody. The chip text and the row's accessible name are both
+          // derived from this one value, so a screen reader is told the same
+          // bucket a sighted reader sees and the two cannot drift apart.
+          const bucketLabel = BUCKET_LABELS[guidanceBucket(category)];
+          // Spelled out rather than reusing the chip string verbatim: "·" is
+          // announced as "middle dot" where a comma is a pause. Same facts, in
+          // the same order, punctuated so they can be heard.
+          const rowLabel = category.archived
+            ? `Rename, recolour, reorder, or archive ${category.name}, ${bucketLabel}, archived`
+            : `Rename, recolour, reorder, or archive ${category.name}, ${bucketLabel}`;
           return (
             <div
               className={styles.manageItem}
@@ -134,7 +147,7 @@ export function ManageCategoriesSurface({
                 className={styles.manageRow}
                 aria-expanded={open}
                 aria-controls={`category-editor-${category.id}`}
-                aria-label={`Rename, recolour, reorder, or archive ${category.name}`}
+                aria-label={rowLabel}
                 onClick={() =>
                   setOpenIds((current) => ({
                     ...current,
@@ -144,11 +157,22 @@ export function ManageCategoriesSurface({
               >
                 <i data-color={category.colorToken} aria-hidden="true" />
                 <strong>{category.name}</strong>
+                {/* B2. The bucket and the disclosure arrow used to be bare
+                    siblings a gap apart, so "Wants" and the chevron read as one
+                    run-on control. Each now carries its own bounded container —
+                    a chip for the bucket, a square for the arrow — which is a
+                    purely visual split: the row is still exactly one button, so
+                    aria-expanded/-controls keep describing the one thing a tap
+                    does, and no interactive element is nested inside another.
+                    The row's `aria-label` now carries this chip's bucket too,
+                    so the split is visual only in both directions. */}
                 <em>
-                  {BUCKET_LABELS[guidanceBucket(category)]}
+                  {bucketLabel}
                   {category.archived ? " · Archived" : ""}
                 </em>
-                <ChevronDown />
+                <span aria-hidden="true">
+                  <ChevronDown />
+                </span>
               </button>
               {open && (
                 <div
@@ -157,13 +181,12 @@ export function ManageCategoriesSurface({
                 >
                   <label className={styles.editorField}>
                     <span>Name</span>
-                    <input
+                    <BufferedTextInput
                       aria-label={`${category.name} name`}
                       value={category.name}
                       maxLength={100}
-                      onChange={(event) =>
-                        patch(category.id, { name: event.target.value })
-                      }
+                      restoreOnEmpty
+                      onValue={(name) => patch(category.id, { name })}
                     />
                   </label>
                   <label className={styles.editorField}>

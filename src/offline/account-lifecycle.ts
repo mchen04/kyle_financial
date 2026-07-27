@@ -11,6 +11,7 @@ import {
   withAccountLock,
   withShellLock,
 } from "./database-core";
+import { discardUnloadJournal } from "./unload-journal";
 
 export type AccountClosureMode = "logout" | "delete";
 export type RemoteAccountClosureOutcome =
@@ -122,6 +123,10 @@ export async function clearRememberedUser(
 }
 
 async function clearClosedAccount(userId: string): Promise<boolean> {
+  // Before anything else, and synchronously: the unload journal is the one
+  // store a logout could otherwise leave behind, and a mutation left parked
+  // there would be adopted into a fresh outbox on the next sign-in.
+  discardUnloadJournal(userId);
   if (typeof BroadcastChannel !== "undefined") {
     const channel = new BroadcastChannel("kyle-financial-auth");
     channel.postMessage({ type: "logout", userId });

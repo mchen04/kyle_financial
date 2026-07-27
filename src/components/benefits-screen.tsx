@@ -96,7 +96,7 @@ export function BenefitsScreen({
           the four figures it was delaying. */}
       <div className={styles.sectionHeading}>
         <label className={styles.addSelect}>
-          <Plus size={17} />
+          <Plus />
           <select
             aria-label="Add benefit"
             defaultValue=""
@@ -156,7 +156,7 @@ export function BenefitsScreen({
           )),
           ...result.notices.map((notice) => (
             <p key={notice} className={styles.modelDisclosure} role="note">
-              <CircleHelp size={16} />{" "}
+              <CircleHelp />{" "}
               {notice.startsWith("Participant limits are aggregated")
                 ? "Because employer and plan details are not entered, contribution limits are estimated separately for each person."
                 : notice}
@@ -230,6 +230,7 @@ function BenefitRow({
           aria-label="Benefit name"
           value={entry.label}
           maxLength={100}
+          restoreOnEmpty
           onValue={(label) => onUpdate({ label })}
         />
         {(entry.type === "employer401kMatch" ||
@@ -285,15 +286,14 @@ function BenefitRow({
       {entry.type === "espp" && (
         <label className={styles.compactField}>
           Discount %
-          <input
+          <BufferedTextInput
             type="number"
             min="0"
             max="15"
-            value={(entry.discountRatePpm ?? 0) / 10_000}
-            onChange={(event) =>
-              onUpdate({
-                discountRatePpm: esppDiscountFromInput(event.target.value),
-              })
+            value={((entry.discountRatePpm ?? 0) / 10_000).toString()}
+            restoreOnEmpty
+            onValue={(value) =>
+              onUpdate({ discountRatePpm: esppDiscountFromInput(value) })
             }
           />
         </label>
@@ -303,7 +303,7 @@ function BenefitRow({
         aria-label={`Delete ${entry.label}`}
         onClick={onDelete}
       >
-        <Trash2 size={17} />
+        <Trash2 />
       </button>
       {entry.type === "custom" && entry.customTaxTreatment && (
         <div className={styles.customTreatment}>

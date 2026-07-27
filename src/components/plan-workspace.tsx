@@ -8,14 +8,21 @@ import {
   CloudOff,
   House,
   Landmark,
+  PenLine,
   Plus,
   RefreshCw,
   UserRound,
   WalletCards,
 } from "lucide-react";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import type { User } from "@/domain/api-contracts";
-import { PRODUCT_MARK, PRODUCT_NAME } from "@/domain/brand";
+import { PRODUCT_NAME } from "@/domain/brand";
 import { planYearHasStarted } from "@/domain/fast-log";
 import { calculatePlan } from "@/domain/tax/engine";
 import {
@@ -35,7 +42,18 @@ import {
   type WorkspaceLocation,
   type WorkspaceRoute,
 } from "./plan-types";
-import type { PlanDraftChange } from "./sync-state";
+import {
+  displayedSaveState,
+  hasDurabilityGap,
+  noDurabilityGapOnServer,
+  subscribeToDurabilityGap,
+  type PlanDraftChange,
+} from "./sync-state";
+import {
+  hasOpenBufferedEdit,
+  noBufferedEditOnServer,
+  subscribeToBufferedEdits,
+} from "./document-exit";
 import { useFastLogController } from "./use-fast-log-controller";
 import styles from "./financial-app.module.css";
 
@@ -69,6 +87,14 @@ const budgetScreens = new Set<Screen>([
   "edit-budget",
   "manage-categories",
 ]);
+/**
+ * The screens that render `PeriodControl`. Its month/year row owns the plan-year
+ * chip there, so the top bar renders its own chip on the complement of this set
+ * and on nothing else: every screen keeps exactly one year control, and no
+ * screen shows two. Adding a `PeriodControl` to another screen means adding it
+ * here in the same change.
+ */
+const periodScreens = new Set<Screen>(["home", "budget", "activity"]);
 
 /**
  * Which of the four tabs is highlighted. Monthly wrap is reachable from Home
@@ -152,7 +178,12 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
     <div className={styles.appFrame}>
       <aside className={styles.sidebar}>
         <div className={styles.wordmark}>
-          <span className={styles.brandMark}>{PRODUCT_MARK}</span>
+          {/* The wordmark already sets the product name in text beside the
+              tile, so the glyph adds nothing for a screen reader and is hidden
+              from it rather than announced twice. */}
+          <span className={styles.brandMark}>
+            <House aria-hidden="true" />
+          </span>
           <span>{PRODUCT_NAME}</span>
         </div>
         <nav aria-label="Main navigation">
@@ -186,7 +217,7 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
         >
           {calculationError && (
             <p className={styles.syncNotice} role="alert">
-              <CircleHelp size={16} /> {calculationError}
+              <CircleHelp /> {calculationError}
             </p>
           )}
           {/* This notice names the draft's year and asserts something about it.
@@ -199,7 +230,7 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
           {!props.planAwaitingAuthority &&
             currentResult.usesFallbackTaxTable && (
               <p className={styles.fallbackNotice}>
-                <CircleHelp size={16} />
+                <CircleHelp />
                 <span>
                   Tax data isn&apos;t available for {draft.year}. This estimate
                   uses {currentResult.appliedTaxYear} data
@@ -221,6 +252,7 @@ export function PlanWorkspace(props: PlanWorkspaceProps) {
             result={currentResult}
             period={activePeriod}
             onPeriod={selectPeriod}
+            onYear={changeYear}
             onDraft={acceptDraft}
             onNavigate={navigate}
             onOpenTransaction={fastLog.open}
@@ -356,38 +388,65 @@ function TopBar({
   const [copyError, setCopyError] = useState("");
   const [copying, setCopying] = useState(false);
   const retryAction = retryActionForSaveState(saveState);
+  // The chip is the only thing on screen that speaks about durability, so it
+  // refuses "Saved" over an edit that is not durable anywhere — in either of the
+  // two ways it can fail to be. First, an edit that has not left the input
+  // element yet, which no layer below has been handed at all.
+  const editing = useSyncExternalStore(
+    subscribeToBufferedEdits,
+    hasOpenBufferedEdit,
+    noBufferedEditOnServer,
+  );
+  // Second, an edit that *has* been handed over and is still in memory: the
+  // local write acknowledges from inside a promise, and a stalled write chain
+  // never resolves it. `saveState` reads `saved` throughout that window because
+  // nothing has told it otherwise.
+  const awaitingDurableWrite = useSyncExternalStore(
+    subscribeToDurabilityGap,
+    hasDurabilityGap,
+    noDurabilityGapOnServer,
+  );
+  const displayed = displayedSaveState(
+    saveState,
+    editing || awaitingDurableWrite,
+  );
   const status = {
     saved: (
       <>
-        <Check size={14} /> Saved
+        <Check /> Saved
+      </>
+    ),
+    unsaved: (
+      <>
+        <PenLine /> Unsaved
       </>
     ),
     saving: (
       <>
-        <RefreshCw size={14} className={styles.spin} /> Saving
+        <RefreshCw className={styles.spin} /> Saving
       </>
     ),
     offline: (
       <>
-        <CloudOff size={14} /> Offline
+        <CloudOff /> Offline
       </>
     ),
     "local-error": (
       <>
-        <CloudOff size={14} /> Device save failed
+        <CloudOff /> Device save failed
       </>
     ),
     "sync-error": (
       <>
-        <CloudOff size={14} /> Sync failed
+        <CloudOff /> Sync failed
       </>
     ),
     rejected: (
       <>
-        <CloudOff size={14} /> Change rejected
+        <CloudOff /> Change rejected
       </>
     ),
-  }[saveState];
+  }[displayed];
 
   async function copyNextYear() {
     const targetYear = draft.year + 1;
@@ -416,23 +475,41 @@ function TopBar({
     <>
       <header className={styles.topBar}>
         <div className={styles.mobileMark}>
-          <span className={styles.brandMark}>{PRODUCT_MARK}</span>
-        </div>
-        <label className={styles.yearPicker}>
-          <span>Plan year</span>
-          <select
-            aria-label="Plan year"
-            value={draft.year}
-            onChange={(event) => onYear(Number(event.target.value))}
+          {/* The only mark on a phone, and it stands alone: the tile carries
+              the accessible name the three letters used to carry, and the glyph
+              inside it is presentational because `role="img"` makes the tile a
+              leaf. */}
+          <span
+            className={styles.brandMark}
+            role="img"
+            aria-label={PRODUCT_NAME}
           >
-            {plans.map((plan) => (
-              <option key={plan.year}>{plan.year}</option>
-            ))}
-          </select>
-        </label>
+            <House />
+          </span>
+        </div>
+        {/* H3. On the three cockpit surfaces the year is chosen on the period
+            row, beside the month, because that is the question the reader is
+            actually asking. Every other screen has no period row, so the chip
+            stays here for them — and the two instances are mutually exclusive,
+            so no screen ever shows two year controls. */}
+        {!periodScreens.has(screen) && (
+          <label className={styles.yearPicker}>
+            <span>Plan year</span>
+            <select
+              className={styles.yearSelect}
+              aria-label="Plan year"
+              value={draft.year}
+              onChange={(event) => onYear(Number(event.target.value))}
+            >
+              {plans.map((plan) => (
+                <option key={plan.year}>{plan.year}</option>
+              ))}
+            </select>
+          </label>
+        )}
         <span
           className={`${styles.syncStatus} ${
-            saveState.endsWith("error") || saveState === "rejected"
+            displayed.endsWith("error") || displayed === "rejected"
               ? styles.syncError
               : ""
           }`}

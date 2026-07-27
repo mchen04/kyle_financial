@@ -125,17 +125,16 @@ export function AccountScreen({
             onClick={() => void exportPlans()}
             disabled={exporting}
           >
-            <Download size={17} />{" "}
-            {exporting ? "Exporting…" : "Export all years"}
+            <Download /> {exporting ? "Exporting…" : "Export all years"}
           </button>
           <button className={styles.secondaryButton} onClick={exportLocalPlans}>
-            <Download size={17} /> Export this device
+            <Download /> Export this device
           </button>
           <button
             className={styles.secondaryButton}
             onClick={() => void logout()}
           >
-            <LogOut size={17} /> Log out
+            <LogOut /> Log out
           </button>
           {logoutError && (
             <p className={styles.warning} role="alert">
@@ -176,8 +175,8 @@ export function AccountScreen({
           </li>
         </ol>
         <p className={styles.estimateNote}>
-          <Cloud size={16} /> Installed plans will remain available offline
-          after their first sync.
+          <Cloud /> Installed plans will remain available offline after their
+          first sync.
         </p>
       </div>
     </section>

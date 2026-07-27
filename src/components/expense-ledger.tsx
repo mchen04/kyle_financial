@@ -63,7 +63,7 @@ export function ExpenseLedger({
           <h2 id="expenses-title">Monthly expense ledger</h2>
         </div>
         <button className={styles.addButton} onClick={addExpense}>
-          <Plus size={17} /> Add expense
+          <Plus /> Add expense
         </button>
       </div>
       <div className={styles.ledgerTotal}>
@@ -71,8 +71,8 @@ export function ExpenseLedger({
         <strong>{money(result.expensesMonthlyCents, 2)} / month</strong>
       </div>
       <p className={styles.ledgerHint}>
-        Type an amount on any row. Tap <ChevronDown size={13} aria-hidden /> to
-        edit its details or archive it.
+        Type an amount on any row. Tap <ChevronDown aria-hidden /> to edit its
+        details or archive it.
       </p>
       {unusedExpenses.length > 0 && (
         <button
@@ -105,6 +105,7 @@ export function ExpenseLedger({
                   aria-label="Expense name"
                   value={expense.name}
                   maxLength={100}
+                  restoreOnEmpty
                   onValue={(name) => updateExpense(expense.id, { name })}
                 />
                 <label className={styles.moneyInput}>
@@ -132,7 +133,7 @@ export function ExpenseLedger({
                   data-active={detailsOpen}
                   onClick={() => toggleDetails(expense.id)}
                 >
-                  <ChevronDown size={18} />
+                  <ChevronDown />
                 </button>
               </div>
               {detailsOpen && (
@@ -147,6 +148,7 @@ export function ExpenseLedger({
                       aria-label={`${expense.name} group`}
                       value={expense.group}
                       maxLength={100}
+                      restoreOnEmpty
                       onValue={(group) => updateExpense(expense.id, { group })}
                     />
                   </label>
@@ -191,14 +193,14 @@ export function ExpenseLedger({
                         onClick={() => moveExpense(expense.id, -1)}
                         disabled={activeIndex === 0}
                       >
-                        <ArrowUp size={15} />
+                        <ArrowUp />
                       </button>
                       <button
                         aria-label={`Move ${expense.name} down`}
                         onClick={() => moveExpense(expense.id, 1)}
                         disabled={activeIndex === activeExpenses.length - 1}
                       >
-                        <ArrowDown size={15} />
+                        <ArrowDown />
                       </button>
                     </div>
                   </div>
@@ -214,7 +216,7 @@ export function ExpenseLedger({
                         })
                       }
                     >
-                      <Archive size={16} />
+                      <Archive />
                     </button>
                   </div>
                 </div>

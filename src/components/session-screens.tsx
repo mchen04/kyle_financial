@@ -1,9 +1,9 @@
 "use client";
 
-import { ChevronRight, RefreshCw } from "lucide-react";
+import { ChevronRight, House, RefreshCw } from "lucide-react";
 import { FormEvent, useRef, useState } from "react";
 import { planResponseSchema, type User } from "@/domain/api-contracts";
-import { PRODUCT_MARK, PRODUCT_NAME } from "@/domain/brand";
+import { PRODUCT_NAME } from "@/domain/brand";
 import { STATE_OPTIONS } from "@/domain/tax/jurisdictions";
 import {
   centsFromInput,
@@ -23,7 +23,9 @@ export function LoadingView() {
       aria-label="Loading your plan"
     >
       <div className={styles.loadingBrand}>
-        <div className={styles.brandMark}>{PRODUCT_MARK}</div>
+        <div className={styles.brandMark}>
+          <House aria-hidden="true" />
+        </div>
         <h1>{PRODUCT_NAME}</h1>
       </div>
       <div className={styles.loadingLine} />
@@ -86,7 +88,9 @@ export function AuthView({
         aria-label={mode === "signup" ? "Create account" : "Sign in"}
       >
         <h1 id="welcome-title" className={styles.wordmark}>
-          <span className={styles.brandMark}>{PRODUCT_MARK}</span>
+          <span className={styles.brandMark}>
+            <House aria-hidden="true" />
+          </span>
           {PRODUCT_NAME}
         </h1>
         <h2>{mode === "signup" ? "Create account" : "Sign in"}</h2>
@@ -130,11 +134,7 @@ export function AuthView({
               : mode === "signup"
                 ? "Create account"
                 : "Sign in"}
-            {busy ? (
-              <RefreshCw size={17} className={styles.spin} />
-            ) : (
-              <ChevronRight size={18} />
-            )}
+            {busy ? <RefreshCw className={styles.spin} /> : <ChevronRight />}
           </button>
         </form>
         <button
@@ -289,11 +289,7 @@ export function Onboarding({
           )}
           <button className={styles.primaryButton} disabled={busy}>
             {busy ? "Creating plan…" : "Create plan"}{" "}
-            {busy ? (
-              <RefreshCw size={17} className={styles.spin} />
-            ) : (
-              <ChevronRight size={18} />
-            )}
+            {busy ? <RefreshCw className={styles.spin} /> : <ChevronRight />}
           </button>
         </form>
       </section>
@@ -304,7 +300,9 @@ export function Onboarding({
 function Wordmark() {
   return (
     <div className={styles.wordmark}>
-      <span className={styles.brandMark}>{PRODUCT_MARK}</span>
+      <span className={styles.brandMark}>
+        <House aria-hidden="true" />
+      </span>
       {PRODUCT_NAME}
     </div>
   );

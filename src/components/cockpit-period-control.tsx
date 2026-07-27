@@ -77,13 +77,28 @@ export function savingsSources(result: PlanResult): AnnualSavingsSources {
   };
 }
 
+/**
+ * The plan years the reader can switch between, and the switch itself. The
+ * cockpit surfaces own this control (H3): the year picker used to live in the
+ * top bar, two containers away from the month picker, which is why one reader
+ * read the two halves of "which month of which year" as unrelated settings.
+ * Screens with no reporting period still take it from the top bar — see
+ * `periodScreens` in `plan-workspace.tsx`.
+ */
+export interface PlanYearChoice {
+  years: number[];
+  onYear: (year: number) => void;
+}
+
 export function PeriodControl({
   period,
   today,
+  planYear,
   onPeriod,
 }: {
   period: SelectedPeriod;
   today: string;
+  planYear: PlanYearChoice;
   onPeriod: (period: SelectedPeriod) => void;
 }) {
   const futureYear = period.year > Number(today.slice(0, 4));
@@ -137,49 +152,63 @@ export function PeriodControl({
           Year
         </button>
       </div>
-      {period.kind === "month" && (
-        <div className={styles.monthStepper}>
-          <button
-            aria-label="Previous month"
-            disabled={period.month === 1}
-            onClick={() => changeMonth(-1)}
-          >
-            <ChevronLeft />
-          </button>
-          <select
-            aria-label="Month"
-            value={period.month}
-            onChange={(event) =>
-              onPeriod({
-                kind: "month",
-                year: period.year,
-                month: Number(event.target.value),
-              })
-            }
-          >
-            {MONTH_NAMES.map((month, index) => (
-              // Abbreviated, and without the year, so the picker, the period
-              // tabs, and both stepper arrows share one 44px row at 360px wide
-              // without clipping. The year is the same on all twelve options —
-              // this control only ever steps within `period.year` — so printing
-              // it twelve times bought nothing and cost the 35px that left the
-              // native arrow overlapping the label at 360px (D2). The year
-              // itself is unchanged and still on screen, in the top bar's year
-              // picker, which is visible on every surface.
-              <option key={month} value={index + 1}>
-                {month.slice(0, 3)}
-              </option>
-            ))}
-          </select>
-          <button
-            aria-label="Next month"
-            disabled={period.month === 12}
-            onClick={() => changeMonth(1)}
-          >
-            <ChevronRight />
-          </button>
-        </div>
-      )}
+      {/* H2/H3: one row, and nothing on it but the two halves of "which month
+          of which year". The period-kind tabs above have the row before it. */}
+      <div className={styles.periodRange}>
+        {period.kind === "month" && (
+          <div className={styles.monthStepper}>
+            <button
+              aria-label="Previous month"
+              disabled={period.month === 1}
+              onClick={() => changeMonth(-1)}
+            >
+              <ChevronLeft />
+            </button>
+            <select
+              aria-label="Month"
+              value={period.month}
+              onChange={(event) =>
+                onPeriod({
+                  kind: "month",
+                  year: period.year,
+                  month: Number(event.target.value),
+                })
+              }
+            >
+              {MONTH_NAMES.map((month, index) => (
+                // Abbreviated, and without the year, so the picker and both
+                // stepper arrows fit their row at 360px wide without clipping.
+                // The year is the same on all twelve options — this control
+                // only ever steps within `period.year` — so printing it twelve
+                // times bought nothing and cost the 35px that left the native
+                // arrow overlapping the label at 360px (D2). The year is chosen
+                // by the chip immediately to the right of this stepper, on the
+                // same row, so it is never off screen while a month is picked.
+                <option key={month} value={index + 1}>
+                  {month.slice(0, 3)}
+                </option>
+              ))}
+            </select>
+            <button
+              aria-label="Next month"
+              disabled={period.month === 12}
+              onClick={() => changeMonth(1)}
+            >
+              <ChevronRight />
+            </button>
+          </div>
+        )}
+        <select
+          className={styles.yearSelect}
+          aria-label="Plan year"
+          value={period.year}
+          onChange={(event) => planYear.onYear(Number(event.target.value))}
+        >
+          {planYear.years.map((year) => (
+            <option key={year}>{year}</option>
+          ))}
+        </select>
+      </div>
     </div>
   );
 }

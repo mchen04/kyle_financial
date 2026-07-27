@@ -327,8 +327,15 @@
   cursor: pointer;
 }
 
+/* Sized here rather than by a `size={18}` prop in the TSX, which is a raw
+   length the token audit cannot see. An icon-only tap target takes `--icon-md`
+   in this codebase (`.monthStepper svg`, `.backHeader svg`, `.reorderButtons
+   svg`); `--icon-sm` is the trailing-chevron-beside-text size. This is the
+   former, so 18px becomes the 20px step. */
 .detailsToggle svg {
-  transition: transform 0.15s ease;
+  width: var(--icon-md);
+  height: var(--icon-md);
+  transition: transform var(--motion-standard) ease;
 }
 
 .detailsToggle:hover {
@@ -415,6 +422,33 @@
   font-size: var(--text-sm);
 }
 
+/* The chevron quoted inside the sentence, so the reader can see the glyph the
+   sentence is naming. `--icon-sm` is the smallest step on the scale and the
+   one used for chevrons that sit beside words. It is 3px larger than the 13px
+   the prop used to hardcode; the line's height is set by the --text-sm line
+   box, which is taller than 16px, so nothing below it moves. */
+.ledgerHint svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+/* T3. A glyph beside the words "Add expense", so the beside-text step, not the
+   icon-only one. Replaces `size={17}`. The narrow-width rule below only ever
+   set colour and flex on this same glyph, so it still composes with this. */
+.addButton svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  flex: 0 0 auto;
+}
+
+/* T3. Same role in the assumptions disclosure: the glyph annotates "Income and
+   taxes", it is not the control. Replaces `size={17}`. */
+.assumptionsCard summary span svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  flex: 0 0 auto;
+}
+
 .reorderButtons {
   display: flex;
   gap: var(--space-2);
@@ -435,6 +469,14 @@
 
 .reorderButtons button:disabled {
   opacity: 0.35;
+}
+
+/* T3. Icon-only 44px tap targets: the glyph is the whole control, so it takes
+   the icon-only step. Replaces `size={15}` — a value that is not on the scale
+   at all — on the two order arrows. */
+.reorderButtons button svg {
+  width: var(--icon-md);
+  height: var(--icon-md);
 }
 
 .assumptionsCard {

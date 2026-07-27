@@ -30,6 +30,7 @@
     "db:migrate": "tsx scripts/migrate.ts",
     "db:seed:density": "tsx scripts/seed-density-fixture.ts",
     "ui:density:measure": "node scripts/measure-density.mjs",
+    "ui:alignment:measure": "node scripts/measure-alignment.mjs",
     "preverify": "pnpm generated-assets:build",
     "verify": "pnpm format:check && pnpm ui:tokens:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
