@@ -1,5 +1,9 @@
 # Daily money cockpit baseline
 
+Status: historical pre-change baseline
+
+Repository-reference audit: 2026-07-28
+
 Recorded 2026-07-23 against `3eca2c9` on `main`, before KF01–KF15
 implementation.
 

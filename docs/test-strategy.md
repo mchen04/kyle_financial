@@ -1,5 +1,7 @@
 # Verification strategy
 
+Last reviewed: 2026-07-28
+
 ## Automated layers
 
 - Domain unit/golden tests assert tax intermediates, explicit zero and threshold boundaries, exact-cent accounting, and display reconciliation.
@@ -14,8 +16,16 @@ Tests never use the Neon connection. The test command requires a local URL whose
 
 ## Browser gate
 
-Production browser passes cover 390x844, 430x932, 320x568, 844x390, 768x1024, and 1440x900, plus 200% text zoom. Required flows, activation budgets, keyboard order, accessibility scans, console/network checks, installability, offline cold relaunch, reconnect, and cache clearing run twice clean. Evidence lives in `docs/evidence/browser-ux.md`.
+Production browser passes cover 390x844, 430x932, 320x568, 844x390, 768x1024, and 1440x900, plus 200% text zoom. Required flows, activation budgets, keyboard order, accessibility scans, console/network checks, installability, offline cold relaunch, reconnect, and cache clearing run twice clean. Historical conclusions live in `docs/evidence/browser-ux.md`.
 
 ## Performance and visual gates
 
 Lighthouse runs against a production build with a realistic plan. Thresholds are Performance 90, Accessibility 95, Best Practices 95, LCP 2.5 seconds, and CLS 0.10. The UI quality loop judges captured surfaces at phone, small phone, and desktop until average 8.5+, every dimension 8+, and no blockers. Structural quality then converges for two independent clean passes.
+
+## Evidence retention
+
+Tests and scripts are the executable source of truth. Maintained evidence
+documents record methods, important outcomes, explicit misses, and residual
+risk. Raw screenshots, capture JSON, generated measurement tables, judge
+transcripts, and loop ledgers are temporary run output and are not committed.
+See `docs/evidence/README.md`.

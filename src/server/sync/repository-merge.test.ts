@@ -393,9 +393,9 @@ describe("offline mutation reconciliation", () => {
     [
       "a transaction created after its category was deleted",
       (
-        categoryId: string,
-        benefitId: string,
-        transactionId: string,
+        _categoryId: string,
+        _benefitId: string,
+        _transactionId: string,
         emptyCategoryId: string,
       ) => [
         {
@@ -424,12 +424,7 @@ describe("offline mutation reconciliation", () => {
     ],
     [
       "a transaction repointed at a category of no plan",
-      (
-        categoryId: string,
-        benefitId: string,
-        transactionId: string,
-        emptyCategoryId: string,
-      ) => [
+      (_categoryId: string, _benefitId: string, transactionId: string) => [
         {
           mutationId: "00000000-0000-4000-8000-000000001203",
           planYear: 2026,
@@ -441,12 +436,7 @@ describe("offline mutation reconciliation", () => {
     ],
     [
       "a tax treatment set on a benefit that is not custom",
-      (
-        categoryId: string,
-        benefitId: string,
-        transactionId: string,
-        emptyCategoryId: string,
-      ) => [
+      (_categoryId: string, benefitId: string) => [
         {
           mutationId: "00000000-0000-4000-8000-000000001204",
           planYear: 2026,
@@ -465,12 +455,7 @@ describe("offline mutation reconciliation", () => {
     ],
     [
       "a timestamp outside the storable range",
-      (
-        categoryId: string,
-        benefitId: string,
-        transactionId: string,
-        emptyCategoryId: string,
-      ) => [
+      (_categoryId: string, _benefitId: string, transactionId: string) => [
         {
           mutationId: "00000000-0000-4000-8000-000000001205",
           planYear: 2026,

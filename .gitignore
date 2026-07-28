@@ -40,12 +40,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-docs/evidence/mobile-density-latest.json
-
-# Browser evidence PNGs. Judge and capture runs write tens of megabytes of
-# screenshots per cycle; they are referenced by path from docs/evidence/*.md and
-# retained on disk, not committed. The measured JSON alongside them is.
+# Browser and judge output is reproducible run state. Keep maintained
+# conclusions in Markdown, and keep raw captures out of Git.
 docs/evidence/**/*.png
+docs/evidence/**/*.json
+docs/evidence/**/measurements*.md
+docs/evidence/**/scores.md
+docs/evidence/final-round*.md
+docs/evidence/l[0-9]*/
+docs/evidence/l[0-9]*-*.md
 
 # Agent convergence ledgers are disposable run state, not project documentation.
 /*-loop.log.md

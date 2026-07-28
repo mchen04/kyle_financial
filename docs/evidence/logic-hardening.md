@@ -1,5 +1,9 @@
 # Logic hardening evidence
 
+Status: curated historical convergence record
+
+Repository-reference audit: 2026-07-28
+
 Run date: 2026-07-12  
 Deterministic seed: `20260712`  
 Convergence target: 2 consecutive clean cycles

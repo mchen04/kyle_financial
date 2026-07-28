@@ -1,5 +1,9 @@
 # Daily cockpit performance evidence
 
+Status: curated historical result; rerun the executable gates for current data
+
+Repository-reference audit: 2026-07-28
+
 Measured 2026-07-24 against the final production code candidate at `46c78ef`,
 on the local Mac/PostgreSQL environment. These are executable local budgets,
 not perceptual claims. The final check passed twice consecutively without a

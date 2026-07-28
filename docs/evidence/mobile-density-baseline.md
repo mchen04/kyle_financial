@@ -1,10 +1,12 @@
 # Mobile density baseline (BEFORE)
 
+Status: curated historical pre-change baseline
+
+Repository-reference audit: 2026-07-28
+
 Every number in this document was measured by `pnpm ui:density:measure` against
-the production build. Nothing here is an estimate, and no cell is an adjective.
-The machine-readable source of truth is
-[`mobile-density-baseline.json`](./mobile-density-baseline.json); this page is
-rendered from it.
+the production build. The original raw capture was disposable run output and is
+not tracked; rerun the executable gate for current machine-readable results.
 
 ## How it was measured
 

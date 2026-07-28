@@ -1,5 +1,7 @@
 # Offline cache and reconciliation
 
+Last reviewed: 2026-07-28
+
 The PostgreSQL server is the source of truth. IndexedDB is an account-scoped working cache so the installed PWA can open and edit without a network.
 
 ## Storage layout

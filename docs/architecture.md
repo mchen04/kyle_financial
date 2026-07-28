@@ -1,6 +1,6 @@
 # Architecture decision
 
-Last reviewed: 2026-07-13
+Last reviewed: 2026-07-28
 
 ## Decision
 
@@ -103,3 +103,16 @@ Tax tables are JSON data keyed by year. Federal filing-status schedules and all 
 ## Deployment shape
 
 The production target is a Node-capable Next.js host with a server-only `DATABASE_URL`. Neon is the production database. Static public assets and the service worker are served by the same origin. No background worker, email service, bank integration, or paid dependency is required.
+
+## Generated and historical files
+
+Two generated files are required at build/deploy time and therefore remain
+tracked: `src/domain/tax/table-registry.generated.ts`, which makes discovered
+tax-table pairs compiler-visible, and `public/sw-runtime.js`, which is emitted
+from the typed service-worker source. The lockfile is also tracked dependency
+state. `.gitattributes` marks all three as generated so GitHub collapses them
+and excludes them from language statistics.
+
+Raw browser captures and convergence ledgers are not architecture. The
+executable gates live in `scripts/` and tests; `docs/evidence/` retains only
+maintained conclusions and limitations.

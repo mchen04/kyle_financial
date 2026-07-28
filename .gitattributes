@@ -1,0 +1,5 @@
+# Required generated files remain tracked, but GitHub should collapse them in
+# diffs and exclude them from language statistics.
+pnpm-lock.yaml linguist-generated=true
+public/sw-runtime.js linguist-generated=true
+src/domain/tax/table-registry.generated.ts linguist-generated=true

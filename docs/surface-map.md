@@ -1,5 +1,7 @@
 # Product surface map
 
+Last reviewed: 2026-07-28
+
 House by 30’s job is to **plan the year, then make today’s spending
 consequence obvious**. The annual plan supplies income, tax, benefit, saving,
 and category allocations; the daily cockpit compares dated actuals with that

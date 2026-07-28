@@ -1,5 +1,9 @@
 # UI quality convergence evidence
 
+Status: curated historical record
+
+Repository-reference audit: 2026-07-28
+
 Date: 2026-07-12
 
 Target: production `next start` against Neon PostgreSQL
