@@ -46,3 +46,6 @@ docs/evidence/mobile-density-latest.json
 # screenshots per cycle; they are referenced by path from docs/evidence/*.md and
 # retained on disk, not committed. The measured JSON alongside them is.
 docs/evidence/**/*.png
+
+# Agent convergence ledgers are disposable run state, not project documentation.
+/*-loop.log.md
