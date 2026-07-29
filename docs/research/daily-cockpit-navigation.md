@@ -1,6 +1,7 @@
 # Daily cockpit navigation and editing patterns
 
 Reviewed 2026-07-23 from current official or first-party product sources.
+Repository-reference audit: 2026-07-28.
 Patterns are evidence, not templates.
 
 | Question                      | Evidence                                                                                                                                                                                             | Adopt                                                                                                                           | Reject                                                                                                                         |

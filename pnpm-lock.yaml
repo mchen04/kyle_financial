@@ -42,9 +42,6 @@ importers:
       "@types/node":
         specifier: ^20
         version: 20.19.43
-      "@types/pg":
-        specifier: ^8.20.0
-        version: 8.20.0
       "@types/react":
         specifier: ^19
         version: 19.2.17
@@ -60,9 +57,6 @@ importers:
       eslint-config-next:
         specifier: 16.2.11
         version: 16.2.11(@typescript-eslint/parser@8.63.0(eslint@9.39.5)(typescript@5.9.3))(eslint@9.39.5)(typescript@5.9.3)
-      eslint-config-prettier:
-        specifier: ^10.1.8
-        version: 10.1.8(eslint@9.39.5)
       fake-indexeddb:
         specifier: ^6.2.5
         version: 6.2.5
@@ -1724,12 +1718,6 @@ packages:
         integrity: sha512-6oYBAi5ikg4Pl+kGsoYtawUMBT2zZMCvPNF7pVLnHZfd1zf38DRiWn/gT01RYCdUqkv7Fhr+C9ot4/tb+2sVvA==,
       }
 
-  "@types/pg@8.20.0":
-    resolution:
-      {
-        integrity: sha512-bEPFOaMAHTEP1EzpvHTbmwR8UsFyHSKsRisLIHVMXnpNefSbGA1bD6CVy+qKjGSqmZqNqBDV2azOBo8TgkcVow==,
-      }
-
   "@types/react-dom@19.2.3":
     resolution:
       {
@@ -2629,15 +2617,6 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
-
-  eslint-config-prettier@10.1.8:
-    resolution:
-      {
-        integrity: sha512-82GZUjRS0p/jganf6q1rEO25VSoHH0hKPCTrgillPjdI/3bgBhAE1QzHrHTizjpRvy6pGAvKjDJtk2pF9NDq8w==,
-      }
-    hasBin: true
-    peerDependencies:
-      eslint: ">=7.0.0"
 
   eslint-import-resolver-node@0.3.10:
     resolution:
@@ -3857,26 +3836,6 @@ packages:
         integrity: sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w==,
       }
 
-  pg-int8@1.0.1:
-    resolution:
-      {
-        integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==,
-      }
-    engines: { node: ">=4.0.0" }
-
-  pg-protocol@1.15.0:
-    resolution:
-      {
-        integrity: sha512-cq9sECI5s0+uPUXjbz8ioyPJni6RzsRib0US67i5IoTZKw8fNeYlVE7u8F4dG7vEJJtc5wdD1K189lCCUwqWTQ==,
-      }
-
-  pg-types@2.2.0:
-    resolution:
-      {
-        integrity: sha512-qTAAlrEsl8s4OiEQY69wDvcMIdQN6wdz5ojQiOy6YRMuynxenON0O5oCpJI6lshc6scgAY8qvJ2On/p+CXY0GA==,
-      }
-    engines: { node: ">=4" }
-
   picocolors@1.1.1:
     resolution:
       {
@@ -4170,34 +4129,6 @@ packages:
         integrity: sha512-Mz8SaolMd8nB+G13WkORcxQKHZ/NE4xXevtkJHVuG+guo9/wYKlIMTKAqGdEmYOXR2ijPjTYNHssizdaVSUNdQ==,
       }
     engines: { node: ^10 || ^12 || >=14 }
-
-  postgres-array@2.0.0:
-    resolution:
-      {
-        integrity: sha512-VpZrUqU5A69eQyW2c5CA1jtLecCsN2U/bD6VilrFDWq5+5UIEVO7nazS3TEcHf1zuPYO/sqGvUvW62g86RXZuA==,
-      }
-    engines: { node: ">=4" }
-
-  postgres-bytea@1.0.1:
-    resolution:
-      {
-        integrity: sha512-5+5HqXnsZPE65IJZSMkZtURARZelel2oXUEO8rH83VS/hxH5vv1uHquPg5wZs8yMAfdv971IU+kcPUczi7NVBQ==,
-      }
-    engines: { node: ">=0.10.0" }
-
-  postgres-date@1.0.7:
-    resolution:
-      {
-        integrity: sha512-suDmjLVQg78nMK2UZ454hAG+OAW+HQPZ6n++TNDUX+L0+uUlLywnoxJKDou51Zm+zTCjrCl0Nq6J9C5hP9vK/Q==,
-      }
-    engines: { node: ">=0.10.0" }
-
-  postgres-interval@1.2.0:
-    resolution:
-      {
-        integrity: sha512-9ZhXKM/rw350N1ovuWHbGxnGh/SNJ4cnxHiM0rxE4VN41wsg8P8zWn9hv/buK00RP4WvlOyr/RBDiptyxVbkZQ==,
-      }
-    engines: { node: ">=0.10.0" }
 
   postgres@3.4.9:
     resolution:
@@ -4976,13 +4907,6 @@ packages:
       {
         integrity: sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==,
       }
-
-  xtend@4.0.2:
-    resolution:
-      {
-        integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==,
-      }
-    engines: { node: ">=0.4" }
 
   yallist@3.1.1:
     resolution:
@@ -5922,12 +5846,6 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
-  "@types/pg@8.20.0":
-    dependencies:
-      "@types/node": 20.19.43
-      pg-protocol: 1.15.0
-      pg-types: 2.2.0
-
   "@types/react-dom@19.2.3(@types/react@19.2.17)":
     dependencies:
       "@types/react": 19.2.17
@@ -6583,10 +6501,6 @@ snapshots:
       - eslint-import-resolver-webpack
       - eslint-plugin-import-x
       - supports-color
-
-  eslint-config-prettier@10.1.8(eslint@9.39.5):
-    dependencies:
-      eslint: 9.39.5
 
   eslint-import-resolver-node@0.3.10:
     dependencies:
@@ -7386,18 +7300,6 @@ snapshots:
 
   pathe@2.0.3: {}
 
-  pg-int8@1.0.1: {}
-
-  pg-protocol@1.15.0: {}
-
-  pg-types@2.2.0:
-    dependencies:
-      pg-int8: 1.0.1
-      postgres-array: 2.0.0
-      postgres-bytea: 1.0.1
-      postgres-date: 1.0.7
-      postgres-interval: 1.2.0
-
   picocolors@1.1.1: {}
 
   picomatch@2.3.2: {}
@@ -7648,16 +7550,6 @@ snapshots:
       nanoid: 3.3.16
       picocolors: 1.1.1
       source-map-js: 1.2.1
-
-  postgres-array@2.0.0: {}
-
-  postgres-bytea@1.0.1: {}
-
-  postgres-date@1.0.7: {}
-
-  postgres-interval@1.2.0:
-    dependencies:
-      xtend: 4.0.2
 
   postgres@3.4.9: {}
 
@@ -8215,8 +8107,6 @@ snapshots:
   xml-name-validator@5.0.0: {}
 
   xmlchars@2.2.0: {}
-
-  xtend@4.0.2: {}
 
   yallist@3.1.1: {}
 

@@ -1,6 +1,9 @@
 # Research sources and traceability
 
-Research/access date: 2026-07-12. Tax amounts are annual unless stated otherwise. Source IDs appear directly in the versioned table data so every bracket, deduction, FICA parameter, and benefit limit can be traced without relying on this prose alone.
+Research/access date: 2026-07-12. Repository-reference audit: 2026-07-28. Tax
+amounts are annual unless stated otherwise. Source IDs appear directly in the
+versioned table data so every bracket, deduction, FICA parameter, and benefit
+limit can be traced without relying on this prose alone.
 
 ## Tax and payroll sources
 

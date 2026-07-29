@@ -34,7 +34,7 @@ The gate runs formatting, token-authority checks, lint, TypeScript, deterministi
 1. Copy the prior year's `src/domain/tax/tables/<year>.federal.json` and `<year>.states.json` to the new year and replace every value, citation ID, and `sources` label/URL from the current IRS, SSA, and Tax Foundation sources.
 2. Keep each JSON file's top-level `year` equal to its filename. No TypeScript registry edit is needed: `pnpm verify` discovers complete filename pairs, validates all 50 states plus DC and every citation destination, and regenerates the compiler-checked registry.
 3. Update `docs/research/sources.md` and `docs/research/tax-validation.md`, including the five external gross-to-net comparisons.
-4. Run `pnpm tax:longevity-drill` and `pnpm verify`, review the diff, commit the two data files plus evidence, and redeploy.
+4. Run `pnpm tax:longevity-drill` and `pnpm verify`, review the diff, commit the two data files plus maintained source/validation documentation, and redeploy. Raw command or browser output is not committed.
 
 If a requested year is absent, the app selects the latest prior table and visibly labels the applied tax year. The drill creates a temporary next-year pair, proves exact selection plus later-year fallback, and removes it again.
 
@@ -72,3 +72,52 @@ delete data migrations.
 The service worker caches only the public app shell and build assets; `/api/**` and private plan JSON are never stored in Cache Storage. See [architecture](docs/architecture.md), [offline and sync behavior](docs/offline-and-sync.md), and [research sources](docs/research/sources.md).
 
 Signed-in users can export every plan year, category, and transaction as one server-backed JSON file from Account. A second account-scoped device export remains available offline for the data currently cached on that device. Ordinary logout revokes the session and clears the local private cache without deleting server plans.
+
+## Repository anatomy
+
+The repository is intentionally source-heavy, but it is not a 160k-line
+application. A July 2026 audit found that 103k tracked lines were raw UI capture
+JSON and another roughly 3k were generated tables and a per-wave convergence
+diary. Those run artifacts have been removed, leaving about 65k tracked text
+lines including the 8k-line lockfile.
+
+- `src/` contains the application, domain, offline, server, and co-located test
+  code (about 46k tracked lines at the audit).
+- `scripts/` contains migration, tax-table, service-worker, and UI-verifier
+  tooling (about 6.6k lines).
+- `migrations/` is the required ordered PostgreSQL history.
+- `docs/` contains maintained architecture, operations, research, and curated
+  quality conclusions. It is not a storage location for raw test runs.
+- `public/sw-runtime.js` and
+  `src/domain/tax/table-registry.generated.ts` are reproducible but required
+  deployment/compiler inputs. They stay tracked and are marked generated for
+  GitHub.
+- `pnpm-lock.yaml` is generated dependency state and stays tracked for
+  reproducible installs.
+
+Three authored files remain above 1,000 lines:
+`scripts/measure-density.mjs`, `scripts/measure-alignment.mjs`, and
+`src/server/sync/repository-merge.test.ts`. They are executable verifier/test
+infrastructure rather than production bundle output. Their size is
+maintainability debt and a candidate for later decomposition, not a reason to
+delete or label them generated.
+
+Build output (`.next/`, `out/`, TypeScript build metadata), local environment
+files, screenshots, capture JSON, measurement tables, and loop ledgers are
+ignored. The five unused Next.js starter SVGs and an unreferenced 1024px icon
+were removed in the same audit.
+
+## Documentation
+
+- [`docs/architecture.md`](docs/architecture.md) — system boundaries, data and
+  conflict model, tax-table lifecycle, and deployment shape.
+- [`docs/offline-and-sync.md`](docs/offline-and-sync.md) — browser cache,
+  outbox, reconciliation, closure fencing, and worker updates.
+- [`docs/surface-map.md`](docs/surface-map.md) — product surfaces, hierarchy,
+  and responsive navigation.
+- [`docs/test-strategy.md`](docs/test-strategy.md) — executable verification
+  layers and evidence policy.
+- [`docs/research/`](docs/research/) — dated tax, navigation, and mobile-density
+  source research.
+- [`docs/evidence/`](docs/evidence/) — curated historical QA conclusions; see
+  its README for what is intentionally not tracked.

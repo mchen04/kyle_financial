@@ -1,5 +1,9 @@
 # Browser UX evidence
 
+Status: curated historical record
+
+Repository-reference audit: 2026-07-28
+
 ## Wave 3 implementation smoke — not the final Wave 6 gate
 
 Date: 2026-07-12  

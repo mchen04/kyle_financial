@@ -1,6 +1,7 @@
 # Mobile density and layout research — 2026-07
 
 **Research date / access date for every source below: 2026-07-24.**
+**Repository-reference audit: 2026-07-28.**
 **Scope:** Kyle Financial ("House by 30") — a private budgeting PWA for exactly two
 users, targeted at iPhone Safari added to the Home Screen (`display: standalone`),
 390x844pt portrait. No customers, no funnel, no marketing surface.

@@ -47,13 +47,11 @@
   "devDependencies": {
     "@csstools/postcss-global-data": "4.0.0",
     "@types/node": "^20",
-    "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "color-name": "1.1.4",
     "eslint": "^9",
     "eslint-config-next": "16.2.11",
-    "eslint-config-prettier": "^10.1.8",
     "fake-indexeddb": "^6.2.5",
     "fast-check": "^4.9.0",
     "jsdom": "26.1.0",

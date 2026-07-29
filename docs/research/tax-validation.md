@@ -1,9 +1,10 @@
 # Gross-to-net validation
 
-Research date: 2026-07-12. All scenarios assume one wage job, no dependents,
-no credits, the standard deduction, no local/city tax, and no employee benefits
-or other pre-tax deductions. “Kyle net” is annual cash take-home from the 2026
-pure engine. The exact intermediate Kyle values are asserted in
+Research date: 2026-07-12. Repository-reference audit: 2026-07-28. All scenarios
+assume one wage job, no dependents, no credits, the standard deduction, no
+local/city tax, and no employee benefits or other pre-tax deductions. “Kyle
+net” is annual cash take-home from the 2026 pure engine. The exact intermediate
+Kyle values are asserted in
 `src/domain/tax/engine.test.ts`; randomized invariant coverage runs 1,000 cases
 per property.
 
